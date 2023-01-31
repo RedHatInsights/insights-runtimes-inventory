@@ -3,6 +3,7 @@ package com.redhat.runtimes.inventory.events;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
+import io.quarkus.logging.Log;
 import io.smallrye.reactive.messaging.annotations.Blocking;
 import org.eclipse.microprofile.reactive.messaging.Acknowledgment;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
@@ -25,6 +26,8 @@ public class EventConsumer {
   private static final String PROCESSING_EXCEPTION_COUNTER_NAME = "input.processing.exception";
   private static final String DUPLICATE_COUNTER_NAME = "input.duplicate";
   private static final String CONSUMED_TIMER_NAME = "input.consumed";
+
+  public static final String X_RH_IDENTITY_HEADER = "x-rh-identity";
 
   private static final String EVENT_TYPE_NOT_FOUND_MSG = "No event type found for [bundleName=%s, applicationName=%s, eventTypeName=%s]";
 
@@ -59,7 +62,11 @@ public class EventConsumer {
     Timer.Sample consumedTimer = Timer.start(registry);
     String payload = message.getPayload();
 
+    Log.infof("Processing received message []");
+
     // Parse JSON using Jackson
+
+    // Find org_id & hostname - use as a lookup key in DB
 
     // Extract UUID
 //    UUID messageId = kafkaMessageDeduplicator.findMessageId(

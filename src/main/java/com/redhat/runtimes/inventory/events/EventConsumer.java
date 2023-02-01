@@ -14,6 +14,13 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.control.ActivateRequestContext;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.UUID;
 import java.util.concurrent.CompletionStage;
 
@@ -40,10 +47,9 @@ public class EventConsumer {
   KafkaMessageDeduplicator kafkaMessageDeduplicator;
 
   @Inject
-  ArchiveAnnouncementParser jsonParser;
-
-  @Inject
   EntityManager entityManager;
+
+  private ArchiveAnnouncementParser jsonParser = new ArchiveAnnouncementParser();
 
   private Counter rejectedCounter;
   private Counter processingErrorCounter;
@@ -65,17 +71,41 @@ public class EventConsumer {
   public CompletionStage<Void> process(Message<String> message) {
     // This timer will have dynamic tag values based on the action parsed from the received message.
     Timer.Sample consumedTimer = Timer.start(registry);
-    String payload = message.getPayload();
+    var payload = message.getPayload();
 
     Log.info("Processing received message: "+ payload);
 
     // Parse JSON using Jackson
+    var announce = jsonParser.fromJsonString(payload);
+    Log.info("Processed message URL: "+ announce.getUrl());
+    Log.info("Processed Org ID: "+ announce.getOrgId());
 
-    // Find org_id & hostname - use as a lookup key in DB
+    // Get data back from S3
+    try {
+      var uri = new URL(announce.getUrl()).toURI();
+      var requestBuilder =
+        HttpRequest.newBuilder().uri(uri);
+      var request = requestBuilder.GET().build();
+      Log.info("Issuing a HTTP POST request to " + request);
 
-    // TODO Do we need this?
-    // Extract UUID
-//    UUID messageId = kafkaMessageDeduplicator.findMessageId(
+      var client = HttpClient.newBuilder().build();
+      var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+      Log.info(
+        "Red Hat Insights HTTP Client: status="
+          + response.statusCode()
+          + ", body="
+          + response.body());
+
+
+    } catch (URISyntaxException | IOException | InterruptedException e) {
+      Log.error("Error in HTTP send: ", e);
+      throw new RuntimeException(e);
+    }
+
+    // Find hostname - use as a lookup key in DB
+    
+
+    // TODO Do we need UUIDs?
 
     // Persist core data
     // entityManager.

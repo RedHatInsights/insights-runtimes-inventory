@@ -14,6 +14,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.control.ActivateRequestContext;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -23,6 +24,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.UUID;
 import java.util.concurrent.CompletionStage;
+import java.util.zip.GZIPInputStream;
 
 import static org.eclipse.microprofile.reactive.messaging.Acknowledgment.Strategy.PRE_PROCESSING;
 
@@ -72,8 +74,7 @@ public class EventConsumer {
     // This timer will have dynamic tag values based on the action parsed from the received message.
     Timer.Sample consumedTimer = Timer.start(registry);
     var payload = message.getPayload();
-
-    Log.info("Processing received message: "+ payload);
+    Log.info("Processing received Kafka message: "+ payload);
 
     // Parse JSON using Jackson
     var announce = jsonParser.fromJsonString(payload);
@@ -81,30 +82,11 @@ public class EventConsumer {
     Log.info("Processed Org ID: "+ announce.getOrgId());
 
     // Get data back from S3
-    try {
-      var uri = new URL(announce.getUrl()).toURI();
-      var requestBuilder =
-        HttpRequest.newBuilder().uri(uri);
-      var request = requestBuilder.GET().build();
-      Log.info("Issuing a HTTP POST request to " + request);
-
-      var client = HttpClient.newBuilder().build();
-      var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-      Log.info(
-        "Red Hat Insights HTTP Client: status="
-          + response.statusCode()
-          + ", body="
-          + response.body());
-
-
-    } catch (URISyntaxException | IOException | InterruptedException e) {
-      Log.error("Error in HTTP send: ", e);
-      throw new RuntimeException(e);
-    }
+    var archiveJson = getJsonFromS3(announce.getUrl());
+    Log.info("Retrieved from S3: "+ archiveJson);
 
     // Find hostname - use as a lookup key in DB
     
-
     // TODO Do we need UUIDs?
 
     // Persist core data
@@ -113,6 +95,36 @@ public class EventConsumer {
     // FIXME Might need tags
     consumedTimer.stop(registry.timer(CONSUMED_TIMER_NAME));
     return message.ack();
+  }
+
+  static String unzipJson(byte[] buffy) {
+    try (var bais = new ByteArrayInputStream(buffy);
+         var gunzip = new GZIPInputStream(bais)) {
+      return new String(gunzip.readAllBytes());
+    } catch (IOException e) {
+      Log.error("Error in Unzipping archive: ", e);
+      throw new RuntimeException(e);
+    }
+  }
+
+  static String getJsonFromS3(String urlStr) {
+    try {
+      var uri = new URL(urlStr).toURI();
+      var requestBuilder =
+        HttpRequest.newBuilder().uri(uri);
+      var request = requestBuilder.GET().build();
+      Log.info("Issuing a HTTP POST request to " + request);
+
+      var client = HttpClient.newBuilder().build();
+      var response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
+      Log.info(
+        "S3 HTTP Client: status="+ response.statusCode());
+
+      return unzipJson(response.body());
+    } catch (URISyntaxException | IOException | InterruptedException e) {
+      Log.error("Error in HTTP send: ", e);
+      throw new RuntimeException(e);
+    }
   }
 
 }

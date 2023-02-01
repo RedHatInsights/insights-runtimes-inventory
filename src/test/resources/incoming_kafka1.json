@@ -1,0 +1,17 @@
+{
+  "account": "12345",
+  "category": "analytics",
+  "content_type": "application/vnd.redhat.runtimes-java-general.analytics+tgz",
+  "metadata": {
+    "reporter": "",
+    "stale_timestamp": "0001-01-01T00:00:00Z"
+  },
+  "request_id": "ingress-service-7cd6ffb567-js5fn/1J6DOEu9ni-000029",
+  "principal": "12345",
+  "org_id": "12345",
+  "service": "runtimes-java-general",
+  "size": 1507,
+  "url": "http://env-ephemeral-tklsfv-minio.ephemeral-tklsfv.svc:9000/insights-upload-perma/ingress-service-7cd6ffb567-js5fn/1J6DOEu9ni-000029?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=jPyVrodwpcNG%2F20230201%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20230201T113343Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&X-Amz-Signature=b40f454a4854fe2e673f9a7fb5385949465efe73eb018fb33ecdc1024fb6c06f",
+  "b64_identity": "eyJpZGVudGl0eSI6eyJhY2NvdW50X251bWJlciI6IjEyMzQ1Iiwib3JnX2lkIjoiMTIzNDUiLCJpbnRlcm5hbCI6eyJvcmdfaWQiOiIxMjM0NSJ9LCJ1c2VyIjp7InVzZXJuYW1lIjoiamRvZSIsImVtYWlsIjoiamRvZUBleGFtcGxlLmNvbSIsImZpcnN0X25hbWUiOiJKb2huIiwibGFzdF9uYW1lIjoiRG9lIiwiaXNfYWN0aXZlIjp0cnVlLCJpc19vcmdfYWRtaW4iOnRydWUsImlzX2ludGVybmFsIjp0cnVlLCJsb2NhbGUiOiJlbl9VUyIsInVzZXJfaWQiOiIifSwic3lzdGVtIjp7fSwiYXNzb2NpYXRlIjp7IlJvbGUiOm51bGwsImVtYWlsIjoiIiwiZ2l2ZW5OYW1lIjoiIiwicmhhdFVVSUQiOiIiLCJzdXJuYW1lIjoiIn0sIng1MDkiOnsic3ViamVjdF9kbiI6IiIsImlzc3Vlcl9kbiI6IiJ9LCJ0eXBlIjoiVXNlciIsImF1dGhfdHlwZSI6ImJhc2ljLWF1dGgifSwiZW50aXRsZW1lbnRzIjp7ImFkdmlzb3IiOnsiaXNfdHJpYWwiOmZhbHNlLCJpc19lbnRpdGxlZCI6dHJ1ZX0sImFuc2libGUiOnsiaXNfdHJpYWwiOmZhbHNlLCJpc19lbnRpdGxlZCI6dHJ1ZX0sImF1dG9tYXRpb25fYW5hbHl0aWNzIjp7ImlzX3RyaWFsIjpmYWxzZSwiaXNfZW50aXRsZWQiOnRydWV9LCJjb3N0X21hbmFnZW1lbnQiOnsiaXNfdHJpYWwiOmZhbHNlLCJpc19lbnRpdGxlZCI6dHJ1ZX0sImluc2lnaHRzIjp7ImlzX3RyaWFsIjpmYWxzZSwiaXNfZW50aXRsZWQiOnRydWV9LCJpbnRlZ3JhdGlvbnMiOnsiaXNfdHJpYWwiOmZhbHNlLCJpc19lbnRpdGxlZCI6dHJ1ZX0sIm1pZ3JhdGlvbnMiOnsiaXNfdHJpYWwiOmZhbHNlLCJpc19lbnRpdGxlZCI6dHJ1ZX0sIm5vdGlmaWNhdGlvbnMiOnsiaXNfdHJpYWwiOmZhbHNlLCJpc19lbnRpdGxlZCI6dHJ1ZX0sIm9wZW5zaGlmdCI6eyJpc190cmlhbCI6ZmFsc2UsImlzX2VudGl0bGVkIjp0cnVlfSwic2V0dGluZ3MiOnsiaXNfdHJpYWwiOmZhbHNlLCJpc19lbnRpdGxlZCI6dHJ1ZX0sInNtYXJ0X21hbmFnZW1lbnQiOnsiaXNfdHJpYWwiOmZhbHNlLCJpc19lbnRpdGxlZCI6dHJ1ZX0sInN1YnNjcmlwdGlvbnMiOnsiaXNfdHJpYWwiOmZhbHNlLCJpc19lbnRpdGxlZCI6dHJ1ZX0sInVzZXJfcHJlZmVyZW5jZXMiOnsiaXNfdHJpYWwiOmZhbHNlLCJpc19lbnRpdGxlZCI6dHJ1ZX19fQ==",
+  "timestamp": "2023-02-01T11:33:43.058570305Z"
+}

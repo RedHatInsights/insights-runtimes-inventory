@@ -13,6 +13,7 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.control.ActivateRequestContext;
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
 import java.util.UUID;
 import java.util.concurrent.CompletionStage;
 
@@ -38,9 +39,8 @@ public class EventConsumer {
   @Inject
   KafkaMessageDeduplicator kafkaMessageDeduplicator;
 
-  // TODO Inject a standard EntityManger instead
   @Inject
-  StatelessSessionFactory statelessSessionFactory;
+  EntityManager entityManager;
 
   private Counter rejectedCounter;
   private Counter processingErrorCounter;
@@ -64,20 +64,21 @@ public class EventConsumer {
     Timer.Sample consumedTimer = Timer.start(registry);
     String payload = message.getPayload();
 
-    Log.infof("Processing received message []");
+    Log.info("Processing received message: "+ payload);
 
     // Parse JSON using Jackson
 
     // Find org_id & hostname - use as a lookup key in DB
 
+    // TODO Do we need this?
     // Extract UUID
 //    UUID messageId = kafkaMessageDeduplicator.findMessageId(
 
-    // Send session into session factory
-//    statelessSessionFactory.withSession(statelessSession -> {
+    // Persist core data
+    // entityManager.
 
-    // Finally
-    consumedTimer.stop(registry.timer(CONSUMED_TIMER_NAME)); // FIXME Might need tags
+    // FIXME Might need tags
+    consumedTimer.stop(registry.timer(CONSUMED_TIMER_NAME));
     return message.ack();
   }
 

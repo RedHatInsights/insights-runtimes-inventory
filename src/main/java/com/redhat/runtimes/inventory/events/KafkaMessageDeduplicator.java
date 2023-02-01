@@ -10,6 +10,7 @@ import org.eclipse.microprofile.reactive.messaging.Message;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import java.util.Iterator;
 import java.util.Optional;
@@ -27,8 +28,8 @@ public class KafkaMessageDeduplicator {
 
     private static final String ACCEPTED_UUID_VERSION = "4";
 
-    @Inject
-    StatelessSessionFactory statelessSessionFactory;
+  @Inject
+  EntityManager entityManager;
 
     @Inject
     MeterRegistry meterRegistry;
@@ -109,7 +110,7 @@ public class KafkaMessageDeduplicator {
         } else {
             String hql = "SELECT TRUE FROM KafkaMessage WHERE id = :messageId";
             try {
-                return statelessSessionFactory.getCurrentSession().createQuery(hql, Boolean.class)
+                return entityManager.createQuery(hql, Boolean.class)
                         .setParameter("messageId", messageId)
                         .getSingleResult();
             } catch (NoResultException e) {
@@ -118,11 +119,11 @@ public class KafkaMessageDeduplicator {
         }
     }
 
-    public void registerMessageId(UUID messageId) {
-        if (messageId != null) {
-            KafkaMessage kafkaMessage = new KafkaMessage(messageId);
-            kafkaMessage.prePersist(); // This method must be called manually while using a StatelessSession.
-            statelessSessionFactory.getCurrentSession().insert(kafkaMessage);
-        }
-    }
+//    public void registerMessageId(UUID messageId) {
+//        if (messageId != null) {
+//            KafkaMessage kafkaMessage = new KafkaMessage(messageId);
+//            kafkaMessage.prePersist(); // This method must be called manually while using a StatelessSession.
+//            entityManager.insert(kafkaMessage);
+//        }
+//    }
 }

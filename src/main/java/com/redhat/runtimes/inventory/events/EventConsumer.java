@@ -34,9 +34,11 @@ public class EventConsumer {
   @Inject
   MeterRegistry registry;
 
+  // TODO
   @Inject
   KafkaMessageDeduplicator kafkaMessageDeduplicator;
 
+  // TODO Inject a standard EntityManger instead
   @Inject
   StatelessSessionFactory statelessSessionFactory;
 

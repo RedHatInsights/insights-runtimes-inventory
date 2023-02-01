@@ -40,6 +40,9 @@ public class EventConsumer {
   KafkaMessageDeduplicator kafkaMessageDeduplicator;
 
   @Inject
+  ArchiveAnnouncementParser jsonParser;
+
+  @Inject
   EntityManager entityManager;
 
   private Counter rejectedCounter;

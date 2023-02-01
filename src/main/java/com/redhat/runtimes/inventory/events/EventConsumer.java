@@ -1,5 +1,9 @@
 package com.redhat.runtimes.inventory.events;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.redhat.runtimes.inventory.models.RuntimesInstance;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
@@ -16,13 +20,12 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.UUID;
+import java.util.Map;
 import java.util.concurrent.CompletionStage;
 import java.util.zip.GZIPInputStream;
 
@@ -78,23 +81,53 @@ public class EventConsumer {
 
     // Parse JSON using Jackson
     var announce = jsonParser.fromJsonString(payload);
-    Log.info("Processed message URL: "+ announce.getUrl());
-    Log.info("Processed Org ID: "+ announce.getOrgId());
+    Log.debug("Processed message URL: "+ announce.getUrl());
+//    Log.info("Processed Org ID: "+ announce.getOrgId());
 
     // Get data back from S3
     var archiveJson = getJsonFromS3(announce.getUrl());
     Log.info("Retrieved from S3: "+ archiveJson);
 
-    // Find hostname - use as a lookup key in DB
-    
-    // TODO Do we need UUIDs?
+    var inst = runtimesInstance(announce, archiveJson);
 
+    // TODO Do we need UUIDs?
     // Persist core data
-    // entityManager.
+    Log.info("About to persist: "+ inst);
+    entityManager.persist(inst);
 
     // FIXME Might need tags
     consumedTimer.stop(registry.timer(CONSUMED_TIMER_NAME));
     return message.ack();
+  }
+
+  static RuntimesInstance runtimesInstance(ArchiveAnnouncement announce, String json) {
+    // Find hostname - will use as a lookup key in DB
+    var inst = new RuntimesInstance();
+    inst.setAccountId(announce.getAccountId());
+    inst.setOrgId(announce.getOrgId());
+
+    TypeReference<Map<String,Object>> typeRef = new TypeReference<>() {};
+
+    var mapper = new ObjectMapper();
+    try {
+      var o = mapper.readValue(json, typeRef);
+      var basic = (Map<String, Object>)o.get("basic");
+      inst.setHostname(String.valueOf(basic.get("hostname")));
+      inst.setVendor(String.valueOf(basic.get("java.vm.specification.vendor")));
+      inst.setVersionString(String.valueOf(basic.get("java.runtime.version")));
+      inst.setVersion(String.valueOf(basic.get("java.version")));
+      inst.setMajorVersion(Integer.parseInt(String.valueOf(basic.get("java.vm.specification.version"))));
+      inst.setOsArch(String.valueOf(basic.get("os.arch")));
+
+      // FIXME Hardcoded for now
+      inst.setProcessors(12);
+      inst.setHeapMax(8192);
+    } catch (JsonProcessingException | ClassCastException | NumberFormatException e) {
+      Log.error("Error in unmarshalling JSON", e);
+      throw new RuntimeException("Error in unmarshalling JSON", e);
+    }
+
+    return inst;
   }
 
   static String unzipJson(byte[] buffy) {

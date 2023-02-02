@@ -77,28 +77,28 @@ public class EventConsumer {
     // This timer will have dynamic tag values based on the action parsed from the received message.
     Timer.Sample consumedTimer = Timer.start(registry);
     var payload = message.getPayload();
-    Log.info("Processing received Kafka message: "+ payload);
+    Log.infof("Processing received Kafka message %s", payload);
 
+    RuntimesInstance inst = null    ;
     try {
       // Parse JSON using Jackson
       var announce = jsonParser.fromJsonString(payload);
-      Log.debug("Processed message URL: " + announce.getUrl());
-//    Log.info("Processed Org ID: "+ announce.getOrgId());
+      Log.debugf("Processed message URL: %s", announce.getUrl());
 
       // Get data back from S3
       var archiveJson = getJsonFromS3(announce.getUrl());
-      Log.info("Retrieved from S3: " + archiveJson);
+      Log.infof("Retrieved from S3: %s", archiveJson);
 
-      var inst = runtimesInstance(announce, archiveJson);
+      inst = runtimesInstance(announce, archiveJson);
 
       // TODO Do we need UUIDs?
       // Persist core data
-      Log.info("About to persist: " + inst);
+      Log.infof("About to persist: %s", inst);
       entityManager.persist(inst);
 
     } catch (Throwable t) {
       processingExceptionCounter.increment();
-      Log.infof(t, "Could not process the payload: %s", payload);
+      Log.debugf(t, "Could not process the payload: %s", inst);
     } finally {
       // FIXME Might need tags
       consumedTimer.stop(registry.timer(CONSUMED_TIMER_NAME));
@@ -153,12 +153,11 @@ public class EventConsumer {
       var requestBuilder =
         HttpRequest.newBuilder().uri(uri);
       var request = requestBuilder.GET().build();
-      Log.info("Issuing a HTTP POST request to " + request);
+      Log.debugf("Issuing a HTTP POST request to %s", request);
 
       var client = HttpClient.newBuilder().build();
       var response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
-      Log.info(
-        "S3 HTTP Client: status="+ response.statusCode());
+      Log.debugf("S3 HTTP Client status: %s", response.statusCode());
 
       return unzipJson(response.body());
     } catch (URISyntaxException | IOException | InterruptedException e) {

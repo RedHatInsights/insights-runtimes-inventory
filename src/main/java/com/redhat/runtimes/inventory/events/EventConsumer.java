@@ -79,24 +79,31 @@ public class EventConsumer {
     var payload = message.getPayload();
     Log.info("Processing received Kafka message: "+ payload);
 
-    // Parse JSON using Jackson
-    var announce = jsonParser.fromJsonString(payload);
-    Log.debug("Processed message URL: "+ announce.getUrl());
+    try {
+      // Parse JSON using Jackson
+      var announce = jsonParser.fromJsonString(payload);
+      Log.debug("Processed message URL: " + announce.getUrl());
 //    Log.info("Processed Org ID: "+ announce.getOrgId());
 
-    // Get data back from S3
-    var archiveJson = getJsonFromS3(announce.getUrl());
-    Log.info("Retrieved from S3: "+ archiveJson);
+      // Get data back from S3
+      var archiveJson = getJsonFromS3(announce.getUrl());
+      Log.info("Retrieved from S3: " + archiveJson);
 
-    var inst = runtimesInstance(announce, archiveJson);
+      var inst = runtimesInstance(announce, archiveJson);
 
-    // TODO Do we need UUIDs?
-    // Persist core data
-    Log.info("About to persist: "+ inst);
-    entityManager.persist(inst);
+      // TODO Do we need UUIDs?
+      // Persist core data
+      Log.info("About to persist: " + inst);
+      entityManager.persist(inst);
 
-    // FIXME Might need tags
-    consumedTimer.stop(registry.timer(CONSUMED_TIMER_NAME));
+    } catch (Throwable t) {
+      processingExceptionCounter.increment();
+      Log.infof(t, "Could not process the payload: %s", payload);
+    } finally {
+      // FIXME Might need tags
+      consumedTimer.stop(registry.timer(CONSUMED_TIMER_NAME));
+    }
+
     return message.ack();
   }
 

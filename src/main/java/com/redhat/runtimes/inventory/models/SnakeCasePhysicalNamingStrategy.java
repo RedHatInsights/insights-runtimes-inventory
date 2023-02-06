@@ -1,10 +1,10 @@
+/* Copyright (C) Red Hat 2023 */
 package com.redhat.runtimes.inventory.models;
 
+import java.util.regex.Pattern;
 import org.hibernate.boot.model.naming.Identifier;
 import org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl;
 import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
-
-import java.util.regex.Pattern;
 
 /**
  * Inspired by Vlad Mihalcea's CamelCaseToSnakeCaseNamingStrategy.
@@ -12,25 +12,26 @@ import java.util.regex.Pattern;
  */
 public class SnakeCasePhysicalNamingStrategy extends PhysicalNamingStrategyStandardImpl {
 
-    private static final Pattern CAMEL_CASE_PATTERN = Pattern.compile("([a-z]+)([A-Z]+)");
-    private static final String SNAKE_CASE_REGEX = "$1\\_$2";
+  private static final Pattern CAMEL_CASE_PATTERN = Pattern.compile("([a-z]+)([A-Z]+)");
+  private static final String SNAKE_CASE_REGEX = "$1\\_$2";
 
-    @Override
-    public Identifier toPhysicalColumnName(Identifier name, JdbcEnvironment context) {
-        return enforceSnakeCase(super.toPhysicalColumnName(name, context));
-    }
+  @Override
+  public Identifier toPhysicalColumnName(Identifier name, JdbcEnvironment context) {
+    return enforceSnakeCase(super.toPhysicalColumnName(name, context));
+  }
 
-    private Identifier enforceSnakeCase(Identifier identifier) {
-        if (identifier == null) {
-            return null;
-        } else {
-            String initialName = identifier.getText();
-            String modifiedName = CAMEL_CASE_PATTERN.matcher(initialName).replaceAll(SNAKE_CASE_REGEX).toLowerCase();
-            if (modifiedName.equals(initialName)) {
-                return identifier;
-            } else {
-                return Identifier.toIdentifier(modifiedName, identifier.isQuoted());
-            }
-        }
+  private Identifier enforceSnakeCase(Identifier identifier) {
+    if (identifier == null) {
+      return null;
+    } else {
+      String initialName = identifier.getText();
+      String modifiedName =
+          CAMEL_CASE_PATTERN.matcher(initialName).replaceAll(SNAKE_CASE_REGEX).toLowerCase();
+      if (modifiedName.equals(initialName)) {
+        return identifier;
+      } else {
+        return Identifier.toIdentifier(modifiedName, identifier.isQuoted());
+      }
     }
+  }
 }

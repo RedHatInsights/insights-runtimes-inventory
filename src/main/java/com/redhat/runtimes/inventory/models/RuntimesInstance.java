@@ -9,8 +9,9 @@ import javax.validation.constraints.Size;
 import java.util.Objects;
 import java.util.UUID;
 
+// (name = "runtimes_instance")
 @Entity
-@Table(name = "runtimes_instance")
+@Table
 public class RuntimesInstance {
 
   @Id

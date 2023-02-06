@@ -48,7 +48,7 @@ public class EventConsumer {
   @Inject
   MeterRegistry registry;
 
-  // TODO
+  // TODO Remove?
   @Inject
   KafkaMessageDeduplicator kafkaMessageDeduplicator;
 
@@ -93,7 +93,6 @@ public class EventConsumer {
 
       inst = runtimesInstance(announce, archiveJson);
 
-      // TODO Do we need UUIDs?
       // Persist core data
       Log.infof("About to persist: %s", inst);
       entityManager.persist(inst);
@@ -110,7 +109,6 @@ public class EventConsumer {
   }
 
   static RuntimesInstance runtimesInstance(ArchiveAnnouncement announce, String json) {
-    // Find hostname - will use as a lookup key in DB
     var inst = new RuntimesInstance();
     inst.setAccountId(announce.getAccountId());
     inst.setOrgId(announce.getOrgId());

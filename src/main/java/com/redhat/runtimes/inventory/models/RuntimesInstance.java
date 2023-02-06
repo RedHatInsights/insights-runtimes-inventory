@@ -212,7 +212,7 @@ public class RuntimesInstance {
   @Override
   public String toString() {
     final StringBuffer sb = new StringBuffer("RuntimesInstance{");
-    sb.append("id='").append(id).append('\'');
+    sb.append("id=").append(id);
     sb.append(", accountId='").append(accountId).append('\'');
     sb.append(", orgId='").append(orgId).append('\'');
     sb.append(", hostname='").append(hostname).append('\'');

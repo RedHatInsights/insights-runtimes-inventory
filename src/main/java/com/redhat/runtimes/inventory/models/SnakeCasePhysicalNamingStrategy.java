@@ -11,7 +11,6 @@ import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
  * https://github.com/vladmihalcea/hibernate-types/blob/master/hibernate-types-52/src/main/java/com/vladmihalcea/hibernate/type/util/CamelCaseToSnakeCaseNamingStrategy.java
  */
 public class SnakeCasePhysicalNamingStrategy extends PhysicalNamingStrategyStandardImpl {
-
   private static final Pattern CAMEL_CASE_PATTERN = Pattern.compile("([a-z]+)([A-Z]+)");
   private static final String SNAKE_CASE_REGEX = "$1\\_$2";
 

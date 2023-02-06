@@ -109,9 +109,12 @@ public class EventConsumer {
 
   static RuntimesInstance runtimesInstance(ArchiveAnnouncement announce, String json) {
     var inst = new RuntimesInstance();
+    // Announce fields first
     inst.setAccountId(announce.getAccountId());
     inst.setOrgId(announce.getOrgId());
+    inst.setCreated(announce.getTimestamp().atZone(ZoneOffset.UTC));
 
+    // Mow the JSON fields
     TypeReference<Map<String, Object>> typeRef = new TypeReference<>() {};
 
     var mapper = new ObjectMapper();
@@ -129,7 +132,6 @@ public class EventConsumer {
       // FIXME Hardcoded for now
       inst.setProcessors(12);
       inst.setHeapMax(8192);
-      inst.setCreated(announce.getTimestamp().atZone(ZoneOffset.UTC));
     } catch (JsonProcessingException | ClassCastException | NumberFormatException e) {
       Log.error("Error in unmarshalling JSON", e);
       throw new RuntimeException("Error in unmarshalling JSON", e);

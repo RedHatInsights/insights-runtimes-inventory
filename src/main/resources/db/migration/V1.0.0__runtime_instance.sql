@@ -10,6 +10,6 @@ CREATE TABLE public.runtimes_instance(
     os_arch character varying(50) NOT NULL,
     processors integer NOT NULL,
     heap_max integer NOT NULL,
-    created timestamp with time zone NOT NULL,
+    created timestamp with time zone DEFAULT now() NOT NULL,
     details jsonb
 );

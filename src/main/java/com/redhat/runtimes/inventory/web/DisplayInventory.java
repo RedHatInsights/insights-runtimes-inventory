@@ -39,9 +39,9 @@ public class DisplayInventory {
     // Retrieve from DB
     var query = entityManager.createQuery("""
     select new com.redhat.runtimes.inventory.models.RuntimesInstance(
-      i.id, i.account_id, i.org_id, i.hostname, i.vendor, i.version_string,
-      i.version, i.major_version, i.os_arch, i.processors, i.heapMax
-    ) from runtimes_instance i
+      i.id, i.accountId, i.orgId, i.hostname, i.vendor, i.versionString,
+      i.version, i.majorVersion, i.osArch, i.processors, i.heapMax
+    ) from com.redhat.runtimes.inventory.models.RuntimesInstance i
     """, RuntimesInstance.class);
     var results = query.getResultList();
     Log.infof("Found %s rows when looking for %s", results.size(), hostname);

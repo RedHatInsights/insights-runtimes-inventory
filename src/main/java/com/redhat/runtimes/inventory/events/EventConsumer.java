@@ -19,6 +19,7 @@ import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.ZoneOffset;
 import java.util.Map;
 import java.util.concurrent.CompletionStage;
 import java.util.zip.GZIPInputStream;
@@ -108,9 +109,12 @@ public class EventConsumer {
 
   static RuntimesInstance runtimesInstance(ArchiveAnnouncement announce, String json) {
     var inst = new RuntimesInstance();
+    // Announce fields first
     inst.setAccountId(announce.getAccountId());
     inst.setOrgId(announce.getOrgId());
+    inst.setCreated(announce.getTimestamp().atZone(ZoneOffset.UTC));
 
+    // Mow the JSON fields
     TypeReference<Map<String, Object>> typeRef = new TypeReference<>() {};
 
     var mapper = new ObjectMapper();

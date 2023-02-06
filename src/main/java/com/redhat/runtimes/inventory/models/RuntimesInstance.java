@@ -1,6 +1,7 @@
 /* Copyright (C) Red Hat 2023 */
 package com.redhat.runtimes.inventory.models;
 
+import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.UUID;
 import javax.persistence.Entity;
@@ -56,6 +57,8 @@ public class RuntimesInstance {
   //  "Heap max (MB)" : 8192.0,
   @NotNull private int heapMax;
 
+  @NotNull private ZonedDateTime created;
+
   //////////////////////////////////////////////////////
 
   public RuntimesInstance() {}
@@ -71,7 +74,8 @@ public class RuntimesInstance {
       int majorVersion,
       String osArch,
       int processors,
-      int heapMax) {
+      int heapMax,
+      ZonedDateTime created) {
     this.id = id;
     this.accountId = accountId;
     this.orgId = orgId;
@@ -83,6 +87,7 @@ public class RuntimesInstance {
     this.osArch = osArch;
     this.processors = processors;
     this.heapMax = heapMax;
+    this.created = created;
   }
 
   //////////////////////////////////////////////////////
@@ -175,6 +180,14 @@ public class RuntimesInstance {
     this.heapMax = heapMax;
   }
 
+  public ZonedDateTime getCreated() {
+    return created;
+  }
+
+  public void setCreated(ZonedDateTime created) {
+    this.created = created;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -190,7 +203,8 @@ public class RuntimesInstance {
         && Objects.equals(vendor, that.vendor)
         && Objects.equals(versionString, that.versionString)
         && Objects.equals(version, that.version)
-        && Objects.equals(osArch, that.osArch);
+        && Objects.equals(osArch, that.osArch)
+        && Objects.equals(created, that.created);
   }
 
   @Override
@@ -206,7 +220,8 @@ public class RuntimesInstance {
         majorVersion,
         osArch,
         processors,
-        heapMax);
+        heapMax,
+        created);
   }
 
   @Override
@@ -223,6 +238,7 @@ public class RuntimesInstance {
     sb.append(", osArch='").append(osArch).append('\'');
     sb.append(", processors=").append(processors);
     sb.append(", heapMax=").append(heapMax);
+    sb.append(", created=").append(created);
     sb.append('}');
     return sb.toString();
   }

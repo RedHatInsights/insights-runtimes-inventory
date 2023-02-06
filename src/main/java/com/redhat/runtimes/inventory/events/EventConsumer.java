@@ -1,5 +1,9 @@
 package com.redhat.runtimes.inventory.events;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.redhat.runtimes.inventory.models.RuntimesInstance;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
@@ -14,15 +18,15 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.control.ActivateRequestContext;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.UUID;
+import java.util.Map;
 import java.util.concurrent.CompletionStage;
 import java.util.zip.GZIPInputStream;
 
@@ -44,7 +48,7 @@ public class EventConsumer {
   @Inject
   MeterRegistry registry;
 
-  // TODO
+  // TODO Remove?
   @Inject
   KafkaMessageDeduplicator kafkaMessageDeduplicator;
 
@@ -70,31 +74,67 @@ public class EventConsumer {
   @Acknowledgment(PRE_PROCESSING)
   @Blocking
   @ActivateRequestContext
+  @Transactional
   public CompletionStage<Void> process(Message<String> message) {
     // This timer will have dynamic tag values based on the action parsed from the received message.
     Timer.Sample consumedTimer = Timer.start(registry);
     var payload = message.getPayload();
-    Log.info("Processing received Kafka message: "+ payload);
+    Log.infof("Processing received Kafka message %s", payload);
 
-    // Parse JSON using Jackson
-    var announce = jsonParser.fromJsonString(payload);
-    Log.info("Processed message URL: "+ announce.getUrl());
-    Log.info("Processed Org ID: "+ announce.getOrgId());
+    RuntimesInstance inst = null    ;
+    try {
+      // Parse JSON using Jackson
+      var announce = jsonParser.fromJsonString(payload);
+      Log.debugf("Processed message URL: %s", announce.getUrl());
 
-    // Get data back from S3
-    var archiveJson = getJsonFromS3(announce.getUrl());
-    Log.info("Retrieved from S3: "+ archiveJson);
+      // Get data back from S3
+      var archiveJson = getJsonFromS3(announce.getUrl());
+      Log.infof("Retrieved from S3: %s", archiveJson);
 
-    // Find hostname - use as a lookup key in DB
-    
-    // TODO Do we need UUIDs?
+      inst = runtimesInstance(announce, archiveJson);
 
-    // Persist core data
-    // entityManager.
+      // Persist core data
+      Log.infof("About to persist: %s", inst);
+      entityManager.persist(inst);
 
-    // FIXME Might need tags
-    consumedTimer.stop(registry.timer(CONSUMED_TIMER_NAME));
+    } catch (Throwable t) {
+      processingExceptionCounter.increment();
+      Log.debugf(t, "Could not process the payload: %s", inst);
+    } finally {
+      // FIXME Might need tags
+      consumedTimer.stop(registry.timer(CONSUMED_TIMER_NAME));
+    }
+
     return message.ack();
+  }
+
+  static RuntimesInstance runtimesInstance(ArchiveAnnouncement announce, String json) {
+    var inst = new RuntimesInstance();
+    inst.setAccountId(announce.getAccountId());
+    inst.setOrgId(announce.getOrgId());
+
+    TypeReference<Map<String,Object>> typeRef = new TypeReference<>() {};
+
+    var mapper = new ObjectMapper();
+    try {
+      var o = mapper.readValue(json, typeRef);
+      var basic = (Map<String, Object>)o.get("basic");
+      inst.setHostname(String.valueOf(basic.get("hostname")));
+      inst.setVendor(String.valueOf(basic.get("java.vm.specification.vendor")));
+      inst.setVersionString(String.valueOf(basic.get("java.runtime.version")));
+      inst.setVersion(String.valueOf(basic.get("java.version")));
+      inst.setMajorVersion(Integer.parseInt(String.valueOf(basic.get("java.vm.specification.version"))));
+      inst.setOsArch(String.valueOf(basic.get("os.arch")));
+
+      // FIXME Hardcoded for now
+      inst.setProcessors(12);
+      inst.setHeapMax(8192);
+    } catch (JsonProcessingException | ClassCastException | NumberFormatException e) {
+      Log.error("Error in unmarshalling JSON", e);
+      throw new RuntimeException("Error in unmarshalling JSON", e);
+    }
+
+    return inst;
   }
 
   static String unzipJson(byte[] buffy) {
@@ -113,12 +153,11 @@ public class EventConsumer {
       var requestBuilder =
         HttpRequest.newBuilder().uri(uri);
       var request = requestBuilder.GET().build();
-      Log.info("Issuing a HTTP POST request to " + request);
+      Log.debugf("Issuing a HTTP POST request to %s", request);
 
       var client = HttpClient.newBuilder().build();
       var response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
-      Log.info(
-        "S3 HTTP Client: status="+ response.statusCode());
+      Log.debugf("S3 HTTP Client status: %s", response.statusCode());
 
       return unzipJson(response.body());
     } catch (URISyntaxException | IOException | InterruptedException e) {

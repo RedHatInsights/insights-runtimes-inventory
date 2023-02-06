@@ -1,0 +1,37 @@
+VENV_DIR=~/bonfire_venv
+. $VENV_DIR/bin/activate
+
+You may need to log in, by using this page (uses Github to authenticate):
+
+https://oauth-openshift.apps.c-rh-c-eph.8p0c.p1.openshiftapps.com/oauth/token/request
+
+This will give you an oc login command. Run it in your venv.
+
+Enter the following command to deploy the advisor backend and frontend components along with their dependencies (notice the use of the --frontends=true argument):
+
+# You may need to set up DNS routing for a few domains to go via the VPN:
+$ sudo systemd-resolve -i tun0 --set-domain=redhat.com --set-domain=~amazonaws.com --set-domain=~devshift.net --set-domain=openshiftapps.com
+
+# This command requires you to be on the VPN (you may also deploy "advisor" for a fuller set of components)
+$ NAMESPACE=$(bonfire deploy host-inventory --frontends=true)
+Optional: Extend your Ephemeral Environment for the time it might take you to complete this exercise. You can start with a two hour extension and update later if you need to.
+
+$ bonfire namespace extend $NAMESPACE --duration 2h
+Enter the following command to print access info for your namespace
+
+$ bonfire namespace describe $NAMESPACE
+You’ll use the URL and login credentials listed in the command output to view your inventory, advisor and rbac apps in the web UI.
+
+In your web browser, enter the hostname and log in with the username/password that you retrieved in the previous step.
+
+In your web browser, click All Apps and Services > Inventory. Note that your inventory listing is empty. It’s time to add something to it.
+
+Return to your terminal window and use the following command to generate a Basic auth header:
+
+TEMP_INSIGHTS_TOKEN=$(oc get secret env-$NAMESPACE-keycloak -n $NAMESPACE -o json | jq '.data | map_values(@base64d)' | jq -r -j '"\(.defaultUsername):\(.defaultPassword)" | @base64')
+To upload a new item to your host inventory, enter the following command:
+
+curl -F "file=@/path/to/file/security_low.tar.gz;type=application/vnd.redhat.advisor.somefile+tgz" \
+ -H "Authorization: Basic $BASIC_AUTH" \
+ -H "x-rh-request_id: testtesttest" https://<my-hostname>/api/ingress/v1/upload -v --insecure
+The output of the command will indicate success or failure.

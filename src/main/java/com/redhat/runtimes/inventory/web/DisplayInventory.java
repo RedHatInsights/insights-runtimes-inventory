@@ -53,9 +53,10 @@ public class DisplayInventory {
     query.setParameter("hostname", hostname);
     var results = query.getResultList();
     Log.infof("Found %s rows when looking for %s", results.size(), hostname);
+    var out = results.size() == 0 ? "[not found]" : results.get(0);
 
     // FIXME Temp - need proper marshalling
-    return "{\"response\": \"" + results.get(0) + "\"}";
+    return "{\"response\": \"" + out + "\"}";
   }
 
   String extractOrgId(String rhIdJson) {

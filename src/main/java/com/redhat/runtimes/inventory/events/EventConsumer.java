@@ -19,6 +19,7 @@ import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.ZoneOffset;
 import java.util.Map;
 import java.util.concurrent.CompletionStage;
 import java.util.zip.GZIPInputStream;
@@ -128,6 +129,7 @@ public class EventConsumer {
       // FIXME Hardcoded for now
       inst.setProcessors(12);
       inst.setHeapMax(8192);
+      inst.setCreated(announce.getTimestamp().atZone(ZoneOffset.UTC));
     } catch (JsonProcessingException | ClassCastException | NumberFormatException e) {
       Log.error("Error in unmarshalling JSON", e);
       throw new RuntimeException("Error in unmarshalling JSON", e);

@@ -1,21 +1,15 @@
+/* Copyright (C) Red Hat 2023 */
 package com.redhat.runtimes.inventory.events;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({"version", "id", "bundle", "application", "event_type", "timestamp", "account_id", "org_id", "context", "events", "recipients"})
 public class ArchiveAnnouncement {
   @JsonProperty("version")
   private String version = "2.0.0";
-
-//  @JsonProperty("id")
-//  private UUID id;
 
   @JsonProperty("bundle")
   @JsonPropertyDescription("Bundle name as used during application registration")
@@ -26,7 +20,9 @@ public class ArchiveAnnouncement {
   private String application;
 
   @JsonProperty("timestamp")
-  @JsonPropertyDescription("ISO-8601 formatted date (per platform convention) when the message was sent in UTC. Dates with timezones/offsets are rejected.")
+  @JsonPropertyDescription(
+      "ISO-8601 formatted date (per platform convention) when the message was sent in UTC. Dates"
+          + " with timezones/offsets are rejected.")
   private LocalDateTime timestamp;
 
   @JsonProperty("account_id")
@@ -41,8 +37,7 @@ public class ArchiveAnnouncement {
   @JsonProperty("url")
   private String url;
 
-  public ArchiveAnnouncement() {
-  }
+  public ArchiveAnnouncement() {}
 
   @JsonProperty("version")
   public String getVersion() {

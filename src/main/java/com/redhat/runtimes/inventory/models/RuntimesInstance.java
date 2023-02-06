@@ -10,7 +10,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Entity
-@Table(name = "instance")
+@Table(name = "runtimes_instance")
 public class RuntimesInstance {
 
   @Id

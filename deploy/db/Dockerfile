@@ -16,7 +16,7 @@ RUN pip3 install psycopg2
 
 RUN mkdir /app
 COPY create_db.py /app
-COPY V1.0.0__runtime_instance.sql /app
+COPY ../../src/main/resources/db/migration/V1.0.0__runtime_instance.sql /app
 WORKDIR /app
 
 # ENTRYPOINT ["python3", "create_db.py"]

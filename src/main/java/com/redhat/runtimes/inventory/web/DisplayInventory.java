@@ -3,11 +3,15 @@ package com.redhat.runtimes.inventory.web;
 
 import static com.redhat.runtimes.inventory.events.EventConsumer.X_RH_IDENTITY_HEADER;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.runtimes.inventory.models.RuntimesInstance;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.quarkus.logging.Log;
 import java.util.Base64;
+import java.util.Map;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.ws.rs.*;
@@ -31,6 +35,7 @@ public class DisplayInventory {
     // X_RH header is just B64 encoded - decode for the org ID
     var rhIdJson = new String(Base64.getDecoder().decode(rhIdentity));
     Log.infof("X_RH_IDENTITY_HEADER: %s", rhIdJson);
+    var orgId = extractOrgId(rhIdJson);
 
     // Retrieve from DB
     var query =
@@ -40,12 +45,33 @@ public class DisplayInventory {
       i.id, i.accountId, i.orgId, i.hostname, i.vendor, i.versionString,
       i.version, i.majorVersion, i.osArch, i.processors, i.heapMax
     ) from com.redhat.runtimes.inventory.models.RuntimesInstance i
+    where i.orgId = :orgId and i.hostname = :hostname
+    order by i.created desc
     """,
             RuntimesInstance.class);
+    query.setParameter("orgId", orgId);
+    query.setParameter("hostname", hostname);
     var results = query.getResultList();
     Log.infof("Found %s rows when looking for %s", results.size(), hostname);
 
-    // Test to see what's in rhIdentity
-    return "{\"response\": \"" + rhIdentity + "\"}";
+    // FIXME Temp - need proper marshalling
+    return "{\"response\": \"" + results.get(0) + "\"}";
+  }
+
+  String extractOrgId(String rhIdJson) {
+    TypeReference<Map<String, Object>> typeRef = new TypeReference<>() {};
+    String out = "";
+
+    var mapper = new ObjectMapper();
+    try {
+      var o = mapper.readValue(rhIdJson, typeRef);
+      var identity = (Map<String, Object>) o.get("identity");
+      out = String.valueOf(o.get("org_id"));
+    } catch (JsonProcessingException | ClassCastException | NumberFormatException e) {
+      Log.error("Error in unmarshalling JSON", e);
+      throw new RuntimeException("Error in unmarshalling JSON", e);
+    }
+
+    return out;
   }
 }

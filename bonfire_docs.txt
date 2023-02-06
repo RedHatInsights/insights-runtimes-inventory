@@ -13,7 +13,7 @@ Enter the following command to deploy the advisor backend and frontend component
 $ sudo systemd-resolve -i tun0 --set-domain=redhat.com --set-domain=~amazonaws.com --set-domain=~devshift.net --set-domain=openshiftapps.com
 
 # This command requires you to be on the VPN (you may also deploy "advisor" for a fuller set of components)
-$ NAMESPACE=$(bonfire deploy ingress --frontends=true)
+$ NAMESPACE=$(bonfire deploy host-inventory --frontends=true)
 Optional: Extend your Ephemeral Environment for the time it might take you to complete this exercise. You can start with a two hour extension and update later if you need to.
 
 $ bonfire namespace extend $NAMESPACE --duration 2h

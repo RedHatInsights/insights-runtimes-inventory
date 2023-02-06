@@ -1,18 +1,21 @@
 package com.redhat.runtimes.inventory.models;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity
 @Table(name = "instance")
 public class RuntimesInstance {
 
   @Id
-  private String id;
+  @GeneratedValue
+  private UUID id;
 
   @Size(max = 50)
   private String accountId;
@@ -59,12 +62,13 @@ public class RuntimesInstance {
 
   //////////////////////////////////////////////////////
 
-  public void setId(String id) {
-    this.id = id;
+
+  public UUID getId() {
+    return id;
   }
 
-  public String getId() {
-    return id;
+  public void setId(UUID id) {
+    this.id = id;
   }
 
   public String getAccountId() {

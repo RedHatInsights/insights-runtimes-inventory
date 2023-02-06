@@ -18,6 +18,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.control.ActivateRequestContext;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -73,6 +74,7 @@ public class EventConsumer {
   @Acknowledgment(PRE_PROCESSING)
   @Blocking
   @ActivateRequestContext
+  @Transactional
   public CompletionStage<Void> process(Message<String> message) {
     // This timer will have dynamic tag values based on the action parsed from the received message.
     Timer.Sample consumedTimer = Timer.start(registry);

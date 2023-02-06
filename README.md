@@ -33,11 +33,15 @@ Add to config (via oc edit env or the Clowd > ClowdEnvironments tab in the web c
 
 This step is needed b/c the clowdservices secret doesn't know about our service (yet!).
 
-(1-Off Task) Tell Ingress about our Kafka topics
+(Daily Task) Tell Ingress about our Kafka topics (under the existing ones)
+
+    - partitions: 3
+      replicas: 3
+      topicName: platform.upload.runtimes-java-general
 
 ### Redeploy
 
-Update the YAML
+Update the YAML then
 
 ```
 oc apply -n $NAMESPACE -f clowdapp-runtimes-minimal.yml

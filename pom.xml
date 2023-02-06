@@ -292,7 +292,7 @@
             <format>
               <!-- define the files to apply to -->
               <includes>
-                <include>*.md</include>
+                <!--                <include>*.md</include>-->
                 <include>.gitignore</include>
               </includes>
               <!-- define the steps to apply to those files -->

@@ -63,6 +63,24 @@ public class RuntimesInstance {
 
   //////////////////////////////////////////////////////
 
+  public RuntimesInstance() {}
+
+  public RuntimesInstance(UUID id, String accountId, String orgId, String hostname, String vendor, String versionString, String version, int majorVersion, String osArch, int processors, int heapMax) {
+    this.id = id;
+    this.accountId = accountId;
+    this.orgId = orgId;
+    this.hostname = hostname;
+    this.vendor = vendor;
+    this.versionString = versionString;
+    this.version = version;
+    this.majorVersion = majorVersion;
+    this.osArch = osArch;
+    this.processors = processors;
+    this.heapMax = heapMax;
+  }
+
+
+  //////////////////////////////////////////////////////
 
   public UUID getId() {
     return id;

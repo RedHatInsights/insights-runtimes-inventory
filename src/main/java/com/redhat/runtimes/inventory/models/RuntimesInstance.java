@@ -74,7 +74,8 @@ public class RuntimesInstance {
       int majorVersion,
       String osArch,
       int processors,
-      int heapMax) {
+      int heapMax,
+      ZonedDateTime created) {
     this.id = id;
     this.accountId = accountId;
     this.orgId = orgId;
@@ -86,6 +87,7 @@ public class RuntimesInstance {
     this.osArch = osArch;
     this.processors = processors;
     this.heapMax = heapMax;
+    this.created = created;
   }
 
   //////////////////////////////////////////////////////

@@ -67,7 +67,7 @@ public class DisplayInventory {
     try {
       var o = mapper.readValue(rhIdJson, typeRef);
       var identity = (Map<String, Object>) o.get("identity");
-      out = String.valueOf(o.get("org_id"));
+      out = String.valueOf(identity.get("org_id"));
     } catch (JsonProcessingException | ClassCastException | NumberFormatException e) {
       Log.error("Error in unmarshalling JSON", e);
       throw new RuntimeException("Error in unmarshalling JSON", e);

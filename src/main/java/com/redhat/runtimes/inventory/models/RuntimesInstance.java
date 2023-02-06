@@ -1,21 +1,20 @@
+/* Copyright (C) Red Hat 2023 */
 package com.redhat.runtimes.inventory.models;
 
+import java.util.Objects;
+import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.Objects;
-import java.util.UUID;
 
 @Entity
 @Table(name = "runtimes_instance")
 public class RuntimesInstance {
 
-  @Id
-  @GeneratedValue
-  private UUID id;
+  @Id @GeneratedValue private UUID id;
 
   @Size(max = 50)
   private String accountId;
@@ -28,43 +27,51 @@ public class RuntimesInstance {
   @Size(max = 50)
   private String hostname;
 
-//   "java.vm.specification.vendor" : "Oracle Corporation",
+  //   "java.vm.specification.vendor" : "Oracle Corporation",
   @NotNull
   @Size(max = 255)
   private String vendor;
 
-//      "java.runtime.version" : "17.0.1+12",
+  //      "java.runtime.version" : "17.0.1+12",
   @NotNull
   @Size(max = 255)
   private String versionString;
 
-//      "java.version" : "17.0.1",
+  //      "java.version" : "17.0.1",
   @NotNull
   @Size(max = 255)
   private String version;
 
-//    "java.vm.specification.version" : "17",
-  @NotNull
-  private int majorVersion;
+  //    "java.vm.specification.version" : "17",
+  @NotNull private int majorVersion;
 
-//  "os.arch" : "x86_64",
+  //  "os.arch" : "x86_64",
   @NotNull
   @Size(max = 50)
   private String osArch;
 
-//      "Logical Processors" : 12,
-  @NotNull
-  private int processors;
+  //      "Logical Processors" : 12,
+  @NotNull private int processors;
 
-//  "Heap max (MB)" : 8192.0,
-  @NotNull
-  private int heapMax;
+  //  "Heap max (MB)" : 8192.0,
+  @NotNull private int heapMax;
 
   //////////////////////////////////////////////////////
 
   public RuntimesInstance() {}
 
-  public RuntimesInstance(UUID id, String accountId, String orgId, String hostname, String vendor, String versionString, String version, int majorVersion, String osArch, int processors, int heapMax) {
+  public RuntimesInstance(
+      UUID id,
+      String accountId,
+      String orgId,
+      String hostname,
+      String vendor,
+      String versionString,
+      String version,
+      int majorVersion,
+      String osArch,
+      int processors,
+      int heapMax) {
     this.id = id;
     this.accountId = accountId;
     this.orgId = orgId;
@@ -77,7 +84,6 @@ public class RuntimesInstance {
     this.processors = processors;
     this.heapMax = heapMax;
   }
-
 
   //////////////////////////////////////////////////////
 
@@ -174,18 +180,39 @@ public class RuntimesInstance {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     RuntimesInstance that = (RuntimesInstance) o;
-    return majorVersion == that.majorVersion && processors == that.processors && heapMax == that.heapMax && Objects.equals(id, that.id) && Objects.equals(accountId, that.accountId) && Objects.equals(orgId, that.orgId) && Objects.equals(hostname, that.hostname) && Objects.equals(vendor, that.vendor) && Objects.equals(versionString, that.versionString) && Objects.equals(version, that.version) && Objects.equals(osArch, that.osArch);
+    return majorVersion == that.majorVersion
+        && processors == that.processors
+        && heapMax == that.heapMax
+        && Objects.equals(id, that.id)
+        && Objects.equals(accountId, that.accountId)
+        && Objects.equals(orgId, that.orgId)
+        && Objects.equals(hostname, that.hostname)
+        && Objects.equals(vendor, that.vendor)
+        && Objects.equals(versionString, that.versionString)
+        && Objects.equals(version, that.version)
+        && Objects.equals(osArch, that.osArch);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, accountId, orgId, hostname, vendor, versionString, version, majorVersion, osArch, processors, heapMax);
+    return Objects.hash(
+        id,
+        accountId,
+        orgId,
+        hostname,
+        vendor,
+        versionString,
+        version,
+        majorVersion,
+        osArch,
+        processors,
+        heapMax);
   }
 
   @Override
   public String toString() {
     final StringBuffer sb = new StringBuffer("RuntimesInstance{");
-    sb.append("id='").append(id).append('\'');
+    sb.append("id=").append(id);
     sb.append(", accountId='").append(accountId).append('\'');
     sb.append(", orgId='").append(orgId).append('\'');
     sb.append(", hostname='").append(hostname).append('\'');

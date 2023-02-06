@@ -1,4 +1,7 @@
+/* Copyright (C) Red Hat 2023 */
 package com.redhat.runtimes.inventory.events;
+
+import static org.eclipse.microprofile.reactive.messaging.Acknowledgment.Strategy.PRE_PROCESSING;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -9,16 +12,6 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import io.quarkus.logging.Log;
 import io.smallrye.reactive.messaging.annotations.Blocking;
-import org.eclipse.microprofile.reactive.messaging.Acknowledgment;
-import org.eclipse.microprofile.reactive.messaging.Incoming;
-import org.eclipse.microprofile.reactive.messaging.Message;
-
-import javax.annotation.PostConstruct;
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.control.ActivateRequestContext;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.transaction.Transactional;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -29,8 +22,15 @@ import java.net.http.HttpResponse;
 import java.util.Map;
 import java.util.concurrent.CompletionStage;
 import java.util.zip.GZIPInputStream;
-
-import static org.eclipse.microprofile.reactive.messaging.Acknowledgment.Strategy.PRE_PROCESSING;
+import javax.annotation.PostConstruct;
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.control.ActivateRequestContext;
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
+import org.eclipse.microprofile.reactive.messaging.Acknowledgment;
+import org.eclipse.microprofile.reactive.messaging.Incoming;
+import org.eclipse.microprofile.reactive.messaging.Message;
 
 @ApplicationScoped
 public class EventConsumer {
@@ -43,17 +43,15 @@ public class EventConsumer {
 
   public static final String X_RH_IDENTITY_HEADER = "x-rh-identity";
 
-  private static final String EVENT_TYPE_NOT_FOUND_MSG = "No event type found for [bundleName=%s, applicationName=%s, eventTypeName=%s]";
+  private static final String EVENT_TYPE_NOT_FOUND_MSG =
+      "No event type found for [bundleName=%s, applicationName=%s, eventTypeName=%s]";
 
-  @Inject
-  MeterRegistry registry;
+  @Inject MeterRegistry registry;
 
   // TODO Remove?
-  @Inject
-  KafkaMessageDeduplicator kafkaMessageDeduplicator;
+  @Inject KafkaMessageDeduplicator kafkaMessageDeduplicator;
 
-  @Inject
-  EntityManager entityManager;
+  @Inject EntityManager entityManager;
 
   private ArchiveAnnouncementParser jsonParser = new ArchiveAnnouncementParser();
 
@@ -81,7 +79,7 @@ public class EventConsumer {
     var payload = message.getPayload();
     Log.infof("Processing received Kafka message %s", payload);
 
-    RuntimesInstance inst = null    ;
+    RuntimesInstance inst = null;
     try {
       // Parse JSON using Jackson
       var announce = jsonParser.fromJsonString(payload);
@@ -113,17 +111,18 @@ public class EventConsumer {
     inst.setAccountId(announce.getAccountId());
     inst.setOrgId(announce.getOrgId());
 
-    TypeReference<Map<String,Object>> typeRef = new TypeReference<>() {};
+    TypeReference<Map<String, Object>> typeRef = new TypeReference<>() {};
 
     var mapper = new ObjectMapper();
     try {
       var o = mapper.readValue(json, typeRef);
-      var basic = (Map<String, Object>)o.get("basic");
+      var basic = (Map<String, Object>) o.get("basic");
       inst.setHostname(String.valueOf(basic.get("hostname")));
       inst.setVendor(String.valueOf(basic.get("java.vm.specification.vendor")));
       inst.setVersionString(String.valueOf(basic.get("java.runtime.version")));
       inst.setVersion(String.valueOf(basic.get("java.version")));
-      inst.setMajorVersion(Integer.parseInt(String.valueOf(basic.get("java.vm.specification.version"))));
+      inst.setMajorVersion(
+          Integer.parseInt(String.valueOf(basic.get("java.vm.specification.version"))));
       inst.setOsArch(String.valueOf(basic.get("os.arch")));
 
       // FIXME Hardcoded for now
@@ -139,7 +138,7 @@ public class EventConsumer {
 
   static String unzipJson(byte[] buffy) {
     try (var bais = new ByteArrayInputStream(buffy);
-         var gunzip = new GZIPInputStream(bais)) {
+        var gunzip = new GZIPInputStream(bais)) {
       return new String(gunzip.readAllBytes());
     } catch (IOException e) {
       Log.error("Error in Unzipping archive: ", e);
@@ -150,8 +149,7 @@ public class EventConsumer {
   static String getJsonFromS3(String urlStr) {
     try {
       var uri = new URL(urlStr).toURI();
-      var requestBuilder =
-        HttpRequest.newBuilder().uri(uri);
+      var requestBuilder = HttpRequest.newBuilder().uri(uri);
       var request = requestBuilder.GET().build();
       Log.debugf("Issuing a HTTP POST request to %s", request);
 
@@ -165,5 +163,4 @@ public class EventConsumer {
       throw new RuntimeException(e);
     }
   }
-
 }

@@ -42,8 +42,8 @@ public class DisplayInventory {
         entityManager.createQuery(
             """
     select new com.redhat.runtimes.inventory.models.RuntimesInstance(
-      i.id, i.accountId, i.orgId, i.hostname, i.vendor, i.versionString,
-      i.version, i.majorVersion, i.osArch, i.processors, i.heapMax, i.created
+      i.id, i.accountId, i.orgId, i.hostname, i.launchTime, i.vendor, i.versionString,
+      i.version, i.majorVersion, i.osArch, i.processors, i.heapMax, i.details, i.created
     ) from com.redhat.runtimes.inventory.models.RuntimesInstance i
     where i.orgId = :orgId and i.hostname = :hostname
     order by i.created desc

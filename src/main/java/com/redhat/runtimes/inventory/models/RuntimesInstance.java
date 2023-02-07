@@ -80,6 +80,7 @@ public class RuntimesInstance {
       String accountId,
       String orgId,
       String hostname,
+      long launchTime,
       String vendor,
       String versionString,
       String version,
@@ -93,6 +94,7 @@ public class RuntimesInstance {
     this.accountId = accountId;
     this.orgId = orgId;
     this.hostname = hostname;
+    this.launchTime = launchTime;
     this.vendor = vendor;
     this.versionString = versionString;
     this.version = version;

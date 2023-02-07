@@ -9,11 +9,11 @@ import java.time.LocalDateTime;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ArchiveAnnouncement {
   @JsonProperty("version")
-  private String version = "2.0.0";
+  private String version = "1.0.0";
 
-  @JsonProperty("bundle")
-  @JsonPropertyDescription("Bundle name as used during application registration")
-  private String bundle;
+  //  @JsonProperty("bundle")
+  //  @JsonPropertyDescription("Bundle name as used during application registration")
+  //  private String bundle;
 
   @JsonProperty("application")
   @JsonPropertyDescription("Application name as used during application registration")
@@ -39,6 +39,8 @@ public class ArchiveAnnouncement {
 
   public ArchiveAnnouncement() {}
 
+  ////////////////////////////////////////////////////////////////////////
+
   @JsonProperty("version")
   public String getVersion() {
     return this.version;
@@ -49,15 +51,15 @@ public class ArchiveAnnouncement {
     this.version = version;
   }
 
-  @JsonProperty("bundle")
-  public String getBundle() {
-    return this.bundle;
-  }
-
-  @JsonProperty("bundle")
-  public void setBundle(String bundle) {
-    this.bundle = bundle;
-  }
+  //  @JsonProperty("bundle")
+  //  public String getBundle() {
+  //    return this.bundle;
+  //  }
+  //
+  //  @JsonProperty("bundle")
+  //  public void setBundle(String bundle) {
+  //    this.bundle = bundle;
+  //  }
 
   @JsonProperty("application")
   public String getApplication() {

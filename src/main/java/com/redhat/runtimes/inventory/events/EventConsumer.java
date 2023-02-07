@@ -129,9 +129,11 @@ public class EventConsumer {
           Integer.parseInt(String.valueOf(basic.get("java.vm.specification.version"))));
       inst.setOsArch(String.valueOf(basic.get("os.arch")));
 
-      // FIXME Hardcoded for now
-      inst.setProcessors(12);
-      inst.setHeapMax(8192);
+      // FIXME Naming
+      inst.setProcessors(Integer.parseInt(String.valueOf(basic.get("Logical Processors"))));
+      inst.setHeapMax((int) Double.parseDouble(String.valueOf(basic.get("Heap max (MB)"))));
+
+      inst.setDetails(basic);
     } catch (JsonProcessingException | ClassCastException | NumberFormatException e) {
       Log.error("Error in unmarshalling JSON", e);
       throw new RuntimeException("Error in unmarshalling JSON", e);

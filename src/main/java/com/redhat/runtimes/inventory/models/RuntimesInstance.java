@@ -88,7 +88,7 @@ public class RuntimesInstance {
       String osArch,
       int processors,
       int heapMax,
-      Map<String, Object> details,
+      Object details,
       ZonedDateTime created) {
     this.id = id;
     this.accountId = accountId;
@@ -102,7 +102,7 @@ public class RuntimesInstance {
     this.osArch = osArch;
     this.processors = processors;
     this.heapMax = heapMax;
-    this.details = details;
+    this.details = (Map<String, Object>)details;
     this.created = created;
   }
 

@@ -125,6 +125,7 @@ public class EventConsumer {
       inst.setVendor(String.valueOf(basic.get("java.vm.specification.vendor")));
       inst.setVersionString(String.valueOf(basic.get("java.runtime.version")));
       inst.setVersion(String.valueOf(basic.get("java.version")));
+      inst.setLaunchTime(Long.parseLong(String.valueOf(basic.get("launch_time"))));
       inst.setMajorVersion(
           Integer.parseInt(String.valueOf(basic.get("java.vm.specification.version"))));
       inst.setOsArch(String.valueOf(basic.get("os.arch")));

@@ -32,7 +32,7 @@ public class RuntimesInstance {
   private String hostname;
 
   // Process launched at
-  @NotNull private ZonedDateTime launchTime;
+  @NotNull private long launchTime;
 
   //   "java.vm.specification.vendor" : "Oracle Corporation",
   @NotNull
@@ -202,11 +202,11 @@ public class RuntimesInstance {
     this.created = created;
   }
 
-  public ZonedDateTime getLaunchTime() {
+  public long getLaunchTime() {
     return launchTime;
   }
 
-  public void setLaunchTime(ZonedDateTime launchTime) {
+  public void setLaunchTime(long launchTime) {
     this.launchTime = launchTime;
   }
 

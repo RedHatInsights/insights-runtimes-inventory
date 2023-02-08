@@ -121,18 +121,17 @@ public class EventConsumer {
     try {
       var o = mapper.readValue(json, typeRef);
       var basic = (Map<String, Object>) o.get("basic");
-      inst.setHostname(String.valueOf(basic.get("hostname")));
+      inst.setHostname(String.valueOf(basic.get("system.hostname")));
       inst.setVendor(String.valueOf(basic.get("java.vm.specification.vendor")));
       inst.setVersionString(String.valueOf(basic.get("java.runtime.version")));
       inst.setVersion(String.valueOf(basic.get("java.version")));
-      inst.setLaunchTime(Long.parseLong(String.valueOf(basic.get("launch_time"))));
+      inst.setLaunchTime(Long.parseLong(String.valueOf(basic.get("jvm.launch_time"))));
       inst.setMajorVersion(
           Integer.parseInt(String.valueOf(basic.get("java.vm.specification.version"))));
       inst.setOsArch(String.valueOf(basic.get("os.arch")));
-
-      // FIXME Naming
-      inst.setProcessors(Integer.parseInt(String.valueOf(basic.get("Logical Processors"))));
-      inst.setHeapMax((int) Double.parseDouble(String.valueOf(basic.get("Heap max (MB)"))));
+      inst.setProcessors(Integer.parseInt(String.valueOf(basic.get("system.cores.logical"))));
+      // FIXME Add heap min
+      inst.setHeapMax((int) Double.parseDouble(String.valueOf(basic.get("jvm.heap.max"))));
 
       inst.setDetails(basic);
     } catch (JsonProcessingException | ClassCastException | NumberFormatException e) {

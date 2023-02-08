@@ -102,7 +102,7 @@ public class RuntimesInstance {
     this.osArch = osArch;
     this.processors = processors;
     this.heapMax = heapMax;
-    this.details = (Map<String, Object>)details;
+    this.details = (Map<String, Object>) details;
     this.created = created;
   }
 

@@ -11,10 +11,6 @@ public class ArchiveAnnouncement {
   @JsonProperty("version")
   private String version = "1.0.0";
 
-  //  @JsonProperty("bundle")
-  //  @JsonPropertyDescription("Bundle name as used during application registration")
-  //  private String bundle;
-
   @JsonProperty("application")
   @JsonPropertyDescription("Application name as used during application registration")
   private String application;
@@ -50,16 +46,6 @@ public class ArchiveAnnouncement {
   public void setVersion(String version) {
     this.version = version;
   }
-
-  //  @JsonProperty("bundle")
-  //  public String getBundle() {
-  //    return this.bundle;
-  //  }
-  //
-  //  @JsonProperty("bundle")
-  //  public void setBundle(String bundle) {
-  //    this.bundle = bundle;
-  //  }
 
   @JsonProperty("application")
   public String getApplication() {

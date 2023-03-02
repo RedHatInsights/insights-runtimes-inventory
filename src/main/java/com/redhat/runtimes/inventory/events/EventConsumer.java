@@ -88,7 +88,7 @@ public class EventConsumer {
 
       // Get data back from S3
       var archiveJson = getJsonFromS3(announce.getUrl());
-      Log.infof("Retrieved from S3: %s", archiveJson);
+      Log.debugf("Retrieved from S3: %s", archiveJson);
 
       inst = runtimesInstance(announce, archiveJson);
 
@@ -98,7 +98,7 @@ public class EventConsumer {
 
     } catch (Throwable t) {
       processingExceptionCounter.increment();
-      Log.debugf(t, "Could not process the payload: %s", inst);
+      Log.errorf(t, "Could not process the payload: %s", inst);
     } finally {
       // FIXME Might need tags
       consumedTimer.stop(registry.timer(CONSUMED_TIMER_NAME));

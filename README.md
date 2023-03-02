@@ -24,10 +24,10 @@ Add to config (via oc edit env or the Clowd > ClowdEnvironments detail tab in th
 
 ```
 	pullSecrets:
-	- name: quay-cloudservices-pull
-	  namespace: ephemeral-base
-	- name: beevans-pull-secret
-	  namespace: ephemeral-< NAMESPACE >
+	    - name: quay-cloudservices-pull
+	      namespace: ephemeral-base
+      - name: beevans-pull-secret
+        namespace: ephemeral-XXXXXX
 ```
 
 (Daily) Edit the Ingress Clowdapp to tell it about our Kafka topics (under the existing ones)

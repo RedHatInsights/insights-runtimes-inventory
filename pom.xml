@@ -149,6 +149,13 @@
       <artifactId>opentelemetry-jdbc</artifactId>
     </dependency>
 
+    <!-- Test our Extension -->
+    <!--    <dependency>-->
+    <!--      <groupId>io.quarkiverse</groupId>-->
+    <!--      <artifactId>quarkus-redhat-insights</artifactId>-->
+    <!--      <version>999-SNAPSHOT</version>-->
+    <!--    </dependency>-->
+
     <!-- Quarkus BOM -->
     <dependency>
       <groupId>io.smallrye.reactive</groupId>

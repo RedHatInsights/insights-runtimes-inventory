@@ -23,6 +23,9 @@ public class RuntimesInstance {
   @Size(max = 50)
   private String accountId;
 
+  //  @Size(max = 255)
+  //  private String appName;
+
   @NotNull
   @Size(max = 50)
   private String orgId;
@@ -52,7 +55,7 @@ public class RuntimesInstance {
   //    "java.vm.specification.version" : "17",
   @NotNull private int majorVersion;
 
-  //  "os.arch" : "x86_64",
+  //  "system.arch" : "x86_64",
   @NotNull
   @Size(max = 50)
   private String osArch;

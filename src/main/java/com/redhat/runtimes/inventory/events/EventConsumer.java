@@ -121,17 +121,20 @@ public class EventConsumer {
     try {
       var o = mapper.readValue(json, typeRef);
       var basic = (Map<String, Object>) o.get("basic");
-      inst.setHostname(String.valueOf(basic.get("system.hostname")));
-      inst.setVendor(String.valueOf(basic.get("java.vm.specification.vendor")));
+
       inst.setVersionString(String.valueOf(basic.get("java.runtime.version")));
       inst.setVersion(String.valueOf(basic.get("java.version")));
-      inst.setLaunchTime(Long.parseLong(String.valueOf(basic.get("jvm.launch_time"))));
+      inst.setVendor(String.valueOf(basic.get("java.vm.specification.vendor")));
       inst.setMajorVersion(
           Integer.parseInt(String.valueOf(basic.get("java.vm.specification.version"))));
-      inst.setOsArch(String.valueOf(basic.get("os.arch")));
-      inst.setProcessors(Integer.parseInt(String.valueOf(basic.get("system.cores.logical"))));
+
       // FIXME Add heap min
       inst.setHeapMax((int) Double.parseDouble(String.valueOf(basic.get("jvm.heap.max"))));
+      inst.setLaunchTime(Long.parseLong(String.valueOf(basic.get("jvm.report_time"))));
+
+      inst.setOsArch(String.valueOf(basic.get("system.arch")));
+      inst.setProcessors(Integer.parseInt(String.valueOf(basic.get("system.cores.logical"))));
+      inst.setHostname(String.valueOf(basic.get("system.hostname")));
 
       inst.setDetails(basic);
     } catch (JsonProcessingException | ClassCastException | NumberFormatException e) {

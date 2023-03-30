@@ -11,6 +11,7 @@ objects:
     cyndi: {}
     database:
       name: runtimes
+      version: 13
     deployments:
       - metadata: {}
         minReplicas: 1

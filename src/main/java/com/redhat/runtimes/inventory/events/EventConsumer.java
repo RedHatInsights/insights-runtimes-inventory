@@ -88,7 +88,7 @@ public class EventConsumer {
 
       // Get data back from S3
       var archiveJson = getJsonFromS3(announce.getUrl());
-      Log.infof("Retrieved from S3: %s", archiveJson);
+      Log.debugf("Retrieved from S3: %s", archiveJson);
 
       inst = runtimesInstance(announce, archiveJson);
 
@@ -98,7 +98,7 @@ public class EventConsumer {
 
     } catch (Throwable t) {
       processingExceptionCounter.increment();
-      Log.debugf(t, "Could not process the payload: %s", inst);
+      Log.errorf(t, "Could not process the payload: %s", inst);
     } finally {
       // FIXME Might need tags
       consumedTimer.stop(registry.timer(CONSUMED_TIMER_NAME));
@@ -121,17 +121,22 @@ public class EventConsumer {
     try {
       var o = mapper.readValue(json, typeRef);
       var basic = (Map<String, Object>) o.get("basic");
-      inst.setHostname(String.valueOf(basic.get("hostname")));
-      inst.setVendor(String.valueOf(basic.get("java.vm.specification.vendor")));
+
       inst.setVersionString(String.valueOf(basic.get("java.runtime.version")));
       inst.setVersion(String.valueOf(basic.get("java.version")));
+      inst.setVendor(String.valueOf(basic.get("java.vm.specification.vendor")));
       inst.setMajorVersion(
           Integer.parseInt(String.valueOf(basic.get("java.vm.specification.version"))));
-      inst.setOsArch(String.valueOf(basic.get("os.arch")));
 
-      // FIXME Hardcoded for now
-      inst.setProcessors(12);
-      inst.setHeapMax(8192);
+      // FIXME Add heap min
+      inst.setHeapMax((int) Double.parseDouble(String.valueOf(basic.get("jvm.heap.max"))));
+      inst.setLaunchTime(Long.parseLong(String.valueOf(basic.get("jvm.report_time"))));
+
+      inst.setOsArch(String.valueOf(basic.get("system.arch")));
+      inst.setProcessors(Integer.parseInt(String.valueOf(basic.get("system.cores.logical"))));
+      inst.setHostname(String.valueOf(basic.get("system.hostname")));
+
+      inst.setDetails(basic);
     } catch (JsonProcessingException | ClassCastException | NumberFormatException e) {
       Log.error("Error in unmarshalling JSON", e);
       throw new RuntimeException("Error in unmarshalling JSON", e);

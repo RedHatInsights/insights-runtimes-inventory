@@ -1,17 +1,20 @@
 /* Copyright (C) Red Hat 2023 */
 package com.redhat.runtimes.inventory.models;
 
+import io.quarkiverse.hibernate.types.json.JsonBinaryType;
 import java.time.ZonedDateTime;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.TypeDefs;
 
 @Entity
+@TypeDefs(value = {@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)})
 @Table(name = "runtimes_instance")
 public class RuntimesInstance {
 
@@ -20,6 +23,9 @@ public class RuntimesInstance {
   @Size(max = 50)
   private String accountId;
 
+  //  @Size(max = 255)
+  //  private String appName;
+
   @NotNull
   @Size(max = 50)
   private String orgId;
@@ -27,6 +33,9 @@ public class RuntimesInstance {
   @NotNull
   @Size(max = 50)
   private String hostname;
+
+  // Process launched at
+  @NotNull private long launchTime;
 
   //   "java.vm.specification.vendor" : "Oracle Corporation",
   @NotNull
@@ -46,7 +55,7 @@ public class RuntimesInstance {
   //    "java.vm.specification.version" : "17",
   @NotNull private int majorVersion;
 
-  //  "os.arch" : "x86_64",
+  //  "system.arch" : "x86_64",
   @NotNull
   @Size(max = 50)
   private String osArch;
@@ -57,6 +66,12 @@ public class RuntimesInstance {
   //  "Heap max (MB)" : 8192.0,
   @NotNull private int heapMax;
 
+  @NotNull
+  @Type(type = "jsonb")
+  @Column(columnDefinition = "jsonb")
+  private Map<String, Object> details;
+
+  // Data record created
   @NotNull private ZonedDateTime created;
 
   //////////////////////////////////////////////////////
@@ -68,6 +83,7 @@ public class RuntimesInstance {
       String accountId,
       String orgId,
       String hostname,
+      long launchTime,
       String vendor,
       String versionString,
       String version,
@@ -75,11 +91,13 @@ public class RuntimesInstance {
       String osArch,
       int processors,
       int heapMax,
+      Object details,
       ZonedDateTime created) {
     this.id = id;
     this.accountId = accountId;
     this.orgId = orgId;
     this.hostname = hostname;
+    this.launchTime = launchTime;
     this.vendor = vendor;
     this.versionString = versionString;
     this.version = version;
@@ -87,6 +105,7 @@ public class RuntimesInstance {
     this.osArch = osArch;
     this.processors = processors;
     this.heapMax = heapMax;
+    this.details = (Map<String, Object>) details;
     this.created = created;
   }
 
@@ -188,6 +207,22 @@ public class RuntimesInstance {
     this.created = created;
   }
 
+  public long getLaunchTime() {
+    return launchTime;
+  }
+
+  public void setLaunchTime(long launchTime) {
+    this.launchTime = launchTime;
+  }
+
+  public Map<String, Object> getDetails() {
+    return details;
+  }
+
+  public void setDetails(Map<String, Object> details) {
+    this.details = details;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -200,10 +235,12 @@ public class RuntimesInstance {
         && Objects.equals(accountId, that.accountId)
         && Objects.equals(orgId, that.orgId)
         && Objects.equals(hostname, that.hostname)
+        && Objects.equals(launchTime, that.launchTime)
         && Objects.equals(vendor, that.vendor)
         && Objects.equals(versionString, that.versionString)
         && Objects.equals(version, that.version)
         && Objects.equals(osArch, that.osArch)
+        && Objects.equals(details, that.details)
         && Objects.equals(created, that.created);
   }
 
@@ -214,6 +251,7 @@ public class RuntimesInstance {
         accountId,
         orgId,
         hostname,
+        launchTime,
         vendor,
         versionString,
         version,
@@ -221,6 +259,7 @@ public class RuntimesInstance {
         osArch,
         processors,
         heapMax,
+        details,
         created);
   }
 
@@ -231,6 +270,7 @@ public class RuntimesInstance {
     sb.append(", accountId='").append(accountId).append('\'');
     sb.append(", orgId='").append(orgId).append('\'');
     sb.append(", hostname='").append(hostname).append('\'');
+    sb.append(", launchTime=").append(launchTime);
     sb.append(", vendor='").append(vendor).append('\'');
     sb.append(", versionString='").append(versionString).append('\'');
     sb.append(", version='").append(version).append('\'');
@@ -238,6 +278,7 @@ public class RuntimesInstance {
     sb.append(", osArch='").append(osArch).append('\'');
     sb.append(", processors=").append(processors);
     sb.append(", heapMax=").append(heapMax);
+    sb.append(", details=").append(details);
     sb.append(", created=").append(created);
     sb.append('}');
     return sb.toString();

@@ -1,12 +1,11 @@
-package events;
+/* Copyright (C) Red Hat 2023 */
+package com.redhat.runtimes.inventory.events;
 
-import com.redhat.runtimes.inventory.events.ArchiveAnnouncementParser;
-import org.junit.jupiter.api.Test;
-
-import static events.Utils.readFromResources;
+import static com.redhat.runtimes.inventory.events.Utils.readFromResources;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
+import org.junit.jupiter.api.Test;
 
 public class ArchiveAnnouncementParserTest {
 
@@ -18,5 +17,4 @@ public class ArchiveAnnouncementParserTest {
     var announce = parser.fromJsonString(json);
     assertEquals("12345", announce.getOrgId());
   }
-
 }

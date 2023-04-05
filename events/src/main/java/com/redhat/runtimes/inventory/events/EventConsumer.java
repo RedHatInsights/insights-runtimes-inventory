@@ -42,8 +42,6 @@ public class EventConsumer {
   private static final String DUPLICATE_COUNTER_NAME = "input.duplicate";
   private static final String CONSUMED_TIMER_NAME = "input.consumed";
 
-  public static final String X_RH_IDENTITY_HEADER = "x-rh-identity";
-
   private static final String EVENT_TYPE_NOT_FOUND_MSG =
       "No event type found for [bundleName=%s, applicationName=%s, eventTypeName=%s]";
 

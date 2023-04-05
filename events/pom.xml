@@ -63,6 +63,12 @@
 
   <dependencies>
 
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>runtimes-inventory-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     <!-- Quarkus -->
     <dependency>
       <groupId>io.quarkus</groupId>

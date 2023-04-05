@@ -1,7 +1,7 @@
 /* Copyright (C) Red Hat 2023 */
 package com.redhat.runtimes.inventory.web;
 
-import static com.redhat.runtimes.inventory.events.EventConsumer.X_RH_IDENTITY_HEADER;
+import static com.redhat.runtimes.inventory.models.Constants.X_RH_IDENTITY_HEADER;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;

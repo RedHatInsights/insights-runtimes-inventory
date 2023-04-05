@@ -1,4 +1,5 @@
-package events;
+/* Copyright (C) Red Hat 2023 */
+package com.redhat.runtimes.inventory.events;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -12,10 +13,11 @@ public final class Utils {
   }
 
   public static byte[] readBytesFromResources(String fName) throws IOException {
-    try (final InputStream is = ArchiveAnnouncementParserTest.class.getClassLoader().getResourceAsStream(fName);
-         final ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+    try (final InputStream is =
+            ArchiveAnnouncementParserTest.class.getClassLoader().getResourceAsStream(fName);
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
       byte[] buffer = new byte[4096];
-      for (;;) {
+      for (; ; ) {
         int nread = is.read(buffer);
         if (nread <= 0) {
           break;
@@ -25,6 +27,4 @@ public final class Utils {
       return baos.toByteArray();
     }
   }
-
-
 }

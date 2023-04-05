@@ -1,11 +1,10 @@
-package events;
+/* Copyright (C) Red Hat 2023 */
+package com.redhat.runtimes.inventory.events;
 
-import com.redhat.runtimes.inventory.events.EventConsumer;
-import org.junit.jupiter.api.Test;
+import static com.redhat.runtimes.inventory.events.Utils.readBytesFromResources;
 
 import java.io.IOException;
-
-import static events.Utils.readBytesFromResources;
+import org.junit.jupiter.api.Test;
 
 public class EventConsumerTest {
 
@@ -15,5 +14,4 @@ public class EventConsumerTest {
     var json = EventConsumer.unzipJson(buffy);
     System.out.println(json);
   }
-
 }

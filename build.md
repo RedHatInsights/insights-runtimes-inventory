@@ -56,3 +56,11 @@ Update the YAML then
 ```
 oc apply -n $NAMESPACE -f clowdapp-runtimes-minimal.yml
 ```
+
+### Adding to stage
+
+```
+docker build -t quay.io/cloudservices/insights-runtimes-inventory .
+docker push quay.io/cloudservices/insights-runtimes-inventory
+```
+

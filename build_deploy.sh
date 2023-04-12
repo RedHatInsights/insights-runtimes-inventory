@@ -18,4 +18,6 @@ docker --config="$DOCKER_CONF" build -t "${REST_IMAGE_NAME}:${IMAGE_TAG}" -t "${
 docker --config="$DOCKER_CONF" build -t "${EVENTS_IMAGE_NAME}:${IMAGE_TAG}" -t "${EVENTS_IMAGE_NAME}:latest" -f deploy/docker/events/Dockerfile .
 
 docker --config="$DOCKER_CONF" push "${REST_IMAGE_NAME}:${IMAGE_TAG}"
+docker --config="$DOCKER_CONF" push "${REST_IMAGE_NAME}:latest"
 docker --config="$DOCKER_CONF" push "${EVENTS_IMAGE_NAME}:${IMAGE_TAG}"
+docker --config="$DOCKER_CONF" push "${EVENTS_IMAGE_NAME}:latest"

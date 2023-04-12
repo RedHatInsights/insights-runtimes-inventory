@@ -17,7 +17,7 @@ objects:
         minReplicas: 1
         name: service
         podSpec:
-          image: quay.io/cloudservices/runtimes-inventory:${IMAGE_TAG}
+          image: quay.io/cloudservices/insights-rbi-events:${IMAGE_TAG}
           livenessProbe:
             failureThreshold: 3
             httpGet:
@@ -51,7 +51,7 @@ objects:
           private: {}
           public:
             # This can override the service name
-            apiPath: runtimes-inventory
+            apiPath: insights-rbi-events
             enabled: true
     kafkaTopics:
       - partitions: 3

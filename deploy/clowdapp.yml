@@ -10,6 +10,7 @@ objects:
     spec:
       cyndi:
         {}
+      envName: ${ENV_NAME}
       database:
         name: runtimes
         version: 13
@@ -67,3 +68,6 @@ parameters:
   - name: IMAGE_TAG
     value: latest
     displayName: the imageTag to deploy
+  - name: ENV_NAME
+    required: true
+    value: stage

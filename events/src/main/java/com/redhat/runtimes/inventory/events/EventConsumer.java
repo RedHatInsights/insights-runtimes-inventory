@@ -42,6 +42,9 @@ public class EventConsumer {
   private static final String DUPLICATE_COUNTER_NAME = "input.duplicate";
   private static final String CONSUMED_TIMER_NAME = "input.consumed";
 
+  static final String VALID_CONTENT_TYPE =
+      "application/vnd.redhat.runtimes-java-general.analytics+tgz";
+
   private static final String EVENT_TYPE_NOT_FOUND_MSG =
       "No event type found for [bundleName=%s, applicationName=%s, eventTypeName=%s]";
 
@@ -82,18 +85,18 @@ public class EventConsumer {
     try {
       // Parse JSON using Jackson
       var announce = jsonParser.fromJsonString(payload);
-      Log.debugf("Processed message URL: %s", announce.getUrl());
+      if (announce.getContentType().equals(VALID_CONTENT_TYPE)) {
+        // Get data back from S3
+        Log.debugf("Processed message URL: %s", announce.getUrl());
+        var archiveJson = getJsonFromS3(announce.getUrl());
+        Log.debugf("Retrieved from S3: %s", archiveJson);
 
-      // Get data back from S3
-      var archiveJson = getJsonFromS3(announce.getUrl());
-      Log.debugf("Retrieved from S3: %s", archiveJson);
+        inst = runtimesInstance(announce, archiveJson);
 
-      inst = runtimesInstance(announce, archiveJson);
-
-      // Persist core data
-      Log.infof("About to persist: %s", inst);
-      entityManager.persist(inst);
-
+        // Persist core data
+        Log.infof("About to persist: %s", inst);
+        entityManager.persist(inst);
+      }
     } catch (Throwable t) {
       processingExceptionCounter.increment();
       Log.errorf(t, "Could not process the payload: %s", inst);

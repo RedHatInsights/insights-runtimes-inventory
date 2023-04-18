@@ -15,6 +15,10 @@ public class ArchiveAnnouncement {
   @JsonPropertyDescription("Application name as used during application registration")
   private String application;
 
+  @JsonProperty("content_type")
+  @JsonPropertyDescription("Application content-type")
+  private String contentType;
+
   @JsonProperty("timestamp")
   @JsonPropertyDescription(
       "ISO-8601 formatted date (per platform convention) when the message was sent in UTC. Dates"
@@ -105,5 +109,15 @@ public class ArchiveAnnouncement {
   @JsonProperty("url")
   public void setUrl(String url) {
     this.url = url;
+  }
+
+  @JsonProperty("content_type")
+  public String getContentType() {
+    return contentType;
+  }
+
+  @JsonProperty("content_type")
+  public void setContentType(String contentType) {
+    this.contentType = contentType;
   }
 }

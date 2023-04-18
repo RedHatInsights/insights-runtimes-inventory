@@ -118,13 +118,15 @@ public class EventConsumer {
     inst.setOrgId(announce.getOrgId());
     inst.setCreated(announce.getTimestamp().atZone(ZoneOffset.UTC));
 
-    // Mow the JSON fields
     TypeReference<Map<String, Object>> typeRef = new TypeReference<>() {};
 
     var mapper = new ObjectMapper();
     try {
       var o = mapper.readValue(json, typeRef);
       var basic = (Map<String, Object>) o.get("basic");
+      if (basic == null) {
+        throw new RuntimeException("Error in unmarshalling JSON - does not contain a basic tag");
+      }
 
       inst.setVersionString(String.valueOf(basic.get("java.runtime.version")));
       inst.setVersion(String.valueOf(basic.get("java.version")));

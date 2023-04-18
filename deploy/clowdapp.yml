@@ -14,7 +14,6 @@ objects:
       database:
         name: runtimes
         version: 13
-        # Force redeploy comment: 2023-04-14:17:36
       deployments:
         - metadata: {}
           minReplicas: 1

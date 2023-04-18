@@ -79,13 +79,16 @@ public class EventConsumer {
     // This timer will have dynamic tag values based on the action parsed from the received message.
     Timer.Sample consumedTimer = Timer.start(registry);
     var payload = message.getPayload();
-    Log.infof("Processing received Kafka message %s", payload);
 
     RuntimesInstance inst = null;
     try {
+      Log.debugf("Processing received Kafka message %s", payload);
+
       // Parse JSON using Jackson
       var announce = jsonParser.fromJsonString(payload);
       if (announce.getContentType().equals(VALID_CONTENT_TYPE)) {
+        Log.infof("Processing our Kafka message %s", payload);
+
         // Get data back from S3
         Log.debugf("Processed message URL: %s", announce.getUrl());
         var archiveJson = getJsonFromS3(announce.getUrl());

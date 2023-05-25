@@ -131,8 +131,12 @@ public class EventConsumer {
       inst.setVersionString(String.valueOf(basic.get("java.runtime.version")));
       inst.setVersion(String.valueOf(basic.get("java.version")));
       inst.setVendor(String.valueOf(basic.get("java.vm.specification.vendor")));
-      inst.setMajorVersion(
-          Integer.parseInt(String.valueOf(basic.get("java.vm.specification.version"))));
+
+      var strVersion = String.valueOf(basic.get("java.vm.specification.version"));
+      if (strVersion.startsWith("1.")) {
+        strVersion = strVersion.substring(2);
+      }
+      inst.setMajorVersion(Integer.parseInt(strVersion));
 
       // FIXME Add heap min
       inst.setHeapMax((int) Double.parseDouble(String.valueOf(basic.get("jvm.heap.max"))));

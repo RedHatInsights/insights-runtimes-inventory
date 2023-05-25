@@ -1,0 +1,183 @@
+{
+  "version" : "1.0.0",
+  "basic" : {
+    "app.user.dir" : "/Users/ben/projects/insights4runtimes-spike",
+    "java.specification.version" : "17",
+    "java.runtime.version" : "17.0.1+12",
+    "java.class.path" : "/Users/ben/projects/insights4runtimes-spike/target/classes:/Users/ben/.m2/repository/com/redhat/insights/runtimes-java-core-runtime/1.0.0-SNAPSHOT/runtimes-java-core-runtime-1.0.0-SNAPSHOT.jar:/Users/ben/.m2/repository/com/redhat/insights/runtimes-java-api/1.0.0-SNAPSHOT/runtimes-java-api-1.0.0-SNAPSHOT.jar:/Users/ben/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.14.2/jackson-core-2.14.2.jar:/Users/ben/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.14.2/jackson-databind-2.14.2.jar:/Users/ben/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jsr310/2.14.2/jackson-datatype-jsr310-2.14.2.jar:/Users/ben/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.14.2/jackson-annotations-2.14.2.jar:/Users/ben/.m2/repository/org/wildfly/security/wildfly-elytron-x500-cert/2.1.0.Final/wildfly-elytron-x500-cert-2.1.0.Final.jar:/Users/ben/.m2/repository/org/wildfly/security/wildfly-elytron-asn1/2.1.0.Final/wildfly-elytron-asn1-2.1.0.Final.jar:/Users/ben/.m2/repository/org/wildfly/security/wildfly-elytron-x500/2.1.0.Final/wildfly-elytron-x500-2.1.0.Final.jar:/Users/ben/.m2/repository/org/wildfly/security/wildfly-elytron-x500-cert-util/2.1.0.Final/wildfly-elytron-x500-cert-util-2.1.0.Final.jar:/Users/ben/.m2/repository/org/wildfly/common/wildfly-common/1.5.4.Final/wildfly-common-1.5.4.Final.jar",
+    "system.os.name" : "Mac OS X",
+    "app.transport.type.file" : "rhel",
+    "java.vm.vendor" : "Eclipse Adoptium",
+    "jvm.packages" : "[package com.redhat.insights.config, package com.intellij.rt.execution.application, package com.redhat.insights.jars, package com.redhat.insights, package com.fasterxml.jackson.core, Jackson-core, version 2.14.2, package com.redhat.sample, package com.fasterxml.jackson.databind.module, jackson-databind, version 2.14.2, package com.redhat.insights.core, package com.fasterxml.jackson.databind.jsonFormatVisitors, jackson-databind, version 2.14.2, package com.redhat.insights.logging, package com.fasterxml.jackson.datatype.jsr310, Jackson datatype: JSR310, version 2.14.2, package com.redhat.insights.http, package com.redhat.insights.core.app, package com.redhat.insights.tls, package com.fasterxml.jackson.databind, jackson-databind, version 2.14.2]",
+    "system.os.version" : "11.3",
+    "jvm.args" : [ "-javaagent:/Applications/IntelliJ IDEA.app/Contents/lib/idea_rt.jar=49401:/Applications/IntelliJ IDEA.app/Contents/bin", "-Dfile.encoding=UTF-8" ],
+    "java.vm.specification.version" : "17",
+    "java.vm.name" : "OpenJDK 64-Bit Server VM",
+    "java.vendor.version" : "Temurin-17.0.1+12",
+    "jvm.heap.min" : 512,
+    "app.name" : "sample_app",
+    "app.user.name" : "ben",
+    "java.command" : "com.redhat.sample.SampleApplication Java",
+    "java.version" : "17.0.1",
+    "jvm.heap.gc.details" : "gc::G1 Young Generation::G1 Old Generation",
+    "java.specification.vendor" : "Oracle Corporation",
+    "java.home" : "/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home",
+    "jvm.heap.max" : 8192,
+    "system.arch" : "x86_64",
+    "java.library.path" : "/Users/ben/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:.",
+    "jvm.report_time" : 1685006422892,
+    "java.vm.specification.vendor" : "Oracle Corporation",
+    "java.vendor" : "Eclipse Adoptium",
+    "jvm.pid" : 84239,
+    "java.class.version" : "61.0",
+    "jvm.http.nonProxyHosts" : "local|*.local|169.254/16|*.169.254/16",
+    "system.hostname" : "uriel.local",
+    "system.cores.logical" : 12
+  },
+  "details" : {
+    "type" : "General Java app"
+  },
+  "jars" : {
+    "version" : "1.0.0",
+    "jars" : [ {
+      "name" : "runtimes-java-core-runtime-1.0.0-SNAPSHOT.jar",
+      "version" : "1.0.0-SNAPSHOT",
+      "attributes" : {
+        "sha1Checksum" : "561ec3fe3f1c9ca5561d81952dc0f0c887723eb6",
+        "groupId" : "com.redhat.insights",
+        "sha256Checksum" : "5bf9fe88aa475ce9dbbdaab069a8eb33b4508e1d296456c00f184cf1da579c79",
+        "artifactId" : "runtimes-java-core-runtime",
+        "sha512Checksum" : "48934861ae91b50dc2416a0f4b5cab7f07b0d38ee89f19e78633d276aca5be748d245fc74434b607ede1ffaea58d01ed914664470bb9c1b1cdeff97a3e48cf63",
+        "version" : "1.0.0-SNAPSHOT"
+      }
+    }, {
+      "name" : "runtimes-java-api-1.0.0-SNAPSHOT.jar",
+      "version" : "1.0.0-SNAPSHOT",
+      "attributes" : {
+        "sha1Checksum" : "627cee23045d0961bf4bc0cccbed62b7e54365cd",
+        "groupId" : "com.redhat.insights",
+        "sha256Checksum" : "91e80c4650a9c5718d5cc9fa86b8d58a59841cde2ff33dc2a42da30b52c8726f",
+        "artifactId" : "runtimes-java-api",
+        "sha512Checksum" : "92ea8476a1d3da9913a0c0801e7cc96b7e76c0a5758b7840b88e7f998c5646685f0988ff4c6df0ff41773bf0182e4d4e015992d69acaa7deaf1a654aec91655c",
+        "version" : "1.0.0-SNAPSHOT"
+      }
+    }, {
+      "name" : "jackson-core-2.14.2.jar",
+      "version" : "2.14.2",
+      "attributes" : {
+        "sha1Checksum" : "f804090e6399ce0cf78242db086017512dd71fcc",
+        "Implementation-Vendor" : "FasterXML",
+        "groupId" : "com.fasterxml.jackson.core",
+        "sha256Checksum" : "b5d37a77c88277b97e3593c8740925216c06df8e4172bbde058528df04ad3e7a",
+        "artifactId" : "jackson-core",
+        "sha512Checksum" : "208953cf72691b3bab1ca2f9a045cccd3d75c46c90099ba884fbf16bc3e45045e5cd014d2c68c96e8a8826f87a5f0e18cb34b35e7ef03348953869c21e197367",
+        "Implementation-Vendor-Id" : "com.fasterxml.jackson.core",
+        "version" : "2.14.2"
+      }
+    }, {
+      "name" : "jackson-databind-2.14.2.jar",
+      "version" : "2.14.2",
+      "attributes" : {
+        "sha1Checksum" : "01e71fddbc80bb86f71a6345ac1e8ab8a00e7134",
+        "Implementation-Vendor" : "FasterXML",
+        "groupId" : "com.fasterxml.jackson.core",
+        "sha256Checksum" : "501d3abce4d18dcc381058ec593c5b94477906bba6efbac14dae40a642f77424",
+        "artifactId" : "jackson-databind",
+        "sha512Checksum" : "85473a29d23292f49092af9e7a7a63993206847c53b3e71f3c67245d68f7b19cc7c341e0ece409eb5e96602df98a848e957d8691fdd2c5fcddd807df9078255e",
+        "Implementation-Vendor-Id" : "com.fasterxml.jackson.core",
+        "version" : "2.14.2"
+      }
+    }, {
+      "name" : "jackson-datatype-jsr310-2.14.2.jar",
+      "version" : "2.14.2",
+      "attributes" : {
+        "sha1Checksum" : "796518148a385b2728d44886cc0f8852eb8eeb53",
+        "Implementation-Vendor" : "FasterXML",
+        "groupId" : "com.fasterxml.jackson.datatype",
+        "sha256Checksum" : "75651b65733ed94e4e28e4ba0817218d93e71e8a7f06f6ab3662752974d2bcae",
+        "artifactId" : "jackson-datatype-jsr310",
+        "sha512Checksum" : "5ea76e302154fdde769622a6891c45cb56ea06277c25cd36b1cc52cbffbeb59e7b4a25d824d2e33d1473c7ba1044ce2141573564457f649ab2a59e6b1086d17e",
+        "Implementation-Vendor-Id" : "com.fasterxml.jackson.datatype",
+        "version" : "2.14.2"
+      }
+    }, {
+      "name" : "jackson-annotations-2.14.2.jar",
+      "version" : "2.14.2",
+      "attributes" : {
+        "sha1Checksum" : "a7aae9525864930723e3453ab799521fdfd9d873",
+        "Implementation-Vendor" : "FasterXML",
+        "groupId" : "com.fasterxml.jackson.core",
+        "sha256Checksum" : "2c6869d505cf60dc066734b7d50339f975bd3adc635e26a78abb71acb4473c0d",
+        "artifactId" : "jackson-annotations",
+        "sha512Checksum" : "a978384791bdc074df8039ffc95bb93f0f60d14d476861ee2a0ce208b33a991c486a07345cb80559252c3ff1dea14d3efb818c19bdc18435946dc8754d8e6ee3",
+        "Implementation-Vendor-Id" : "com.fasterxml.jackson.core",
+        "version" : "2.14.2"
+      }
+    }, {
+      "name" : "wildfly-elytron-x500-cert-2.1.0.Final.jar",
+      "version" : "2.1.0.Final",
+      "attributes" : {
+        "sha1Checksum" : "d3f187eba97208723e63b740f8f7c349d3995692",
+        "Implementation-Vendor" : "JBoss by Red Hat",
+        "groupId" : "org.wildfly.security",
+        "sha256Checksum" : "e9c5b51203879d49aba279ebe9660f1c85952c9731371e9199228300727d4017",
+        "artifactId" : "wildfly-elytron-x500-cert",
+        "sha512Checksum" : "5942d7cbb12128822250d49632ca3bf164ade74818e747e5ab41ee2f9ada72852e05b6545d7d9c6ea92617a65c680b98f66e41cfbbdd1e71c4ff8dbecddc6fc3",
+        "Implementation-Vendor-Id" : "org.wildfly.security",
+        "version" : "2.1.0.Final"
+      }
+    }, {
+      "name" : "wildfly-elytron-asn1-2.1.0.Final.jar",
+      "version" : "2.1.0.Final",
+      "attributes" : {
+        "sha1Checksum" : "979a7d3bab59a5e58789e55aceed0f6bc6a0c8bc",
+        "Implementation-Vendor" : "JBoss by Red Hat",
+        "groupId" : "org.wildfly.security",
+        "sha256Checksum" : "c5cb6bf96e3f51fa6188e96a61193bc97d8ea2617de486a5d6b6b764a88137ad",
+        "artifactId" : "wildfly-elytron-asn1",
+        "sha512Checksum" : "249ffa8f971898af6874c45c934fbe8de6ecea01d9e1f90874a02aed072ab48e2a2c503335efcd860f5e4ef5bf0d2b8b0b6db0d3ab42119860f6cdf373313f54",
+        "Implementation-Vendor-Id" : "org.wildfly.security",
+        "version" : "2.1.0.Final"
+      }
+    }, {
+      "name" : "wildfly-elytron-x500-2.1.0.Final.jar",
+      "version" : "2.1.0.Final",
+      "attributes" : {
+        "sha1Checksum" : "0f9ba0055b229733577370c65140ae236913c503",
+        "Implementation-Vendor" : "JBoss by Red Hat",
+        "groupId" : "org.wildfly.security",
+        "sha256Checksum" : "1e94fbac674e35d7c1d1c675e28f5344098ca930a2ad64ea8357a7d99815198d",
+        "artifactId" : "wildfly-elytron-x500",
+        "sha512Checksum" : "e4c49ed0157d80f7def525d3bd1ab2e839147926def92975ff9f5ba7f673d09fd66864a7e41cf778e322fef83347f583db69c98c98d144fcffaaa90d6c99fb5b",
+        "Implementation-Vendor-Id" : "org.wildfly.security",
+        "version" : "2.1.0.Final"
+      }
+    }, {
+      "name" : "wildfly-elytron-x500-cert-util-2.1.0.Final.jar",
+      "version" : "2.1.0.Final",
+      "attributes" : {
+        "sha1Checksum" : "75ca96a7ea4a2f09e92011e29ca69ff60d9b8811",
+        "Implementation-Vendor" : "JBoss by Red Hat",
+        "groupId" : "org.wildfly.security",
+        "sha256Checksum" : "6d5b43474e7e449d6073fb3ab04135617cac09b230019f921d6f6d1b3fff45f5",
+        "artifactId" : "wildfly-elytron-x500-cert-util",
+        "sha512Checksum" : "fa3009b5126fe364b05b7c2bbe15936f6333b1e68c9adecd9b7eeaf6afc30726e0627f47cd47db29a101c036e7224a772943395834d27d0293eaf799697248f9",
+        "Implementation-Vendor-Id" : "org.wildfly.security",
+        "version" : "2.1.0.Final"
+      }
+    }, {
+      "name" : "wildfly-common-1.5.4.Final.jar",
+      "version" : "1.5.4.Final",
+      "attributes" : {
+        "sha1Checksum" : "735ceee5616d5143bac1bc740e444697073c002f",
+        "Implementation-Vendor" : "JBoss by Red Hat",
+        "groupId" : "org.wildfly.common",
+        "sha256Checksum" : "9fda3caf8bd528dec56ebc70daf78f5a9ff5d0bfcea8b3e41ab7ae838747e46a",
+        "artifactId" : "wildfly-common",
+        "sha512Checksum" : "69c5aec2c4748038b81ee7f72ed48b64325a82ff754dabefb2c389cbc50246cc6183cd0033a08d6261aaeb521be91ca48a7c95d03a2ff2103608862d0bf7b732",
+        "Implementation-Vendor-Id" : "org.wildfly.common",
+        "version" : "1.5.4.Final"
+      }
+    } ]
+  }
+}

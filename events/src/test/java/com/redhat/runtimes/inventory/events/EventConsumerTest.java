@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Map;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class EventConsumerTest {
@@ -42,6 +43,19 @@ public class EventConsumerTest {
     json = readFromResources("test17.json");
     inst = runtimesInstance(dummy, json);
     hostname = "uriel.local";
+    assertEquals(hostname, inst.getHostname());
+  }
+
+  @Test
+  @Disabled
+  public void test_runtimesInstance_MWTELE_67() throws IOException {
+    var dummy = new ArchiveAnnouncement();
+    dummy.setTimestamp(LocalDateTime.MIN);
+
+    var buffy = readBytesFromResources("update1.json.gz");
+    var json = EventConsumer.unzipJson(buffy);
+    var inst = runtimesInstance(dummy, json);
+    var hostname = "fedora";
     assertEquals(hostname, inst.getHostname());
   }
 }

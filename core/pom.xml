@@ -12,6 +12,13 @@
 
   <dependencies>
 
+    <!-- Jakarta -->
+    <dependency>
+      <groupId>jakarta.persistence</groupId>
+      <artifactId>jakarta.persistence-api</artifactId>
+      <version>${jakarta.version}</version>
+    </dependency>
+
     <!-- Quarkus -->
     <dependency>
       <groupId>io.quarkus</groupId>
@@ -29,11 +36,11 @@
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-hibernate-validator</artifactId>
     </dependency>
-    <dependency>
-      <groupId>io.quarkiverse.hibernatetypes</groupId>
-      <artifactId>quarkus-hibernate-types</artifactId>
-      <version>${quarkus-hibernate-types.version}</version>
-    </dependency>
+    <!--    <dependency>-->
+    <!--      <groupId>io.quarkiverse.hibernatetypes</groupId>-->
+    <!--      <artifactId>quarkus-hibernate-types</artifactId>-->
+    <!--      <version>${quarkus-hibernate-types.version}</version>-->
+    <!--    </dependency>-->
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-jdbc-postgresql</artifactId>
@@ -91,7 +98,6 @@
     <!--      <version>999-SNAPSHOT</version>-->
     <!--    </dependency>-->
 
-    <!-- Quarkus BOM -->
     <dependency>
       <groupId>io.smallrye.reactive</groupId>
       <artifactId>smallrye-mutiny-vertx-web-client</artifactId>

@@ -2,13 +2,13 @@
 package com.redhat.runtimes.inventory;
 
 import io.quarkus.logging.Log;
+import jakarta.enterprise.context.ApplicationScoped;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.util.regex.Pattern;
-import javax.enterprise.context.ApplicationScoped;
 import org.eclipse.microprofile.config.ConfigProvider;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 

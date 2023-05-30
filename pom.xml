@@ -16,7 +16,7 @@
 
   <properties>
     <enforcer-plugin.version>3.1.0</enforcer-plugin.version>
-    <maven-minimum-version>3.8.4</maven-minimum-version>
+    <maven-minimum-version>3.9.2</maven-minimum-version>
     <java-version>17</java-version>
     <compiler-plugin.version>3.10.1</compiler-plugin.version>
     <maven.compiler.parameters>true</maven.compiler.parameters>
@@ -41,13 +41,15 @@
 
     <clowder-quarkus-config-source.version>1.3.0</clowder-quarkus-config-source.version>
 
+    <jakarta.version>3.1.0</jakarta.version>
+
     <quarkus-logging-cloudwatch.version>5.2.0</quarkus-logging-cloudwatch.version>
     <quarkus-logging-sentry.version>1.2.1</quarkus-logging-sentry.version>
-    <quarkus-hibernate-types.version>1.0.1</quarkus-hibernate-types.version>
+    <!--    <quarkus-hibernate-types.version>1.0.1</quarkus-hibernate-types.version>-->
 
     <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
     <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
-    <quarkus.platform.version>2.15.3.Final</quarkus.platform.version>
+    <quarkus.platform.version>3.0.4.Final</quarkus.platform.version>
   </properties>
 
   <dependencyManagement>

@@ -6,10 +6,10 @@ import static com.fasterxml.jackson.annotation.JsonProperty.Access.READ_ONLY;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.PrePersist;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.PrePersist;
 
 @MappedSuperclass
 public abstract class CreationTimestamped {

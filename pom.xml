@@ -35,13 +35,10 @@
     <checkstyle.version>10.6.0</checkstyle.version>
 
     <testcontainers.version>1.17.6</testcontainers.version>
-    <version.cloud-commons>0.1.1</version.cloud-commons>
-    <openapi-parser.version>4.0.4</openapi-parser.version>
     <failsafe.version>3.3.0</failsafe.version>
 
     <mockserver-netty-no-dependencies.version>5.15.0</mockserver-netty-no-dependencies.version>
 
-    <insights-notification-schemas-java.version>0.18</insights-notification-schemas-java.version>
     <clowder-quarkus-config-source.version>1.3.0</clowder-quarkus-config-source.version>
 
     <quarkus-logging-cloudwatch.version>5.2.0</quarkus-logging-cloudwatch.version>

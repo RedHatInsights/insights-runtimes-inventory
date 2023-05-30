@@ -1,5 +1,6 @@
 CREATE TABLE public.runtimes_instance(
     id uuid NOT NULL,
+    linking_hash character varying(255) NOT NULL,
     account_id character varying(50) NOT NULL,
     org_id character varying(50) NOT NULL,
     hostname character varying(50) NOT NULL,

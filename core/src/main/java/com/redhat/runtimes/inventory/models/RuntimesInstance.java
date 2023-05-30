@@ -20,6 +20,10 @@ public class RuntimesInstance {
 
   @Id @GeneratedValue private UUID id;
 
+  @NotNull
+  @Size(max = 255)
+  private String linkingHash;
+
   @Size(max = 50)
   private String accountId;
 
@@ -117,6 +121,14 @@ public class RuntimesInstance {
 
   public void setId(UUID id) {
     this.id = id;
+  }
+
+  public void setLinkingHash(String linkingHash) {
+    this.linkingHash = linkingHash;
+  }
+
+  public String getLinkingHash() {
+    return linkingHash;
   }
 
   public String getAccountId() {

@@ -12,13 +12,6 @@
 
   <dependencies>
 
-    <!-- Jakarta -->
-    <dependency>
-      <groupId>jakarta.persistence</groupId>
-      <artifactId>jakarta.persistence-api</artifactId>
-      <version>${jakarta.version}</version>
-    </dependency>
-
     <!-- Quarkus -->
     <dependency>
       <groupId>io.quarkus</groupId>

@@ -127,12 +127,14 @@ public class EventConsumer {
       if (basic == null) {
         throw new RuntimeException("Error in unmarshalling JSON - does not contain a basic tag");
       }
+      inst.setLinkingHash((String) o.get("idHash"));
 
       inst.setVersionString(String.valueOf(basic.get("java.runtime.version")));
       inst.setVersion(String.valueOf(basic.get("java.version")));
       inst.setVendor(String.valueOf(basic.get("java.vm.specification.vendor")));
 
       var strVersion = String.valueOf(basic.get("java.vm.specification.version"));
+      // Handle Java 8
       if (strVersion.startsWith("1.")) {
         strVersion = strVersion.substring(2);
       }

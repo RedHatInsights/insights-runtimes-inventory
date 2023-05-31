@@ -27,10 +27,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.ZoneOffset;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletionStage;
 import java.util.zip.GZIPInputStream;
 import org.eclipse.microprofile.reactive.messaging.Acknowledgment;
@@ -107,7 +104,7 @@ public class EventConsumer {
         var jarHashes = jarHashesOf(inst, archiveJson);
         Log.infof("About to persist %s jar entries", jarHashes.size());
         if (jarHashes.size() > 0) {
-          entityManager.persist(jarHashes);
+          entityManager.persist(jarHashes.get(0));
         }
       }
     } catch (Throwable t) {
@@ -121,7 +118,7 @@ public class EventConsumer {
     return message.ack();
   }
 
-  static Set<JarHash> jarHashesOf(RuntimesInstance inst, String json) {
+  static List<JarHash> jarHashesOf(RuntimesInstance inst, String json) {
     TypeReference<Map<String, Object>> typeRef = new TypeReference<>() {};
 
     var mapper = new ObjectMapper();
@@ -129,13 +126,13 @@ public class EventConsumer {
       var o = mapper.readValue(json, typeRef);
       var jarsRep = (Map<String, Object>) o.get("jars");
       if (jarsRep == null) {
-        return Set.of();
+        return List.of();
       }
       var jars = (List<Object>) jarsRep.get("jars");
       if (jars == null) {
-        return Set.of();
+        return List.of();
       }
-      var out = new HashSet<JarHash>();
+      var out = new ArrayList<JarHash>();
       jars.forEach(j -> out.add(jarHashOf(inst, (Map<String, Object>) j)));
 
       var eapRep = (Map<String, Object>) o.get("eap");

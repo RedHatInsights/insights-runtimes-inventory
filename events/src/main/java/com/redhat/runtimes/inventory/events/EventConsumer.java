@@ -104,7 +104,9 @@ public class EventConsumer {
 
         var jarHashes = jarHashesOf(inst, archiveJson);
         Log.infof("About to persist %s jar entries", jarHashes.size());
-        entityManager.persist(jarHashes);
+        if (jarHashes.size() > 0) {
+          entityManager.persist(jarHashes);
+        }
       }
     } catch (Throwable t) {
       processingExceptionCounter.increment();

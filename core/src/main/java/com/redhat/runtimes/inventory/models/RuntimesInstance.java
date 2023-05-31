@@ -1,20 +1,18 @@
 /* Copyright (C) Red Hat 2023 */
 package com.redhat.runtimes.inventory.models;
 
-import io.quarkiverse.hibernate.types.json.JsonBinaryType;
+import static org.hibernate.type.SqlTypes.*;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
-import org.hibernate.annotations.TypeDefs;
+import org.hibernate.annotations.JdbcTypeCode;
 
 @Entity
-@TypeDefs(value = {@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)})
 @Table(name = "runtimes_instance")
 public class RuntimesInstance {
 
@@ -71,7 +69,7 @@ public class RuntimesInstance {
   @NotNull private int heapMax;
 
   @NotNull
-  @Type(type = "jsonb")
+  @JdbcTypeCode(JSON)
   @Column(columnDefinition = "jsonb")
   private Map<String, Object> details;
 

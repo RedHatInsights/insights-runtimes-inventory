@@ -10,12 +10,12 @@ import com.redhat.runtimes.inventory.models.RuntimesInstance;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.quarkus.logging.Log;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
 import java.util.Base64;
 import java.util.Map;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
 
 @Path("/api/runtimes-inventory/v1")
 public class DisplayInventory {

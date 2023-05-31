@@ -20,15 +20,13 @@ CREATE TABLE public.runtimes_instance(
 CREATE TABLE public.jar_hash(
     id uuid NOT NULL,
     instance_id uuid NOT NULL,
---     instance_hash character varying(255) NOT NULL,
---    hash character varying(255) NOT NULL,
     name character varying(255) NOT NULL,
     group_id character varying(255) NOT NULL,
     vendor character varying(255) NOT NULL,
     version character varying(255) NOT NULL,
-    sha1_checksum character varying(255) NOT NULL,
-    sha256_checksum character varying(255) NOT NULL,
-    sha512_checksum character varying(255) NOT NULL,
+    sha1checksum character varying(255) NOT NULL,
+    sha256checksum character varying(255) NOT NULL,
+    sha512checksum character varying(255) NOT NULL,
     PRIMARY KEY (id)
 );
 

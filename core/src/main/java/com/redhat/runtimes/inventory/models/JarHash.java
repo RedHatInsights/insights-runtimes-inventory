@@ -16,7 +16,7 @@ public final class JarHash {
 
   @ManyToOne(optional = false)
   @NaturalId
-  RuntimesInstance instance;
+  private RuntimesInstance instance;
 
   @NotNull
   @Size(max = 255)

@@ -100,12 +100,6 @@ public class EventConsumer {
         // Persist core data
         Log.infof("About to persist: %s", inst);
         entityManager.persist(inst);
-
-        var jarHashes = jarHashesOf(inst, archiveJson);
-        Log.infof("About to persist %s jar entries", jarHashes.size());
-        if (jarHashes.size() > 0) {
-          entityManager.persist(jarHashes.get(0));
-        }
       }
     } catch (Throwable t) {
       processingExceptionCounter.increment();
@@ -116,51 +110,6 @@ public class EventConsumer {
     }
 
     return message.ack();
-  }
-
-  static List<JarHash> jarHashesOf(RuntimesInstance inst, String json) {
-    TypeReference<Map<String, Object>> typeRef = new TypeReference<>() {};
-
-    var mapper = new ObjectMapper();
-    try {
-      var o = mapper.readValue(json, typeRef);
-      var jarsRep = (Map<String, Object>) o.get("jars");
-      if (jarsRep == null) {
-        return List.of();
-      }
-      var jars = (List<Object>) jarsRep.get("jars");
-      if (jars == null) {
-        return List.of();
-      }
-      var out = new ArrayList<JarHash>();
-      jars.forEach(j -> out.add(jarHashOf(inst, (Map<String, Object>) j)));
-
-      var eapRep = (Map<String, Object>) o.get("eap");
-      if (eapRep != null) {
-        // FIXME Do EAP-specific processing
-        Log.infof("EAP-specific processing required");
-      }
-      return out;
-    } catch (JsonProcessingException | ClassCastException | NumberFormatException e) {
-      Log.error("Error in unmarshalling JSON for jars", e);
-      throw new RuntimeException("Error in unmarshalling JSON for jars", e);
-    }
-  }
-
-  static JarHash jarHashOf(RuntimesInstance inst, Map<String, Object> jarJson) {
-    var out = new JarHash();
-    out.setInstanceId(inst.getId());
-    out.setName((String) jarJson.getOrDefault("name", ""));
-    out.setVersion((String) jarJson.getOrDefault("version", ""));
-
-    var attrs = (Map<String, String>) jarJson.getOrDefault("attributes", Map.of());
-    out.setGroupId(attrs.getOrDefault("group_id", ""));
-    out.setVendor(attrs.getOrDefault("vendor", ""));
-    out.setSha1Checksum(attrs.getOrDefault("sha1_checksum", ""));
-    out.setSha256Checksum(attrs.getOrDefault("sha256_checksum", ""));
-    out.setSha512Checksum(attrs.getOrDefault("sha512_checksum", ""));
-
-    return out;
   }
 
   static RuntimesInstance runtimesInstanceOf(ArchiveAnnouncement announce, String json) {
@@ -201,12 +150,59 @@ public class EventConsumer {
       inst.setHostname(String.valueOf(basic.get("system.hostname")));
 
       inst.setDetails(basic);
+
+      inst.setJarHashes(jarHashesOf(inst, json));
     } catch (JsonProcessingException | ClassCastException | NumberFormatException e) {
       Log.error("Error in unmarshalling JSON", e);
       throw new RuntimeException("Error in unmarshalling JSON", e);
     }
 
     return inst;
+  }
+
+  static Set<JarHash> jarHashesOf(RuntimesInstance inst, String json) {
+    TypeReference<Map<String, Object>> typeRef = new TypeReference<>() {};
+
+    var mapper = new ObjectMapper();
+    try {
+      var o = mapper.readValue(json, typeRef);
+      var jarsRep = (Map<String, Object>) o.get("jars");
+      if (jarsRep == null) {
+        return Set.of();
+      }
+      var jars = (List<Object>) jarsRep.get("jars");
+      if (jars == null) {
+        return Set.of();
+      }
+      var out = new HashSet<JarHash>();
+      jars.forEach(j -> out.add(jarHashOf(inst, (Map<String, Object>) j)));
+
+      var eapRep = (Map<String, Object>) o.get("eap");
+      if (eapRep != null) {
+        // FIXME Do EAP-specific processing
+        // Log.infof("EAP-specific processing required");
+      }
+      return out;
+    } catch (JsonProcessingException | ClassCastException | NumberFormatException e) {
+      Log.error("Error in unmarshalling JSON for jars", e);
+      throw new RuntimeException("Error in unmarshalling JSON for jars", e);
+    }
+  }
+
+  static JarHash jarHashOf(RuntimesInstance inst, Map<String, Object> jarJson) {
+    var out = new JarHash();
+    out.setInstance(inst);
+    out.setName((String) jarJson.getOrDefault("name", ""));
+    out.setVersion((String) jarJson.getOrDefault("version", ""));
+
+    var attrs = (Map<String, String>) jarJson.getOrDefault("attributes", Map.of());
+    out.setGroupId(attrs.getOrDefault("group_id", ""));
+    out.setVendor(attrs.getOrDefault("vendor", ""));
+    out.setSha1Checksum(attrs.getOrDefault("sha1_checksum", ""));
+    out.setSha256Checksum(attrs.getOrDefault("sha256_checksum", ""));
+    out.setSha512Checksum(attrs.getOrDefault("sha512_checksum", ""));
+
+    return out;
   }
 
   static String unzipJson(byte[] buffy) {

@@ -7,9 +7,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.time.ZonedDateTime;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import org.hibernate.annotations.JdbcTypeCode;
 
 @Entity
@@ -75,6 +73,8 @@ public final class RuntimesInstance {
 
   // Data record created
   @NotNull private ZonedDateTime created;
+
+  @OneToMany private Set<JarHash> jarHashes;
 
   //////////////////////////////////////////////////////
 
@@ -231,6 +231,14 @@ public final class RuntimesInstance {
 
   public void setDetails(Map<String, Object> details) {
     this.details = details;
+  }
+
+  public Set<JarHash> getJarHashes() {
+    return jarHashes;
+  }
+
+  public void setJarHashes(Set<JarHash> jarHashes) {
+    this.jarHashes = jarHashes;
   }
 
   @Override

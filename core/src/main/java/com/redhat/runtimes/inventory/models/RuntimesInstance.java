@@ -14,7 +14,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 
 @Entity
 @Table(name = "runtimes_instance")
-public class RuntimesInstance {
+public final class RuntimesInstance {
 
   @Id @GeneratedValue private UUID id;
 

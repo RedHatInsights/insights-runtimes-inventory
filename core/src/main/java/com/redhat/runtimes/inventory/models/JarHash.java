@@ -1,14 +1,12 @@
 /* Copyright (C) Red Hat 2023 */
 package com.redhat.runtimes.inventory.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.Objects;
 import java.util.UUID;
+import org.hibernate.annotations.NaturalId;
 
 @Entity
 @Table(name = "jar_hash")
@@ -16,9 +14,9 @@ public final class JarHash {
 
   @Id @GeneratedValue private UUID id;
 
-  @NotNull
-  @Size(max = 255)
-  private UUID instanceId;
+  @ManyToOne(optional = false)
+  @NaturalId
+  RuntimesInstance instance;
 
   @NotNull
   @Size(max = 255)
@@ -54,7 +52,7 @@ public final class JarHash {
 
   public JarHash(
       UUID id,
-      UUID instanceId,
+      RuntimesInstance instance,
       String name,
       String groupId,
       String vendor,
@@ -63,7 +61,7 @@ public final class JarHash {
       String sha256Checksum,
       String sha512Checksum) {
     this.id = id;
-    this.instanceId = instanceId;
+    this.instance = instance;
     this.name = name;
     this.groupId = groupId;
     this.vendor = vendor;
@@ -83,12 +81,12 @@ public final class JarHash {
     this.id = id;
   }
 
-  public UUID getInstanceId() {
-    return instanceId;
+  public RuntimesInstance getInstance() {
+    return instance;
   }
 
-  public void setInstanceId(UUID instanceId) {
-    this.instanceId = instanceId;
+  public void setInstance(RuntimesInstance instance) {
+    this.instance = instance;
   }
 
   public String getName() {
@@ -153,7 +151,7 @@ public final class JarHash {
     if (o == null || getClass() != o.getClass()) return false;
     JarHash jarHash = (JarHash) o;
     return Objects.equals(id, jarHash.id)
-        && Objects.equals(instanceId, jarHash.instanceId)
+        && Objects.equals(instance, jarHash.instance)
         && Objects.equals(name, jarHash.name)
         && Objects.equals(groupId, jarHash.groupId)
         && Objects.equals(vendor, jarHash.vendor)
@@ -166,22 +164,14 @@ public final class JarHash {
   @Override
   public int hashCode() {
     return Objects.hash(
-        id,
-        instanceId,
-        name,
-        groupId,
-        vendor,
-        version,
-        sha1Checksum,
-        sha256Checksum,
-        sha512Checksum);
+        id, instance, name, groupId, vendor, version, sha1Checksum, sha256Checksum, sha512Checksum);
   }
 
   @Override
   public String toString() {
     final StringBuffer sb = new StringBuffer("JarHash{");
     sb.append("id=").append(id);
-    sb.append(", instanceId=").append(instanceId);
+    sb.append(", instance=").append(instance);
     sb.append(", name='").append(name).append('\'');
     sb.append(", groupId='").append(groupId).append('\'');
     sb.append(", vendor='").append(vendor).append('\'');

@@ -74,7 +74,8 @@ public final class RuntimesInstance {
   // Data record created
   @NotNull private ZonedDateTime created;
 
-  @OneToMany private Set<JarHash> jarHashes;
+  @OneToMany(cascade = CascadeType.ALL)
+  private Set<JarHash> jarHashes;
 
   //////////////////////////////////////////////////////
 

@@ -1,7 +1,7 @@
 /* Copyright (C) Red Hat 2023 */
 package com.redhat.runtimes.inventory.events;
 
-import static com.redhat.runtimes.inventory.events.EventConsumer.runtimesInstance;
+import static com.redhat.runtimes.inventory.events.EventConsumer.runtimesInstanceOf;
 import static com.redhat.runtimes.inventory.events.Utils.readBytesFromResources;
 import static com.redhat.runtimes.inventory.events.Utils.readFromResources;
 import static org.junit.jupiter.api.Assertions.*;
@@ -36,12 +36,12 @@ public class EventConsumerTest {
     var buffy = readBytesFromResources("jdk8_MWTELE-66.gz");
     var json = EventConsumer.unzipJson(buffy);
 
-    var inst = runtimesInstance(dummy, json);
+    var inst = runtimesInstanceOf(dummy, json);
     var hostname = "fedora";
     assertEquals(hostname, inst.getHostname());
 
     json = readFromResources("test17.json");
-    inst = runtimesInstance(dummy, json);
+    inst = runtimesInstanceOf(dummy, json);
     hostname = "uriel.local";
     assertEquals(hostname, inst.getHostname());
   }
@@ -54,7 +54,7 @@ public class EventConsumerTest {
 
     var buffy = readBytesFromResources("update1.json.gz");
     var json = EventConsumer.unzipJson(buffy);
-    var inst = runtimesInstance(dummy, json);
+    var inst = runtimesInstanceOf(dummy, json);
     var hostname = "fedora";
     assertEquals(hostname, inst.getHostname());
   }

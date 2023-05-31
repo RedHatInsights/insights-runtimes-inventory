@@ -6,6 +6,7 @@ import static org.eclipse.microprofile.reactive.messaging.Acknowledgment.Strateg
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.redhat.runtimes.inventory.models.JarHash;
 import com.redhat.runtimes.inventory.models.RuntimesInstance;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -27,6 +28,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.ZoneOffset;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletionStage;
 import java.util.zip.GZIPInputStream;
 import org.eclipse.microprofile.reactive.messaging.Acknowledgment;
@@ -94,11 +96,15 @@ public class EventConsumer {
         var archiveJson = getJsonFromS3(announce.getUrl());
         Log.debugf("Retrieved from S3: %s", archiveJson);
 
-        inst = runtimesInstance(announce, archiveJson);
+        inst = runtimesInstanceOf(announce, archiveJson);
 
         // Persist core data
         Log.infof("About to persist: %s", inst);
         entityManager.persist(inst);
+
+        var jarHashes = jarHashesOf(inst, archiveJson);
+        Log.infof("About to persist %s jar entries", jarHashes.size());
+        entityManager.persist(jarHashes);
       }
     } catch (Throwable t) {
       processingExceptionCounter.increment();
@@ -111,7 +117,11 @@ public class EventConsumer {
     return message.ack();
   }
 
-  static RuntimesInstance runtimesInstance(ArchiveAnnouncement announce, String json) {
+  static Set<JarHash> jarHashesOf(RuntimesInstance inst, String json) {
+    return Set.of();
+  }
+
+  static RuntimesInstance runtimesInstanceOf(ArchiveAnnouncement announce, String json) {
     var inst = new RuntimesInstance();
     // Announce fields first
     inst.setAccountId(announce.getAccountId());

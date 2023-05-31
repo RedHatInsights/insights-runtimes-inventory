@@ -27,6 +27,8 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.ZoneOffset;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletionStage;
@@ -120,7 +122,48 @@ public class EventConsumer {
   }
 
   static Set<JarHash> jarHashesOf(RuntimesInstance inst, String json) {
-    return Set.of();
+    TypeReference<Map<String, Object>> typeRef = new TypeReference<>() {};
+
+    var mapper = new ObjectMapper();
+    try {
+      var o = mapper.readValue(json, typeRef);
+      var jarsRep = (Map<String, Object>) o.get("jars");
+      if (jarsRep == null) {
+        return Set.of();
+      }
+      var jars = (List<Object>) jarsRep.get("jars");
+      if (jars == null) {
+        return Set.of();
+      }
+      var out = new HashSet<JarHash>();
+      jars.forEach(j -> out.add(jarHashOf(inst, (Map<String, Object>) j)));
+
+      var eapRep = (Map<String, Object>) o.get("eap");
+      if (eapRep != null) {
+        // FIXME Do EAP-specific processing
+        Log.infof("EAP-specific processing required");
+      }
+      return out;
+    } catch (JsonProcessingException | ClassCastException | NumberFormatException e) {
+      Log.error("Error in unmarshalling JSON for jars", e);
+      throw new RuntimeException("Error in unmarshalling JSON for jars", e);
+    }
+  }
+
+  static JarHash jarHashOf(RuntimesInstance inst, Map<String, Object> jarJson) {
+    var out = new JarHash();
+    out.setInstanceId(inst.getId());
+    out.setName((String) jarJson.getOrDefault("name", ""));
+    out.setVersion((String) jarJson.getOrDefault("version", ""));
+
+    var attrs = (Map<String, String>) jarJson.getOrDefault("attributes", Map.of());
+    out.setGroupId(attrs.getOrDefault("group_id", ""));
+    out.setVendor(attrs.getOrDefault("vendor", ""));
+    out.setSha1Checksum(attrs.getOrDefault("sha1_checksum", ""));
+    out.setSha256Checksum(attrs.getOrDefault("sha256_checksum", ""));
+    out.setSha512Checksum(attrs.getOrDefault("sha512_checksum", ""));
+
+    return out;
   }
 
   static RuntimesInstance runtimesInstanceOf(ArchiveAnnouncement announce, String json) {

@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.redhat.runtimes.inventory.models.RuntimesInstance;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -36,12 +37,18 @@ public class EventConsumerTest {
     var buffy = readBytesFromResources("jdk8_MWTELE-66.gz");
     var json = EventConsumer.unzipJson(buffy);
 
-    var inst = runtimesInstanceOf(dummy, json);
+    var msg = runtimesInstanceOf(dummy, json);
+    assertTrue(msg instanceof RuntimesInstance);
+    var inst = (RuntimesInstance) msg;
+
     var hostname = "fedora";
     assertEquals(hostname, inst.getHostname());
 
     json = readFromResources("test17.json");
-    inst = runtimesInstanceOf(dummy, json);
+    msg = runtimesInstanceOf(dummy, json);
+    assertTrue(msg instanceof RuntimesInstance);
+    inst = (RuntimesInstance) msg;
+
     hostname = "uriel.local";
     assertEquals(hostname, inst.getHostname());
   }
@@ -54,7 +61,10 @@ public class EventConsumerTest {
 
     var buffy = readBytesFromResources("update1.json.gz");
     var json = EventConsumer.unzipJson(buffy);
-    var inst = runtimesInstanceOf(dummy, json);
+    var msg = runtimesInstanceOf(dummy, json);
+    assertTrue(msg instanceof RuntimesInstance);
+    var inst = (RuntimesInstance) msg;
+
     var hostname = "fedora";
     assertEquals(hostname, inst.getHostname());
   }

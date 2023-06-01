@@ -6,8 +6,10 @@ import static org.eclipse.microprofile.reactive.messaging.Acknowledgment.Strateg
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.redhat.runtimes.inventory.models.InsightsMessage;
 import com.redhat.runtimes.inventory.models.JarHash;
 import com.redhat.runtimes.inventory.models.RuntimesInstance;
+import com.redhat.runtimes.inventory.models.UpdateInstance;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
@@ -95,12 +97,33 @@ public class EventConsumer {
         var archiveJson = getJsonFromS3(announce.getUrl());
         Log.debugf("Retrieved from S3: %s", archiveJson);
 
-        inst = runtimesInstanceOf(announce, archiveJson);
-
-        // Persist core data
-        Log.infof("About to persist: %s", inst);
-        entityManager.persist(inst);
+        var msg = runtimesInstanceOf(announce, archiveJson);
+        // This should be a true pattern match on type
+        if (msg instanceof RuntimesInstance) {
+          inst = (RuntimesInstance) msg;
+        } else if (msg instanceof UpdateInstance update) {
+          var linkingHash = update.getLinkingHash();
+          var maybeInst = getInstanceFromHash(linkingHash);
+          if (maybeInst.isPresent()) {
+            inst = maybeInst.get();
+            var newJars = update.getUpdates();
+            for (var jh : newJars) {
+              jh.setInstance(inst);
+            }
+            inst.getJarHashes().addAll(newJars);
+          } else {
+            throw new IllegalStateException(
+                "Update message seen for non-existant hash: " + linkingHash);
+          }
+        } else {
+          // Can't happen, but just in case
+          throw new IllegalStateException(
+              "Message seen that is neither a new instance or an update");
+        }
       }
+
+      Log.infof("About to persist: %s", inst);
+      entityManager.persist(inst);
     } catch (Throwable t) {
       processingExceptionCounter.increment();
       Log.errorf(t, "Could not process the payload: %s", inst);
@@ -112,7 +135,22 @@ public class EventConsumer {
     return message.ack();
   }
 
-  static RuntimesInstance runtimesInstanceOf(ArchiveAnnouncement announce, String json) {
+  Optional<RuntimesInstance> getInstanceFromHash(String linkingHash) {
+    List<RuntimesInstance> instances =
+        entityManager
+            .createQuery("SELECT ri from RuntimesInstance ri where ri.linkingHash = ?1")
+            .setParameter(1, linkingHash)
+            .getResultList();
+    if (instances.size() > 1) {
+      throw new IllegalStateException(
+          "Multiple instances found matching linking hash: " + linkingHash);
+    } else if (instances.size() == 0) {
+      return Optional.empty();
+    }
+    return Optional.of(instances.get(0));
+  }
+
+  static InsightsMessage runtimesInstanceOf(ArchiveAnnouncement announce, String json) {
     var inst = new RuntimesInstance();
     // Announce fields first
     inst.setAccountId(announce.getAccountId());
@@ -126,7 +164,12 @@ public class EventConsumer {
       var o = mapper.readValue(json, typeRef);
       var basic = (Map<String, Object>) o.get("basic");
       if (basic == null) {
-        throw new RuntimeException("Error in unmarshalling JSON - does not contain a basic tag");
+        var updatedJars = (Map<String, Object>) o.get("updated-jars");
+        if (updatedJars != null) {
+          return updatedInstanceOf(updatedJars);
+        }
+        throw new RuntimeException(
+            "Error in unmarshalling JSON - does not contain a basic or updated-jars tag");
       }
       inst.setLinkingHash((String) o.get("idHash"));
 
@@ -158,6 +201,15 @@ public class EventConsumer {
     }
 
     return inst;
+  }
+
+  static UpdateInstance updatedInstanceOf(Map<String, Object> updatedJars) {
+    var linkingHash = (String) updatedJars.get("idHash");
+    var jarsJson = (List<Map<String, Object>>) updatedJars.get("jars");
+
+    var jars = new ArrayList<JarHash>();
+    jarsJson.forEach(j -> jars.add(jarHashOf(null, j)));
+    return new UpdateInstance(linkingHash, jars);
   }
 
   static Set<JarHash> jarHashesOf(RuntimesInstance inst, String json) {

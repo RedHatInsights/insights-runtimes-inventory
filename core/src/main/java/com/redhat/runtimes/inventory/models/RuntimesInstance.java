@@ -12,7 +12,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 
 @Entity
 @Table(name = "runtimes_instance")
-public final class RuntimesInstance {
+public final class RuntimesInstance implements InsightsMessage {
 
   @Id @GeneratedValue private UUID id;
 

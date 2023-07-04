@@ -83,6 +83,7 @@ public class EventConsumer {
     Timer.Sample consumedTimer = Timer.start(registry);
     var payload = message.getPayload();
 
+    // Needs to be visible in the catch block
     RuntimesInstance inst = null;
     try {
       Log.debugf("Processing received Kafka message %s", payload);
@@ -123,7 +124,9 @@ public class EventConsumer {
       }
 
       Log.infof("About to persist: %s", inst);
-      entityManager.persist(inst);
+      if (inst != null) {
+        entityManager.persist(inst);
+      }
     } catch (Throwable t) {
       processingExceptionCounter.increment();
       Log.errorf(t, "Could not process the payload: %s", inst);

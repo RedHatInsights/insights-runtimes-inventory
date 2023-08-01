@@ -1,3 +1,5 @@
+# Bonfire Quickstart for Ephemeral Environments
+
 Ensure that you're logged into the VPN.
 
 VENV_DIR=~/bonfire_venv
@@ -8,33 +10,46 @@ You may need to log in, by using this page (uses Github to authenticate):
 https://oauth-openshift.apps.c-rh-c-eph.8p0c.p1.openshiftapps.com/oauth/token/request
 
 This will give you an oc login command. Run it in your venv.
-\You are now credentialed in this shell for the ephemeral cluster.
+You are now credentialed in this shell for the ephemeral cluster.
 
-# You may need to set up DNS routing for a few domains to go via the VPN:
+You may need to set up DNS routing for a few domains to go via the VPN:
+
+```
 $ sudo systemd-resolve -i tun0 --set-domain=redhat.com --set-domain=~amazonaws.com --set-domain=~devshift.net --set-domain=openshiftapps.com
+```
 
 Enter the following command to deploy the advisor backend and frontend components along with their dependencies (notice the use of the --frontends=true argument):
 
-# This command requires you to be on the VPN (you may also deploy "advisor" for a fuller set of components)
+This command requires you to be on the VPN and will fail with a cryptic error message if you're not connected.
+
+```
 $ NAMESPACE=$(bonfire deploy runtimes-inventory --frontends=true)
+```
 
-# Extend your Ephemeral Environment for the time left in your working day:
+You may also deploy "advisor" for a fuller set of components
 
+Next, extend your Ephemeral Environment for the time left in your working day:
+
+```
 $ bonfire namespace extend $NAMESPACE --duration 12h
+```
 
-# Enter the following command to print access info for your namespace
+Enter the following command to print access info for your namespace
 
+```
 $ bonfire namespace describe $NAMESPACE
+```
 
-You'll use the URL and login credentials listed in the command output to view your inventory, advisor and rbac apps in the web UI.
+You'll need to use the URL and login credentials listed in the command output to view your inventory, advisor and rbac apps in the web UI.
 
-In your web browser, enter the hostname and log in with the username/password that you retrieved in the previous step.
+In your web browser, enter the console URL and keep it open. Check that the runtimes components have started OK (under Workloads -> Pods).
 
-In your web browser, click All Apps and Services > Inventory. Note that your inventory listing is empty. It’s time to add something to it.
+In your terminal window use the following command to generate a Basic auth header:
 
-Return to your terminal window and use the following command to generate a Basic auth header:
-
+```
 TEMP_INSIGHTS_TOKEN=$(oc get secret env-$NAMESPACE-keycloak -n $NAMESPACE -o json | jq '.data | map_values(@base64d)' | jq -r -j '"\(.defaultUsername):\(.defaultPassword)" | @base64')
+```
+
 To upload a new item to your host inventory, enter the following command:
 
 curl -F "file=@/path/to/file/security_low.tar.gz;type=application/vnd.redhat.advisor.somefile+tgz" \

@@ -26,6 +26,8 @@ public final class JarHash {
   @Size(max = 255)
   private String groupId;
 
+  // Should groupId & artifactId be nullable?
+
   @NotNull
   @Size(max = 255)
   private String vendor;

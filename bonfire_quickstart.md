@@ -44,15 +44,66 @@ You'll need to use the URL and login credentials listed in the command output to
 
 In your web browser, enter the console URL and keep it open. Check that the runtimes components have started OK (under Workloads -> Pods).
 
-In your terminal window use the following command to generate a Basic auth header:
+In your terminal window use the following command to generate a Basic auth header, if you need one:
 
 ```
 TEMP_INSIGHTS_TOKEN=$(oc get secret env-$NAMESPACE-keycloak -n $NAMESPACE -o json | jq '.data | map_values(@base64d)' | jq -r -j '"\(.defaultUsername):\(.defaultPassword)" | @base64')
 ```
 
-To upload a new item to your host inventory, enter the following command:
+### Updating an Ephemeral env with local changes
 
-curl -F "file=@/path/to/file/security_low.tar.gz;type=application/vnd.redhat.advisor.somefile+tgz" \
- -H "Authorization: Basic $BASIC_AUTH" \
- -H "x-rh-request_id: testtesttest" https://<my-hostname>/api/ingress/v1/upload -v --insecure
-The output of the command will indicate success or failure.
+Build a container and push it to quay.io:
+
+```
+docker build -t quay.io/beevans/runtimes-inventory:rcN .
+docker push quay.io/beevans/runtimes-inventory:rcN
+```
+
+
+(1-Off Task) Download K8s secret (if you don't have it already).
+
+(Daily) Add the pullsecret to the env (needed, b/c our app is not fully integrated into the env yet).
+This step is needed b/c the clowdservices secret doesn't know about our service (yet!).
+
+```
+oc apply -n $NAMESPACE -f beevans-secret.yml
+```
+
+(Daily)
+Add to config (via oc edit env or the Clowd > ClowdEnvironments detail tab in the web console - i.e. env-ephemeral-XXXX):
+
+```
+	pullSecrets:
+	    - name: quay-cloudservices-pull
+	      namespace: ephemeral-base
+      - name: beevans-pull-secret
+        namespace: ephemeral-XXXXXX
+```
+
+(Daily) Edit the Ingress Clowdapp to tell it about our Kafka topics (under the existing ones)
+
+```
+    - partitions: 3
+      replicas: 3
+      topicName: platform.upload.runtimes-java-general
+```
+
+(Every Push) Update the clowdapp YAML (e.g. clowdapp-runtimes-minimal.yml) to use the new RC version and todays namespace.
+
+Then deploy the clowdapp:
+
+```
+oc apply -n $NAMESPACE -f clowdapp-runtimes-minimal.yml
+```
+
+### Redeploy
+
+Update the YAML then
+
+```
+oc apply -n $NAMESPACE -f clowdapp-runtimes-minimal.yml
+```
+
+### Adding to stage
+
+Merge to `main`

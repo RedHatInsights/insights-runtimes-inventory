@@ -2,7 +2,7 @@
 
 Ensure that you're logged into the VPN.
 
-Make sure that you have `$VENV_DIR` set (for a Python virtual environment for Bonfire).
+Make sure that you have `$VENV_DIR` set (for a Python virtual environment "venv" for Bonfire).
 You can add the env variable to your shell profile file.
 
 ```
@@ -19,8 +19,10 @@ You may need to log in to the ephemeral cluster, by using this page (uses Github
 
 https://oauth-openshift.apps.c-rh-c-eph.8p0c.p1.openshiftapps.com/oauth/token/request
 
-This will give you an oc login command. Run it in your venv.
+This will give you an `oc login` command. Run it in your venv.
+
 You are now credentialed in this shell for the ephemeral cluster.
+You may well need more than one credentialed shell to work effectively.
 
 You may need to set up DNS routing for a few domains to go via the VPN:
 
@@ -50,6 +52,8 @@ Enter the following command to print access info for your namespace
 $ bonfire namespace describe $NAMESPACE
 ```
 
+NOTE: `$NAMESPACE` is optional for quite a few commands, but you may find it helpful to be explicit about its usage, especially in complex setups.
+
 You'll need to use the URL and login credentials listed in the command output to view your inventory, advisor and rbac apps in the web UI.
 
 In your web browser, enter the console URL and keep it open. Check that the runtimes components have started OK (under Workloads -> Pods).
@@ -61,8 +65,6 @@ TEMP_INSIGHTS_TOKEN=$(oc get secret env-$NAMESPACE-keycloak -n $NAMESPACE -o jso
 ```
 
 ### Updating an Ephemeral env with local changes
-
-(1-Off Task) Download K8s secret (if you don't have it already).
 
 Build a container and push it to quay.io:
 
@@ -80,60 +82,69 @@ docker push "${EVENTS_IMAGE_NAME}:${IMAGE_TAG}"
 docker push "${EVENTS_IMAGE_NAME}:latest"
 ```
 
-(Daily) Add the pullsecret to the env (needed, b/c our containers need to be pulled from our quay.io repo - if it's private).
+To deploy from our personal quay.io repos, we need to configure `~/.config/bonfire/config.yaml`.
+
+1. This provides overrides to the base config
+2. In particular, it allows a redirect to a different Clowder deployment file.
+3. The variant deployment file can point at a different quay.io repo
+
+NOTE: The repos we want to deploy from must be public. Previous versions of instructions involving private repos and pullsecrets will no longer work.
+
+A starter version of the config (for a user that keeps their projects under `~/projects/`) looks like this:
 
 ```
-oc apply -n $NAMESPACE -f beevans-secret.yml
+# Bonfire deployment configuration
+
+# Defines where to fetch the file that defines application configs
+appsFile:
+  host: gitlab
+  repo: insights-platform/cicd-common
+  path: bonfire_configs/ephemeral_apps.yaml
+
+# (optional) define any apps locally. An app defined here with <name> will override config for app
+# <name> in above fetched config.
+
+apps:
+- name: runtimes-inventory
+  components:
+    - name: runtimes-inventory
+      host: local
+      repo: ~/projects/insights-runtimes-inventory
+      path: deploy/clowdapp_ee.yml
 ```
 
-(Daily)
-Add to config (via oc edit env or the Clowder > ClowdEnvironments detail tab in the web console - i.e. env-ephemeral-XXXX):
+Note that the app and component name must be `runtimes-inventory`.
+
+The file `deploy/clowdapp_ee.yml` contains the deployment file for your app.
+It will be very similar to `deploy/clowdapp.yml`, with only the most minimal changes to deploy the modified version of the app into the EE.
+
+For example:
 
 ```
-	pullSecrets:
-	    - name: quay-cloudservices-pull
-	      namespace: ephemeral-base
-      - name: beevans-pull-secret
-        namespace: ephemeral-XXXXXX
+$ diff -u clowdapp.yml clowdapp_ee.yml
+--- clowdapp.yml	2023-07-28 19:04:09.952718733 +0200
++++ clowdapp_ee.yml	2023-08-02 16:46:09.414677132 +0200
+@@ -19,7 +19,7 @@
+           minReplicas: 1
+           name: service
+           podSpec:
+-            image: quay.io/cloudservices/insights-rbi-events:${IMAGE_TAG}
++            image: quay.io/beevans/insights-rbi-events:${IMAGE_TAG}
+             livenessProbe:
+               failureThreshold: 3
+               httpGet:
+@@ -59,7 +59,7 @@
+           minReplicas: 1
+           name: rest
+           podSpec:
+-            image: quay.io/cloudservices/insights-rbi-rest:${IMAGE_TAG}
++            image: quay.io/beevans/insights-rbi-rest:${IMAGE_TAG}
+             livenessProbe:
+               failureThreshold: 3
+               httpGet:
 ```
 
-To deploy from our personal quay.io repos, we need to configure `~/.config/bonfire/config.yaml`
-
-
-
+This example simply pulls from a personal repo rather than the merged one.
 
 /////////////////////
 
-
-(Every Push) Update the clowdapp YAML (e.g. clowdapp-runtimes-minimal.yml) to use the new tag and todays namespace.
-
-Then deploy the clowdapp:
-
-```
-oc apply -n $NAMESPACE -f clowdapp-runtimes-minimal.yml
-```
-
-### Redeploy
-
-Update the YAML then
-
-```
-oc apply -n $NAMESPACE -f clowdapp-runtimes-minimal.yml
-```
-
-### Adding to stage
-
-Merge to `main`
-
-
-/////////////////////////////////////////
-
-
-// FIXME I think this is dead now
-(Daily) Edit the Ingress Clowdapp to tell it about our Kafka topics (under the existing ones)
-
-```
-    - partitions: 3
-      replicas: 3
-      topicName: platform.upload.runtimes-java-general
-```

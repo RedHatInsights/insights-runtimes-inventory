@@ -80,8 +80,7 @@ docker push "${EVENTS_IMAGE_NAME}:${IMAGE_TAG}"
 docker push "${EVENTS_IMAGE_NAME}:latest"
 ```
 
-(Daily) Add the pullsecret to the env (needed, b/c our containers need to be pulled from our quay.io repo).
-// This step is needed b/c the clowdservices secret doesn't know about our service.
+(Daily) Add the pullsecret to the env (needed, b/c our containers need to be pulled from our quay.io repo - if it's private).
 
 ```
 oc apply -n $NAMESPACE -f beevans-secret.yml
@@ -98,14 +97,13 @@ Add to config (via oc edit env or the Clowder > ClowdEnvironments detail tab in 
         namespace: ephemeral-XXXXXX
 ```
 
-// FIXME I think this is dead now
-(Daily) Edit the Ingress Clowdapp to tell it about our Kafka topics (under the existing ones)
+To deploy from our personal quay.io repos, we need to configure `~/.config/bonfire/config.yaml`
 
-```
-    - partitions: 3
-      replicas: 3
-      topicName: platform.upload.runtimes-java-general
-```
+
+
+
+/////////////////////
+
 
 (Every Push) Update the clowdapp YAML (e.g. clowdapp-runtimes-minimal.yml) to use the new tag and todays namespace.
 
@@ -126,3 +124,16 @@ oc apply -n $NAMESPACE -f clowdapp-runtimes-minimal.yml
 ### Adding to stage
 
 Merge to `main`
+
+
+/////////////////////////////////////////
+
+
+// FIXME I think this is dead now
+(Daily) Edit the Ingress Clowdapp to tell it about our Kafka topics (under the existing ones)
+
+```
+    - partitions: 3
+      replicas: 3
+      topicName: platform.upload.runtimes-java-general
+```

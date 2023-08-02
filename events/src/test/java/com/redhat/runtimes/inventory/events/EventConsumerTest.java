@@ -1,6 +1,7 @@
 /* Copyright (C) Red Hat 2023 */
 package com.redhat.runtimes.inventory.events;
 
+import static com.redhat.runtimes.inventory.events.EventConsumer.eapInstanceOf;
 import static com.redhat.runtimes.inventory.events.EventConsumer.runtimesInstanceOf;
 import static com.redhat.runtimes.inventory.events.Utils.readBytesFromResources;
 import static com.redhat.runtimes.inventory.events.Utils.readFromResources;
@@ -8,13 +9,16 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.redhat.runtimes.inventory.models.EapInstance;
 import com.redhat.runtimes.inventory.models.RuntimesInstance;
+// import io.quarkus.test.junit.QuarkusTest;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Map;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+// @QuarkusTest
 public class EventConsumerTest {
 
   @Test
@@ -67,5 +71,33 @@ public class EventConsumerTest {
 
     var hostname = "fedora";
     assertEquals(hostname, inst.getHostname());
+  }
+
+  @Test
+  // @Disabled
+  public void test_EapInstance_example1() throws IOException {
+    var dummy = new ArchiveAnnouncement();
+    dummy.setTimestamp(LocalDateTime.MAX);
+
+    var json = readFromResources("eap_example1.json");
+    var msg = eapInstanceOf(dummy, json);
+    assertTrue(msg instanceof EapInstance);
+    var inst = (EapInstance) msg;
+
+    var hostname = "freya";
+    assertEquals(hostname, inst.getHostname());
+    assertEquals(false, inst.getEapXp());
+    assertEquals(
+        "JBoss EAP 7.4.11.GA (WildFly Core 15.0.26.Final-redhat-00001)", inst.getEapVersion());
+    assertEquals("7.4.11.GA", inst.getConfiguration().getProductVersion());
+    // assertEquals(4708, inst.getModules().size());
+    assertEquals(2, inst.getDeployments().size());
+
+    assertEquals(2, inst.getConfiguration().getDeployments().size());
+    assertEquals(39, inst.getConfiguration().getExtensions().size());
+    assertNotNull(inst.getConfiguration().getCoreServices());
+    assertNotNull(inst.getConfiguration().getInterfaces());
+    assertNotNull(inst.getConfiguration().getPaths());
+    assertNotNull(inst.getConfiguration().getSocketBindingGroups());
   }
 }

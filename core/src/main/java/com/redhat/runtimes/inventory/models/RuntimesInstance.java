@@ -11,8 +11,9 @@ import java.util.*;
 import org.hibernate.annotations.JdbcTypeCode;
 
 @Entity
-@Table(name = "runtimes_instance")
-public final class RuntimesInstance implements InsightsMessage {
+@Table(name = "jvm_instance")
+@Inheritance(strategy = InheritanceType.JOINED)
+public sealed class RuntimesInstance implements InsightsMessage permits EapInstance {
 
   @Id @GeneratedValue private UUID id;
 

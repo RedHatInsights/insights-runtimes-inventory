@@ -8,27 +8,27 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "eap_instance")
-public final class EapInstance extends RuntimesInstance {
+public final class EapInstance extends JvmInstance {
   @Id @GeneratedValue private UUID id;
 
   /****************************************************************************
    *                            Complex Fields
    ***************************************************************************/
 
-  @OneToMany(mappedBy = "eap_instance", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "instance", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<JarHash> jars; // These seem to be only jboss jars. Maybe only one instead of a set?
 
-  @OneToMany(mappedBy = "eap_instance", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "instance", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<JarHash> modules;
 
   @OneToOne(
-      mappedBy = "eap_instance",
+      mappedBy = "eapInstance",
       cascade = CascadeType.ALL,
       orphanRemoval = true,
       fetch = FetchType.LAZY)
   private EapConfiguration configuration;
 
-  @OneToMany(mappedBy = "eap_instance", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "eapInstance", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<EapDeployment> deployments;
 
   public EapConfiguration getConfiguration() {
@@ -323,7 +323,7 @@ public final class EapInstance extends RuntimesInstance {
     this.eapUseGit = eapUseGit;
   }
 
-  /********** These are in the RuntimesInstance **********/
+  /********** These are in the JvmInstance **********/
   // private String javaVmSpecificationVendor;
   // private String javaVmSpecificationVersion;
   // private String javaRuntimeVersion;

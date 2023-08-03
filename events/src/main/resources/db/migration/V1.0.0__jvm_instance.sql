@@ -1,4 +1,4 @@
-CREATE TABLE public.runtimes_instance(
+CREATE TABLE public.jvm_instance(
     id uuid NOT NULL,
     linking_hash character varying(255) NOT NULL,
     account_id character varying(50) NOT NULL,
@@ -30,11 +30,11 @@ CREATE TABLE public.jar_hash(
     PRIMARY KEY (id)
 );
 
-ALTER TABLE IF EXISTS runtimes_instance
+ALTER TABLE IF EXISTS jvm_instance
   ADD CONSTRAINT U_LINK_HASH
     UNIQUE (linking_hash);
 
 ALTER TABLE IF EXISTS jar_hash
-  ADD CONSTRAINT FK_JAR_HASH_LINK_RUNTIMES_INSTANCE
-    FOREIGN KEY (instance_id) REFERENCES runtimes_instance(id)
+  ADD CONSTRAINT FK_JAR_HASH_LINK_JVM_INSTANCE
+    FOREIGN KEY (instance_id) REFERENCES jvm_instance(id)
 

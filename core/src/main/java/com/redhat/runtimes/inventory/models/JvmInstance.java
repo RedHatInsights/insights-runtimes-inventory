@@ -13,7 +13,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 @Entity
 @Table(name = "jvm_instance")
 @Inheritance(strategy = InheritanceType.JOINED)
-public sealed class RuntimesInstance implements InsightsMessage permits EapInstance {
+public non-sealed class JvmInstance implements InsightsMessage {
 
   @Id @GeneratedValue private UUID id;
 
@@ -80,9 +80,9 @@ public sealed class RuntimesInstance implements InsightsMessage permits EapInsta
 
   //////////////////////////////////////////////////////
 
-  public RuntimesInstance() {}
+  public JvmInstance() {}
 
-  public RuntimesInstance(
+  public JvmInstance(
       UUID id,
       String accountId,
       String orgId,
@@ -247,7 +247,7 @@ public sealed class RuntimesInstance implements InsightsMessage permits EapInsta
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    RuntimesInstance that = (RuntimesInstance) o;
+    JvmInstance that = (JvmInstance) o;
     return majorVersion == that.majorVersion
         && processors == that.processors
         && heapMax == that.heapMax
@@ -285,7 +285,7 @@ public sealed class RuntimesInstance implements InsightsMessage permits EapInsta
 
   @Override
   public String toString() {
-    final StringBuffer sb = new StringBuffer("RuntimesInstance{");
+    final StringBuffer sb = new StringBuffer("JvmInstance{");
     sb.append("id=").append(id);
     sb.append(", accountId='").append(accountId).append('\'');
     sb.append(", orgId='").append(orgId).append('\'');

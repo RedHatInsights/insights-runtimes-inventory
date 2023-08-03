@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import org.hibernate.annotations.NaturalId;
 
 @Entity
 @Table(name = "eap_configuration")
@@ -16,6 +17,7 @@ public final class EapConfiguration {
    ***************************************************************************/
 
   @OneToOne(fetch = FetchType.LAZY)
+  @NaturalId
   private EapInstance eapInstance;
 
   @ManyToMany

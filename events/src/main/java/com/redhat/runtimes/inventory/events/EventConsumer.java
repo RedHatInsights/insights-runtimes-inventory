@@ -12,8 +12,8 @@ import com.redhat.runtimes.inventory.models.EapExtension;
 import com.redhat.runtimes.inventory.models.EapInstance;
 import com.redhat.runtimes.inventory.models.InsightsMessage;
 import com.redhat.runtimes.inventory.models.JarHash;
+import com.redhat.runtimes.inventory.models.JvmInstance;
 import com.redhat.runtimes.inventory.models.NameVersionPair;
-import com.redhat.runtimes.inventory.models.RuntimesInstance;
 import com.redhat.runtimes.inventory.models.UpdateInstance;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -70,8 +70,6 @@ public class EventConsumer {
   private Counter duplicateCounter;
   private Counter processingExceptionCounter;
 
-  private static ObjectMapper mapper = new ObjectMapper();
-
   @PostConstruct
   public void init() {
     rejectedCounter = registry.counter(REJECTED_COUNTER_NAME);
@@ -91,7 +89,7 @@ public class EventConsumer {
     var payload = message.getPayload();
 
     // Needs to be visible in the catch block
-    RuntimesInstance inst = null;
+    JvmInstance inst = null;
     try {
       Log.debugf("Processing received Kafka message %s", payload);
 
@@ -105,10 +103,10 @@ public class EventConsumer {
         var archiveJson = getJsonFromS3(announce.getUrl());
         Log.debugf("Retrieved from S3: %s", archiveJson);
 
-        var msg = runtimesInstanceOf(announce, archiveJson);
+        var msg = jvmInstanceOf(announce, archiveJson);
         // This should be a true pattern match on type
-        if (msg instanceof RuntimesInstance) {
-          inst = (RuntimesInstance) msg;
+        if (msg instanceof JvmInstance) {
+          inst = (JvmInstance) msg;
         } else if (msg instanceof UpdateInstance update) {
           var linkingHash = update.getLinkingHash();
           var maybeInst = getInstanceFromHash(linkingHash);
@@ -145,10 +143,10 @@ public class EventConsumer {
     return message.ack();
   }
 
-  Optional<RuntimesInstance> getInstanceFromHash(String linkingHash) {
-    List<RuntimesInstance> instances =
+  Optional<JvmInstance> getInstanceFromHash(String linkingHash) {
+    List<JvmInstance> instances =
         entityManager
-            .createQuery("SELECT ri from RuntimesInstance ri where ri.linkingHash = ?1")
+            .createQuery("SELECT ri from JvmInstance ri where ri.linkingHash = ?1")
             .setParameter(1, linkingHash)
             .getResultList();
     if (instances.size() > 1) {
@@ -164,8 +162,8 @@ public class EventConsumer {
    *                         Runtimes Methods
    ***************************************************************************/
 
-  static InsightsMessage runtimesInstanceOf(ArchiveAnnouncement announce, String json) {
-    var inst = new RuntimesInstance();
+  static InsightsMessage jvmInstanceOf(ArchiveAnnouncement announce, String json) {
+    var inst = new JvmInstance();
     // Announce fields first
     inst.setAccountId(announce.getAccountId());
     inst.setOrgId(announce.getOrgId());
@@ -173,7 +171,7 @@ public class EventConsumer {
 
     TypeReference<Map<String, Object>> typeRef = new TypeReference<>() {};
 
-    // var mapper = new ObjectMapper();
+    var mapper = new ObjectMapper();
     try {
       var o = mapper.readValue(json, typeRef);
       var basic = (Map<String, Object>) o.get("basic");
@@ -186,8 +184,8 @@ public class EventConsumer {
             "Error in unmarshalling JSON - does not contain a basic or updated-jars tag");
       }
 
-      mapRuntimesInstanceValues(inst, o, basic);
-      inst.setJarHashes(jarHashesOf(inst, json));
+      mapJvmInstanceValues(inst, o, basic);
+      inst.setJarHashes(jarHashesOf(inst, (Map<String, Object>) o.get("jars")));
     } catch (JsonProcessingException | ClassCastException | NumberFormatException e) {
       Log.error("Error in unmarshalling JSON", e);
       throw new RuntimeException("Error in unmarshalling JSON", e);
@@ -196,8 +194,8 @@ public class EventConsumer {
     return inst;
   }
 
-  static void mapRuntimesInstanceValues(
-      RuntimesInstance inst, Map<String, Object> o, Map<String, Object> basic) {
+  static void mapJvmInstanceValues(
+      JvmInstance inst, Map<String, Object> o, Map<String, Object> basic) {
 
     try {
       // if (basic == null) {
@@ -245,20 +243,7 @@ public class EventConsumer {
     return new UpdateInstance(linkingHash, jars);
   }
 
-  static Set<JarHash> jarHashesOf(RuntimesInstance inst, String json) {
-    TypeReference<Map<String, Object>> typeRef = new TypeReference<>() {};
-
-    // var mapper = new ObjectMapper();
-    try {
-      var o = mapper.readValue(json, typeRef);
-      return jarHashesOf(inst, (Map<String, Object>) o.get("jars"));
-    } catch (JsonProcessingException | ClassCastException | NumberFormatException e) {
-      Log.error("Error in unmarshalling JSON for jars", e);
-      throw new RuntimeException("Error in unmarshalling JSON for jars", e);
-    }
-  }
-
-  static Set<JarHash> jarHashesOf(RuntimesInstance inst, Map<String, Object> jarsRep) {
+  static Set<JarHash> jarHashesOf(JvmInstance inst, Map<String, Object> jarsRep) {
     if (jarsRep == null) {
       return Set.of();
     }
@@ -272,31 +257,7 @@ public class EventConsumer {
     return out;
   }
 
-  // static Set<JarHash> jarHashesOf(RuntimesInstance inst, String json) {
-  //   TypeReference<Map<String, Object>> typeRef = new TypeReference<>() {};
-
-  //   var mapper = new ObjectMapper();
-  //   try {
-  //     var o = mapper.readValue(json, typeRef);
-  //     var jarsRep = (Map<String, Object>) o.get("jars");
-  //     if (jarsRep == null) {
-  //       return Set.of();
-  //     }
-  //     var jars = (List<Object>) jarsRep.get("jars");
-  //     if (jars == null) {
-  //       return Set.of();
-  //     }
-  //     var out = new HashSet<JarHash>();
-  //     jars.forEach(j -> out.add(jarHashOf(inst, (Map<String, Object>) j)));
-
-  //     return out;
-  //   } catch (JsonProcessingException | ClassCastException | NumberFormatException e) {
-  //     Log.error("Error in unmarshalling JSON for jars", e);
-  //     throw new RuntimeException("Error in unmarshalling JSON for jars", e);
-  //   }
-  // }
-
-  static JarHash jarHashOf(RuntimesInstance inst, Map<String, Object> jarJson) {
+  static JarHash jarHashOf(JvmInstance inst, Map<String, Object> jarJson) {
     var out = new JarHash();
     out.setInstance(inst);
     out.setName((String) jarJson.getOrDefault("name", ""));
@@ -326,10 +287,10 @@ public class EventConsumer {
 
     TypeReference<Map<String, Object>> typeRef = new TypeReference<>() {};
 
-    // var mapper = new ObjectMapper();
+    var mapper = new ObjectMapper();
     try {
       var o = mapper.readValue(json, typeRef);
-      mapRuntimesInstanceValues(inst, o, (Map<String, Object>) o.get("basic"));
+      mapJvmInstanceValues(inst, o, (Map<String, Object>) o.get("basic"));
       inst.setJarHashes(jarHashesOf(inst, (Map<String, Object>) o.get("jars")));
 
       var eapRep = (Map<String, Object>) o.get("eap");
@@ -393,6 +354,7 @@ public class EventConsumer {
       throw new RuntimeException(
           "Error in unmarshalling JSON - is an EapInstance without an eap-configuration.");
     }
+    var mapper = new ObjectMapper();
     var config = new EapConfiguration();
     config.setEapInstance(inst);
     config.setVersion(String.valueOf(eapConfigRep.get("version")));

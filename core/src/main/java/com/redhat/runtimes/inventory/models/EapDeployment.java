@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import java.util.Set;
 import java.util.UUID;
+import org.hibernate.annotations.NaturalId;
 
 @Entity
 @Table(name = "eap_deployment")
@@ -12,6 +13,7 @@ public final class EapDeployment {
   @Id @GeneratedValue private UUID id;
 
   @ManyToOne(fetch = FetchType.LAZY)
+  @NaturalId
   private EapInstance eapInstance;
 
   @Size(max = 255)

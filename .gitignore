@@ -45,3 +45,7 @@ tmp/
 
 # VS Code
 .vscode/
+
+# ///// Private config
+deploy/clowdapp_ee.yml
+beevans-secret.yml

@@ -16,7 +16,7 @@ public final class JarHash {
 
   @ManyToOne(optional = false)
   @NaturalId
-  private RuntimesInstance instance;
+  private JvmInstance instance;
 
   @NotNull
   @Size(max = 255)
@@ -54,7 +54,7 @@ public final class JarHash {
 
   public JarHash(
       UUID id,
-      RuntimesInstance instance,
+      JvmInstance instance,
       String name,
       String groupId,
       String vendor,
@@ -83,11 +83,11 @@ public final class JarHash {
     this.id = id;
   }
 
-  public RuntimesInstance getInstance() {
+  public JvmInstance getInstance() {
     return instance;
   }
 
-  public void setInstance(RuntimesInstance instance) {
+  public void setInstance(JvmInstance instance) {
     this.instance = instance;
   }
 

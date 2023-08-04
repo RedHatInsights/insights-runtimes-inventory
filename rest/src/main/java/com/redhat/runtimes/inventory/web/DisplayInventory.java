@@ -6,7 +6,7 @@ import static com.redhat.runtimes.inventory.models.Constants.X_RH_IDENTITY_HEADE
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.redhat.runtimes.inventory.models.RuntimesInstance;
+import com.redhat.runtimes.inventory.models.JvmInstance;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.quarkus.logging.Log;
@@ -41,14 +41,14 @@ public class DisplayInventory {
     var query =
         entityManager.createQuery(
             """
-    select new com.redhat.runtimes.inventory.models.RuntimesInstance(
+    select new com.redhat.runtimes.inventory.models.JvmInstance(
       i.id, i.accountId, i.orgId, i.hostname, i.launchTime, i.vendor, i.versionString,
       i.version, i.majorVersion, i.osArch, i.processors, i.heapMax, i.details, i.created
-    ) from com.redhat.runtimes.inventory.models.RuntimesInstance i
+    ) from com.redhat.runtimes.inventory.models.JvmInstance i
     where i.orgId = :orgId and i.hostname = :hostname
     order by i.created desc
     """,
-            RuntimesInstance.class);
+            JvmInstance.class);
     query.setParameter("orgId", orgId);
     query.setParameter("hostname", hostname);
     var results = query.getResultList();

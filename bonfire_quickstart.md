@@ -30,7 +30,13 @@ You may need to set up DNS routing for a few domains to go via the VPN:
 $ sudo systemd-resolve -i tun0 --set-domain=redhat.com --set-domain=~amazonaws.com --set-domain=~devshift.net --set-domain=openshiftapps.com
 ```
 
-Enter the following command to deploy the advisor backend and frontend components along with their dependencies (notice the use of the `--frontends=true` argument):
+If you are running with overrides (e.g. a locally-built container with modified code), then you will need to make sure that the containers have been built and push to quay.io first:
+
+```
+$ ./build_ee.sh
+```
+
+Enter the following command to deploy the runtimes-inventory backend and frontend components along with their dependencies (notice the use of the `--frontends=true` argument):
 
 This command requires you to be on the VPN and will fail with a cryptic error message if you're not connected.
 
@@ -61,7 +67,7 @@ In your web browser, enter the console URL and keep it open. Check that the runt
 In your terminal window use the following command to generate a Basic auth header, if you need one:
 
 ```
-TEMP_INSIGHTS_TOKEN=$(oc get secret env-$NAMESPACE-keycloak -n $NAMESPACE -o json | jq '.data | map_values(@base64d)' | jq -r -j '"\(.defaultUsername):\(.defaultPassword)" | @base64')
+RHT_INSIGHTS_JAVA_AUTH_TOKEN=$(oc get secret env-$NAMESPACE-keycloak -n $NAMESPACE -o json | jq '.data | map_values(@base64d)' | jq -r -j '"\(.defaultUsername):\(.defaultPassword)" | @base64')
 ```
 
 ### Updating an Ephemeral env with local changes

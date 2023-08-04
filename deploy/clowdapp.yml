@@ -92,8 +92,8 @@ objects:
             metrics: {}
             private: {}
             public:
-              # This can override the service name
-              apiPath: insights-rbi-rest
+              # This overrides the service name
+              apiPath: runtimes-inventory-service
               enabled: true
       # platform.upload.runtimes-java-general
       kafkaTopics:

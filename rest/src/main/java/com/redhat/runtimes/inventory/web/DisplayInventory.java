@@ -17,7 +17,7 @@ import jakarta.ws.rs.core.MediaType;
 import java.util.Base64;
 import java.util.Map;
 
-@Path("/api/runtimes-inventory-service/v1")
+@Path("/api/insights-rbi-rest/v1")
 public class DisplayInventory {
 
   @Inject MeterRegistry registry;

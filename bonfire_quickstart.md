@@ -116,41 +116,13 @@ apps:
     - name: runtimes-inventory
       host: local
       repo: ~/projects/insights-runtimes-inventory
-      path: deploy/clowdapp_ee.yml
+      path: deploy/clowdapp.yml
+      parameters:
+        IMAGE_NAMESPACE: <your quay.io username>
+        IMAGE_TAG: latest
 ```
 
 Note that the app and component name must be `runtimes-inventory`.
-
-The file `deploy/clowdapp_ee.yml` contains the deployment file for your app.
-It will be very similar to `deploy/clowdapp.yml`, with only the most minimal changes to deploy the modified version of the app into the EE.
-
-For example:
-
-```
-$ diff -u clowdapp.yml clowdapp_ee.yml
---- clowdapp.yml	2023-07-28 19:04:09.952718733 +0200
-+++ clowdapp_ee.yml	2023-08-02 16:46:09.414677132 +0200
-@@ -19,7 +19,7 @@
-           minReplicas: 1
-           name: service
-           podSpec:
--            image: quay.io/cloudservices/insights-rbi-events:${IMAGE_TAG}
-+            image: quay.io/beevans/insights-rbi-events:${IMAGE_TAG}
-             livenessProbe:
-               failureThreshold: 3
-               httpGet:
-@@ -59,7 +59,7 @@
-           minReplicas: 1
-           name: rest
-           podSpec:
--            image: quay.io/cloudservices/insights-rbi-rest:${IMAGE_TAG}
-+            image: quay.io/beevans/insights-rbi-rest:${IMAGE_TAG}
-             livenessProbe:
-               failureThreshold: 3
-               httpGet:
-```
-
-This example simply pulls from a personal repo rather than the merged one.
 
 /////////////////////
 

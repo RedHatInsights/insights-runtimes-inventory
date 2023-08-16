@@ -19,7 +19,7 @@ objects:
           minReplicas: 1
           name: service
           podSpec:
-            image: quay.io/cloudservices/insights-rbi-events:${IMAGE_TAG}
+            image: quay.io/${IMAGE_NAMESPACE}/insights-rbi-events:${IMAGE_TAG}
             livenessProbe:
               failureThreshold: 3
               httpGet:
@@ -59,7 +59,7 @@ objects:
           minReplicas: 1
           name: rest
           podSpec:
-            image: quay.io/cloudservices/insights-rbi-rest:${IMAGE_TAG}
+            image: quay.io/${IMAGE_NAMESPACE}/insights-rbi-rest:${IMAGE_TAG}
             livenessProbe:
               failureThreshold: 3
               httpGet:
@@ -109,6 +109,9 @@ parameters:
   - name: IMAGE_TAG
     value: latest
     displayName: the imageTag to deploy
+  - name: IMAGE_NAMESPACE
+    value: cloudservices
+    displayName: the image namespace to deploy
   - name: ENV_NAME
     required: true
     value: stage

@@ -139,14 +139,13 @@
   <profiles>
     <profile>
       <id>coverage</id>
-      <!-- uncomment when there is a @QuarkusTest being run -->
-      <!-- <dependencies>
+      <dependencies>
         <dependency>
           <groupId>io.quarkus</groupId>
           <artifactId>quarkus-jacoco</artifactId>
           <scope>test</scope>
         </dependency>
-      </dependencies> -->
+      </dependencies>
       <build>
         <plugins>
           <plugin>
@@ -159,12 +158,11 @@
                 <goals>
                   <goal>prepare-agent</goal>
                 </goals>
-                <!-- uncomment this config when there is a @QuarkusTest being run -->
-                <!-- <configuration>
+                <configuration>
                   <exclClassLoaders>*QuarkusClassLoader</exclClassLoaders>
                   <destFile>${project.build.directory}/jacoco-quarkus.exec</destFile>
                   <append>true</append>
-                </configuration> -->
+                </configuration>
               </execution>
               <execution>
                 <id>default-report</id>

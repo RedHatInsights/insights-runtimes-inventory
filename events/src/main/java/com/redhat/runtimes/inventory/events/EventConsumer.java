@@ -43,12 +43,12 @@ import org.eclipse.microprofile.reactive.messaging.Message;
 
 @ApplicationScoped
 public class EventConsumer {
-  private static final String INGRESS_CHANNEL = "ingress";
-  private static final String REJECTED_COUNTER_NAME = "input.rejected";
-  private static final String PROCESSING_ERROR_COUNTER_NAME = "input.processing.error";
-  private static final String PROCESSING_EXCEPTION_COUNTER_NAME = "input.processing.exception";
-  private static final String DUPLICATE_COUNTER_NAME = "input.duplicate";
-  private static final String CONSUMED_TIMER_NAME = "input.consumed";
+  public static final String INGRESS_CHANNEL = "ingress";
+  public static final String REJECTED_COUNTER_NAME = "input.rejected";
+  public static final String PROCESSING_ERROR_COUNTER_NAME = "input.processing.error";
+  public static final String PROCESSING_EXCEPTION_COUNTER_NAME = "input.processing.exception";
+  public static final String DUPLICATE_COUNTER_NAME = "input.duplicate";
+  public static final String CONSUMED_TIMER_NAME = "input.consumed";
 
   static final String VALID_CONTENT_TYPE =
       "application/vnd.redhat.runtimes-java-general.analytics+tgz";

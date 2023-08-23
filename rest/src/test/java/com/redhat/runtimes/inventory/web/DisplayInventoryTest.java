@@ -5,10 +5,11 @@ import static com.redhat.runtimes.inventory.models.Constants.X_RH_IDENTITY_HEADE
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.Header;
-import io.vertx.core.json.JsonObject;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import java.io.IOException;
@@ -30,16 +31,21 @@ public class DisplayInventoryTest {
   }
 
   private static String encodeRHIdentityInfo(String accountNumber, String orgId, String username) {
-    JsonObject identity = new JsonObject();
-    JsonObject user = new JsonObject();
+    ObjectMapper mapper = new ObjectMapper();
+
+    ObjectNode user = mapper.createObjectNode();
     user.put("username", username);
+
+    ObjectNode identity = mapper.createObjectNode();
     identity.put("account_number", accountNumber);
     identity.put("org_id", orgId);
-    identity.put("user", user);
+    identity.set("user", user);
     identity.put("type", "User");
-    JsonObject header = new JsonObject();
-    header.put("identity", identity);
-    return encode(header.encode());
+
+    ObjectNode head = mapper.createObjectNode();
+    head.set("identity", identity);
+
+    return encode(head.toString());
   }
 
   @Test

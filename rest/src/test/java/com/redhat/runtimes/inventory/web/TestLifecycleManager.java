@@ -1,6 +1,8 @@
 /* Copyright (C) Red Hat 2023 */
 package com.redhat.runtimes.inventory.web;
 
+import static com.redhat.runtimes.inventory.events.EventConsumer.INGRESS_CHANNEL;
+
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
 import io.smallrye.reactive.messaging.memory.InMemoryConnector;
 import java.sql.SQLException;
@@ -14,7 +16,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
  */
 public class TestLifecycleManager implements QuarkusTestResourceLifecycleManager {
 
-  PostgreSQLContainer<?> postgreSQLContainer;
+  private PostgreSQLContainer<?> postgreSQLContainer;
 
   @Override
   public Map<String, String> start() {
@@ -29,9 +31,7 @@ public class TestLifecycleManager implements QuarkusTestResourceLifecycleManager
      * We'll use an in-memory Reactive Messaging connector to send payloads.
      * See https://smallrye.io/smallrye-reactive-messaging/smallrye-reactive-messaging/2/testing/testing.html
      */
-    properties.putAll(
-        InMemoryConnector.switchIncomingChannelsToInMemory(
-            com.redhat.runtimes.inventory.events.EventConsumer.INGRESS_CHANNEL));
+    properties.putAll(InMemoryConnector.switchIncomingChannelsToInMemory(INGRESS_CHANNEL));
     return properties;
   }
 

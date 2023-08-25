@@ -14,10 +14,12 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import java.io.IOException;
 import java.util.Base64;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 @QuarkusTest
 @QuarkusTestResource(TestLifecycleManager.class)
+@Tag("integration-tests")
 public class DisplayInventoryTest {
 
   @Inject EntityManager entityManager;

@@ -48,8 +48,7 @@ public class DisplayInventory {
     } catch (Exception e) {
       processingErrorCounter.increment();
       return """
-      {"response": "[error]"}
-      """;
+      {"response": "[error]"}""";
     }
 
     // Retrieve from DB
@@ -61,8 +60,7 @@ public class DisplayInventory {
       i.version, i.majorVersion, i.osArch, i.processors, i.heapMax, i.details, i.created
     ) from com.redhat.runtimes.inventory.models.JvmInstance i
     where i.orgId = :orgId and i.hostname = :hostname
-    order by i.created desc
-    """,
+    order by i.created desc""",
             JvmInstance.class);
     query.setParameter("orgId", orgId);
     query.setParameter("hostname", hostname);
@@ -70,8 +68,7 @@ public class DisplayInventory {
     Log.debugf("Found %s rows when looking for %s in org %s", results.size(), hostname, orgId);
     if (results.size() == 0) {
       return """
-      {"response": "[not found]"}
-      """;
+      {"response": "[not found]"}""";
     }
 
     var mapper = new ObjectMapper();
@@ -83,8 +80,7 @@ public class DisplayInventory {
       Log.error("JSON Exception", e);
       processingErrorCounter.increment();
       return """
-      {"response": "[error]"}
-      """;
+      {"response": "[error]"}""";
     }
   }
 

@@ -10,6 +10,7 @@ import com.redhat.runtimes.inventory.models.JvmInstance;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.quarkus.logging.Log;
+import jakarta.annotation.PostConstruct;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.ws.rs.*;
@@ -19,12 +20,18 @@ import java.util.Map;
 
 @Path("/api/runtimes-inventory-service/v1")
 public class DisplayInventory {
+  public static final String PROCESSING_ERROR_COUNTER_NAME = "input.processing.error";
 
   @Inject MeterRegistry registry;
 
   @Inject EntityManager entityManager;
 
   private Counter processingErrorCounter;
+
+  @PostConstruct
+  public void init() {
+    processingErrorCounter = registry.counter(PROCESSING_ERROR_COUNTER_NAME);
+  }
 
   @GET
   @Path("/instance/") // trailing slash is required by api
@@ -34,8 +41,16 @@ public class DisplayInventory {
       @HeaderParam(X_RH_IDENTITY_HEADER) String rhIdentity) {
     // X_RH header is just B64 encoded - decode for the org ID
     var rhIdJson = new String(Base64.getDecoder().decode(rhIdentity));
-    Log.infof("X_RH_IDENTITY_HEADER: %s", rhIdJson);
-    var orgId = extractOrgId(rhIdJson);
+    Log.debugf("X_RH_IDENTITY_HEADER: %s", rhIdJson);
+    var orgId = "";
+    try {
+      orgId = extractOrgId(rhIdJson);
+    } catch (Exception e) {
+      processingErrorCounter.increment();
+      return """
+      {"response": "[error]"}
+      """;
+    }
 
     // Retrieve from DB
     var query =
@@ -52,14 +67,28 @@ public class DisplayInventory {
     query.setParameter("orgId", orgId);
     query.setParameter("hostname", hostname);
     var results = query.getResultList();
-    Log.infof("Found %s rows when looking for %s in org %s", results.size(), hostname, orgId);
-    var out = results.size() == 0 ? "[not found]" : results.get(0);
+    Log.debugf("Found %s rows when looking for %s in org %s", results.size(), hostname, orgId);
+    if (results.size() == 0) {
+      return """
+      {"response": "[not found]"}
+      """;
+    }
 
-    // FIXME Temp - need proper marshalling
-    return "{\"response\": \"" + out + "\"}";
+    var mapper = new ObjectMapper();
+    try {
+      var map = Map.of("response", results.get(0));
+      return mapper.writeValueAsString(map);
+
+    } catch (JsonProcessingException e) {
+      Log.error("JSON Exception", e);
+      processingErrorCounter.increment();
+      return """
+      {"response": "[error]"}
+      """;
+    }
   }
 
-  String extractOrgId(String rhIdJson) {
+  static String extractOrgId(String rhIdJson) {
     TypeReference<Map<String, Object>> typeRef = new TypeReference<>() {};
     String out = "";
 
@@ -69,7 +98,7 @@ public class DisplayInventory {
       var identity = (Map<String, Object>) o.get("identity");
       out = String.valueOf(identity.get("org_id"));
     } catch (JsonProcessingException | ClassCastException | NumberFormatException e) {
-      Log.error("Error in unmarshalling JSON", e);
+      Log.error("Error in unmarshalling incoming JSON", e);
       throw new RuntimeException("Error in unmarshalling JSON", e);
     }
 

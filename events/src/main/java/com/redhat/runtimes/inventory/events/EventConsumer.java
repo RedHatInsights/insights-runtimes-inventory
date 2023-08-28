@@ -58,9 +58,6 @@ public class EventConsumer {
 
   @Inject MeterRegistry registry;
 
-  // TODO Remove?
-  @Inject KafkaMessageDeduplicator kafkaMessageDeduplicator;
-
   @Inject EntityManager entityManager;
 
   private ArchiveAnnouncementParser jsonParser = new ArchiveAnnouncementParser();
@@ -119,7 +116,7 @@ public class EventConsumer {
             inst.getJarHashes().addAll(newJars);
           } else {
             throw new IllegalStateException(
-                "Update message seen for non-existant hash: " + linkingHash);
+                "Update message seen for non-existent hash: " + linkingHash);
           }
         } else {
           // Can't happen, but just in case
@@ -128,8 +125,8 @@ public class EventConsumer {
         }
       }
 
-      Log.infof("About to persist: %s", inst);
       if (inst != null) {
+        Log.debugf("About to persist: %s", inst);
         entityManager.persist(inst);
       }
     } catch (Throwable t) {

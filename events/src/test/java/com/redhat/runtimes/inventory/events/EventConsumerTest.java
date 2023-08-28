@@ -11,14 +11,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.runtimes.inventory.models.EapInstance;
 import com.redhat.runtimes.inventory.models.JvmInstance;
-// import io.quarkus.test.junit.QuarkusTest;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Map;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-// @QuarkusTest
 public class EventConsumerTest {
 
   @Test

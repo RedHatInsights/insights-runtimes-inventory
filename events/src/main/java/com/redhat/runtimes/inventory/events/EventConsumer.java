@@ -45,6 +45,7 @@ import org.eclipse.microprofile.reactive.messaging.Message;
 @ApplicationScoped
 public class EventConsumer {
   public static final String INGRESS_CHANNEL = "ingress";
+  public static final String EGG_CHANNEL = "egg";
   public static final String REJECTED_COUNTER_NAME = "input.rejected";
   public static final String PROCESSING_ERROR_COUNTER_NAME = "input.processing.error";
   public static final String PROCESSING_EXCEPTION_COUNTER_NAME = "input.processing.exception";
@@ -143,9 +144,9 @@ public class EventConsumer {
     return message.ack();
   }
 
-  // Incoming(EGG_CHANNEL)
+  @Incoming(EGG_CHANNEL)
   @Acknowledgment(PRE_PROCESSING)
-  // Blocking
+  @Blocking
   @ActivateRequestContext
   @Transactional
   public CompletionStage<Void> processEggFlow(Message<String> message) {

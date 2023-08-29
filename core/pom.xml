@@ -141,7 +141,6 @@
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>mockserver</artifactId>
-      <version>${testcontainers.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -153,7 +152,6 @@
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>postgresql</artifactId>
-      <version>${testcontainers.version}</version>
       <scope>test</scope>
     </dependency>
 
@@ -163,7 +161,6 @@
       <artifactId>spotless-maven-plugin</artifactId>
       <version>${spotless-maven-plugin.version}</version>
     </dependency>
-
   </dependencies>
 
   <build>

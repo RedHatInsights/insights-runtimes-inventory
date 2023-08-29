@@ -60,6 +60,8 @@ public class EventConsumer {
 
   @Inject EntityManager entityManager;
 
+  private static HttpClient httpClient;
+
   private ArchiveAnnouncementParser jsonParser = new ArchiveAnnouncementParser();
 
   private Counter rejectedCounter;
@@ -449,6 +451,10 @@ public class EventConsumer {
     }
   }
 
+  static void setHttpClient(HttpClient httpClient) {
+    EventConsumer.httpClient = httpClient;
+  }
+
   static String getJsonFromS3(String urlStr) {
     try {
       var uri = new URL(urlStr).toURI();
@@ -456,8 +462,10 @@ public class EventConsumer {
       var request = requestBuilder.GET().build();
       Log.debugf("Issuing a HTTP POST request to %s", request);
 
-      var client = HttpClient.newBuilder().build();
-      var response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
+      if (httpClient == null) {
+        httpClient = HttpClient.newBuilder().build();
+      }
+      var response = httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
       Log.debugf("S3 HTTP Client status: %s", response.statusCode());
 
       return unzipJson(response.body());

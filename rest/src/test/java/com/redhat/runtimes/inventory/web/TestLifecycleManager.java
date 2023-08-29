@@ -1,6 +1,7 @@
 /* Copyright (C) Red Hat 2023 */
 package com.redhat.runtimes.inventory.web;
 
+import static com.redhat.runtimes.inventory.events.EventConsumer.EGG_CHANNEL;
 import static com.redhat.runtimes.inventory.events.EventConsumer.INGRESS_CHANNEL;
 
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
@@ -32,6 +33,7 @@ public class TestLifecycleManager implements QuarkusTestResourceLifecycleManager
      * See https://smallrye.io/smallrye-reactive-messaging/smallrye-reactive-messaging/2/testing/testing.html
      */
     properties.putAll(InMemoryConnector.switchIncomingChannelsToInMemory(INGRESS_CHANNEL));
+    properties.putAll(InMemoryConnector.switchIncomingChannelsToInMemory(EGG_CHANNEL));
     return properties;
   }
 

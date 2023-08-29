@@ -5,8 +5,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public final class Utils {
-  private Utils() {}
+public final class TestUtils {
+  private TestUtils() {}
 
   public static String readFromResources(String fName) throws IOException {
     return new String(readBytesFromResources(fName));

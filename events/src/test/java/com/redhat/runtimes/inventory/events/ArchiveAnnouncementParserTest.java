@@ -1,7 +1,7 @@
 /* Copyright (C) Red Hat 2023 */
 package com.redhat.runtimes.inventory.events;
 
-import static com.redhat.runtimes.inventory.events.Utils.readFromResources;
+import static com.redhat.runtimes.inventory.events.TestUtils.readFromResources;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;

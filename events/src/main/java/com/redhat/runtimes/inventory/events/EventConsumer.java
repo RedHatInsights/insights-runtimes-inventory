@@ -83,7 +83,7 @@ public class EventConsumer {
   @Blocking
   @ActivateRequestContext
   @Transactional
-  public CompletionStage<Void> process(Message<String> message) {
+  public CompletionStage<Void> processMainFlow(Message<String> message) {
     // This timer will have dynamic tag values based on the action parsed from the received message.
     Timer.Sample consumedTimer = Timer.start(registry);
     var payload = message.getPayload();
@@ -131,6 +131,51 @@ public class EventConsumer {
       if (inst != null) {
         Log.debugf("About to persist: %s", inst);
         entityManager.persist(inst);
+      }
+    } catch (Throwable t) {
+      processingExceptionCounter.increment();
+      Log.errorf(t, "Could not process the payload: %s", inst);
+    } finally {
+      // FIXME Might need tags
+      consumedTimer.stop(registry.timer(CONSUMED_TIMER_NAME));
+    }
+
+    return message.ack();
+  }
+
+  // Incoming(EGG_CHANNEL)
+  @Acknowledgment(PRE_PROCESSING)
+  // Blocking
+  @ActivateRequestContext
+  @Transactional
+  public CompletionStage<Void> processEggFlow(Message<String> message) {
+    // This timer will have dynamic tag values based on the action parsed from the received message.
+    Timer.Sample consumedTimer = Timer.start(registry);
+    var payload = message.getPayload();
+
+    // Needs to be visible in the catch block
+    JvmInstance inst = null;
+    try {
+      Log.debugf("Processing received Kafka message %s", payload);
+
+      // Parse JSON using Jackson
+      var announce = jsonParser.fromJsonString(payload);
+      // FIXME
+      if (announce.getContentType().equals(VALID_CONTENT_TYPE)) {
+        Log.infof("Processing our Kafka message %s", payload);
+
+        // Get data back from S3
+        Log.debugf("Processed message URL: %s", announce.getUrl());
+        var archiveJson = getJsonFromS3(announce.getUrl());
+        Log.debugf("Retrieved from S3: %s", archiveJson);
+
+        var msg = jvmInstanceOf(announce, archiveJson);
+        // The egg topic does not deliver update events, so this
+        if (msg instanceof JvmInstance) {
+          inst = (JvmInstance) msg;
+          Log.infof("About to persist (from egg): %s", inst);
+          entityManager.persist(inst);
+        }
       }
     } catch (Throwable t) {
       processingExceptionCounter.increment();

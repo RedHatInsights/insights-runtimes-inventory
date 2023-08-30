@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import java.time.Instant;
+import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ArchiveAnnouncement {
@@ -37,10 +38,19 @@ public class ArchiveAnnouncement {
   @JsonProperty("url")
   private String url;
 
-  @JsonProperty("is_runtimes")
-  private boolean isRuntimes;
+  @JsonProperty("platform_metadata")
+  private Map<String, Object> platformMetadata;
 
   public ArchiveAnnouncement() {}
+
+  // The is_runtimes  field in the platform_metadata in stage
+  public boolean isRuntimes() {
+    if (platformMetadata == null) {
+      return false;
+    }
+    var isRuntimes = String.valueOf(platformMetadata.get("is_runtimes"));
+    return isRuntimes == "true" ? true : false;
+  }
 
   ////////////////////////////////////////////////////////////////////////
 
@@ -124,13 +134,13 @@ public class ArchiveAnnouncement {
     this.contentType = contentType;
   }
 
-  @JsonProperty("is_runtimes")
-  public boolean isRuntimes() {
-    return isRuntimes;
+  @JsonProperty("platform_metadata")
+  public Map<String, Object> getPlatformMetadata() {
+    return platformMetadata;
   }
 
-  @JsonProperty("is_runtimes")
-  public void setRuntimes(boolean runtimes) {
-    isRuntimes = runtimes;
+  @JsonProperty("platform_metadata")
+  public void setPlatformMetadata(Map<String, Object> platformMetadata) {
+    this.platformMetadata = platformMetadata;
   }
 }

@@ -10,7 +10,7 @@ Both components come from the same Quarkus codebase, with just a different entry
 
 This will be split into 2 sets of pods (in Staging & Prod) to allow independent scaling of the two operations.
 
-Both sets will run the same image (with a flag for setting which mode, or both modes for development purposes)
+Each set will run a slightly different image.
 
 ### rbi-rest
 

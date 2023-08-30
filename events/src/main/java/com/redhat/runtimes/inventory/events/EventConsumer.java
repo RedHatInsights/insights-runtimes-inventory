@@ -162,7 +162,7 @@ public class EventConsumer {
       // Parse JSON using Jackson
       var announce = jsonParser.fromJsonString(payload);
       // FIXME
-      if (VALID_CONTENT_TYPE.equals(announce.getContentType())) {
+      if (VALID_CONTENT_TYPE.equals(announce.getContentType()) || announce.isRuntimes()) {
         Log.infof("Processing our Kafka message from egg %s", payload);
 
         // Get data back from S3

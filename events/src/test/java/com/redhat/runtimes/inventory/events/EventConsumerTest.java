@@ -2,9 +2,9 @@
 package com.redhat.runtimes.inventory.events;
 
 import static com.redhat.runtimes.inventory.events.EventConsumer.eapInstanceOf;
-import static com.redhat.runtimes.inventory.events.EventConsumer.jvmInstanceOf;
-import static com.redhat.runtimes.inventory.events.Utils.readBytesFromResources;
-import static com.redhat.runtimes.inventory.events.Utils.readFromResources;
+import static com.redhat.runtimes.inventory.events.TestUtils.readBytesFromResources;
+import static com.redhat.runtimes.inventory.events.TestUtils.readFromResources;
+import static com.redhat.runtimes.inventory.events.Utils.jvmInstanceOf;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.core.type.TypeReference;

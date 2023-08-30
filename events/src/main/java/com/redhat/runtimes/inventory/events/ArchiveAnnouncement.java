@@ -37,6 +37,9 @@ public class ArchiveAnnouncement {
   @JsonProperty("url")
   private String url;
 
+  @JsonProperty("is_runtimes")
+  private boolean isRuntimes;
+
   public ArchiveAnnouncement() {}
 
   ////////////////////////////////////////////////////////////////////////
@@ -119,5 +122,15 @@ public class ArchiveAnnouncement {
   @JsonProperty("content_type")
   public void setContentType(String contentType) {
     this.contentType = contentType;
+  }
+
+  @JsonProperty("is_runtimes")
+  public boolean isRuntimes() {
+    return isRuntimes;
+  }
+
+  @JsonProperty("is_runtimes")
+  public void setRuntimes(boolean runtimes) {
+    isRuntimes = runtimes;
   }
 }

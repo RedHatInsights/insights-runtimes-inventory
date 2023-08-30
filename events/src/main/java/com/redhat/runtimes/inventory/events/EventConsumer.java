@@ -165,17 +165,21 @@ public class EventConsumer {
       if (VALID_CONTENT_TYPE.equals(announce.getContentType()) || announce.isRuntimes()) {
         Log.infof("Processing our Kafka message from egg %s", payload);
 
-        // Get data back from S3
-        Log.debugf("Processed message URL: %s", announce.getUrl());
-        var archiveJson = getJsonFromS3(announce.getUrl());
-        Log.debugf("Retrieved from S3: %s", archiveJson);
+        var url = announce.getUrl();
+        // FIXME I think that we'll need to do more JSON spelunking to get the S3 URL
+        if (url != null) {
+          // Get data back from S3
+          Log.debugf("Processed message URL: %s", url);
+          var archiveJson = getJsonFromS3(announce.getUrl());
+          Log.debugf("Retrieved from S3: %s", archiveJson);
 
-        var msg = jvmInstanceOf(announce, archiveJson);
-        // The egg topic does not deliver update events, so this
-        if (msg instanceof JvmInstance) {
-          inst = (JvmInstance) msg;
-          Log.infof("About to persist (from egg): %s", inst);
-          entityManager.persist(inst);
+          var msg = jvmInstanceOf(announce, archiveJson);
+          // The egg topic does not deliver update events, so this
+          if (msg instanceof JvmInstance) {
+            inst = (JvmInstance) msg;
+            Log.infof("About to persist (from egg): %s", inst);
+            entityManager.persist(inst);
+          }
         }
       }
     } catch (Throwable t) {

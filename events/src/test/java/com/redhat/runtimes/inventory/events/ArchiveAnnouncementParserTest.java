@@ -16,6 +16,7 @@ public class ArchiveAnnouncementParserTest {
 
     var announce = parser.fromJsonString(json);
     assertEquals("12345", announce.getOrgId());
+    assertFalse(announce.isRuntimes());
   }
 
   @Test
@@ -25,5 +26,15 @@ public class ArchiveAnnouncementParserTest {
 
     var announce = parser.fromJsonString(json);
     assertEquals("1.0.0", announce.getVersion());
+    assertFalse(announce.isRuntimes());
+  }
+
+  @Test
+  public void eggIsRuntimes() throws IOException {
+    var json = readFromResources("egg_is_runtimes.json");
+    var parser = new ArchiveAnnouncementParser();
+
+    var announce = parser.fromJsonString(json);
+    assertTrue(announce.isRuntimes());
   }
 }

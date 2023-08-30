@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
@@ -89,7 +89,7 @@ public class EventConsumerIntegrationTest {
     ArchiveAnnouncement dummy = new ArchiveAnnouncement();
     dummy.setAccountId("dummy account id");
     dummy.setOrgId("dummy org");
-    dummy.setTimestamp(LocalDateTime.now());
+    dummy.setTimestamp(Instant.now());
 
     byte[] buffy = readBytesFromResources("jdk8_MWTELE-66.gz");
     String json = EventConsumer.unzipJson(buffy);

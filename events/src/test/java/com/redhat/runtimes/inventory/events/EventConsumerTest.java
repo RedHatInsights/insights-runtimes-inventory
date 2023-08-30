@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.runtimes.inventory.models.EapInstance;
 import com.redhat.runtimes.inventory.models.JvmInstance;
 import java.io.IOException;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Map;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -34,7 +34,7 @@ public class EventConsumerTest {
   @Test
   public void test_jvmInstance_MWTELE_66() throws IOException {
     var dummy = new ArchiveAnnouncement();
-    dummy.setTimestamp(LocalDateTime.MAX);
+    dummy.setTimestamp(Instant.now());
 
     var buffy = readBytesFromResources("jdk8_MWTELE-66.gz");
     var json = EventConsumer.unzipJson(buffy);
@@ -59,7 +59,7 @@ public class EventConsumerTest {
   @Disabled
   public void test_jvmInstance_MWTELE_67() throws IOException {
     var dummy = new ArchiveAnnouncement();
-    dummy.setTimestamp(LocalDateTime.MIN);
+    dummy.setTimestamp(Instant.MIN);
 
     var buffy = readBytesFromResources("update1.json.gz");
     var json = EventConsumer.unzipJson(buffy);
@@ -72,10 +72,9 @@ public class EventConsumerTest {
   }
 
   @Test
-  // @Disabled
   public void test_EapInstance_example1() throws IOException {
     var dummy = new ArchiveAnnouncement();
-    dummy.setTimestamp(LocalDateTime.MAX);
+    dummy.setTimestamp(Instant.now());
 
     var json = readFromResources("eap_example1.json");
     var msg = eapInstanceOf(dummy, json);

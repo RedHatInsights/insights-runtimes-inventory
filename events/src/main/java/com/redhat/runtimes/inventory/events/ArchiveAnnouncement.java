@@ -4,7 +4,7 @@ package com.redhat.runtimes.inventory.events;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ArchiveAnnouncement {
@@ -23,7 +23,7 @@ public class ArchiveAnnouncement {
   @JsonPropertyDescription(
       "ISO-8601 formatted date (per platform convention) when the message was sent in UTC. Dates"
           + " with timezones/offsets are rejected.")
-  private LocalDateTime timestamp;
+  private Instant timestamp;
 
   @JsonProperty("account_id")
   private String accountId;
@@ -65,12 +65,12 @@ public class ArchiveAnnouncement {
   }
 
   @JsonProperty("timestamp")
-  public LocalDateTime getTimestamp() {
+  public Instant getTimestamp() {
     return this.timestamp;
   }
 
   @JsonProperty("timestamp")
-  public void setTimestamp(LocalDateTime timestamp) {
+  public void setTimestamp(Instant timestamp) {
     this.timestamp = timestamp;
   }
 

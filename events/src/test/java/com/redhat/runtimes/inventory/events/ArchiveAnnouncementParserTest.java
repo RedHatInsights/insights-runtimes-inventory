@@ -17,4 +17,13 @@ public class ArchiveAnnouncementParserTest {
     var announce = parser.fromJsonString(json);
     assertEquals("12345", announce.getOrgId());
   }
+
+  @Test
+  public void eggDateTime() throws IOException {
+    var json = readFromResources("egg_datetime.json");
+    var parser = new ArchiveAnnouncementParser();
+
+    var announce = parser.fromJsonString(json);
+    assertEquals("1.0.0", announce.getVersion());
+  }
 }

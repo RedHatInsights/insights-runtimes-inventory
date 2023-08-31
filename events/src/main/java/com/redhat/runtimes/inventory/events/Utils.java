@@ -124,11 +124,11 @@ final class Utils {
     out.setVersion((String) jarJson.getOrDefault("version", ""));
 
     var attrs = (Map<String, String>) jarJson.getOrDefault("attributes", Map.of());
-    out.setGroupId(attrs.getOrDefault("group_id", ""));
-    out.setVendor(attrs.getOrDefault("vendor", ""));
-    out.setSha1Checksum(attrs.getOrDefault("sha1_checksum", ""));
-    out.setSha256Checksum(attrs.getOrDefault("sha256_checksum", ""));
-    out.setSha512Checksum(attrs.getOrDefault("sha512_checksum", ""));
+    out.setGroupId(attrs.getOrDefault("groupId", ""));
+    out.setVendor(attrs.getOrDefault("Implementation-Vendor", ""));
+    out.setSha1Checksum(attrs.getOrDefault("sha1Checksum", ""));
+    out.setSha256Checksum(attrs.getOrDefault("sha256Checksum", ""));
+    out.setSha512Checksum(attrs.getOrDefault("sha512Checksum", ""));
 
     return out;
   }

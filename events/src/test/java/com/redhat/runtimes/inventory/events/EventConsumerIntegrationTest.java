@@ -60,7 +60,7 @@ public class EventConsumerIntegrationTest {
   @Transactional
   @SuppressWarnings("unchecked")
   void testValidJvmInstancePayload() throws IOException, InterruptedException {
-    clearTables();
+    TestUtils.clearTables(entityManager);
     HttpClient mockClient = mock(HttpClient.class);
     HttpResponse<byte[]> mockResponse = mock(HttpResponse.class);
     byte[] buffy = readBytesFromResources("jdk8_MWTELE-66.gz");
@@ -74,7 +74,7 @@ public class EventConsumerIntegrationTest {
 
     micrometerAssertionHelper.awaitAndAssertTimerIncrement(CONSUMED_TIMER_NAME, 1);
     micrometerAssertionHelper.assertCounterIncrement(PROCESSING_EXCEPTION_COUNTER_NAME, 0);
-    assertEquals(1L, entity_count("JvmInstance"));
+    assertEquals(1L, TestUtils.entity_count(entityManager, "JvmInstance"));
   }
 
   @Test
@@ -87,7 +87,7 @@ public class EventConsumerIntegrationTest {
   @Test
   @Transactional
   void testJvmInstanceBasicPostgresTransactions() throws IOException {
-    clearTables();
+    TestUtils.clearTables(entityManager);
     ArchiveAnnouncement dummy = new ArchiveAnnouncement();
     dummy.setAccountId("dummy account id");
     dummy.setOrgId("dummy org");
@@ -100,25 +100,25 @@ public class EventConsumerIntegrationTest {
     assertTrue(msg instanceof JvmInstance);
     JvmInstance inst = (JvmInstance) msg;
 
-    assertEquals(0L, entity_count("JvmInstance"));
-    assertEquals(0L, entity_count("JarHash"));
+    assertEquals(0L, TestUtils.entity_count(entityManager, "JvmInstance"));
+    assertEquals(0L, TestUtils.entity_count(entityManager, "JarHash"));
 
     entityManager.persist(inst);
-    assertEquals(1L, entity_count("JvmInstance"));
-    assertEquals(1L, entity_count("JarHash"));
-    assertEquals(1L, table_count("jvm_instance_jar_hash"));
+    assertEquals(1L, TestUtils.entity_count(entityManager, "JvmInstance"));
+    assertEquals(1L, TestUtils.entity_count(entityManager, "JarHash"));
+    assertEquals(1L, TestUtils.table_count(entityManager, "jvm_instance_jar_hash"));
 
     entityManager.remove(inst);
-    assertEquals(0L, entity_count("JvmInstance"));
+    assertEquals(0L, TestUtils.entity_count(entityManager, "JvmInstance"));
     // TODO: This won't pass right now because orphans still need to be handled
-    // assertEquals(0L, entity_count("JarHash"));
-    assertEquals(0L, table_count("jvm_instance_jar_hash"));
+    // assertEquals(0L, TestUtils.entity_count(entityManager, "JarHash"));
+    assertEquals(0L, TestUtils.table_count(entityManager, "jvm_instance_jar_hash"));
   }
 
   @Test
   @Transactional
   void testEapInstanceBasicPostgresTransactions() throws IOException {
-    clearTables();
+    TestUtils.clearTables(entityManager);
     ArchiveAnnouncement dummy = new ArchiveAnnouncement();
     dummy.setAccountId("dummy account id");
     dummy.setOrgId("dummy org");
@@ -133,87 +133,53 @@ public class EventConsumerIntegrationTest {
     /*******************
      *  Pre-persist checks
      *******************/
-    assertEquals(0L, entity_count("EapInstance"));
-    assertEquals(0L, entity_count("JarHash"));
-    assertEquals(0L, entity_count("EapConfiguration"));
-    assertEquals(0L, entity_count("EapDeployment"));
-    assertEquals(0L, entity_count("EapExtension"));
+    assertEquals(0L, TestUtils.entity_count(entityManager, "EapInstance"));
+    assertEquals(0L, TestUtils.entity_count(entityManager, "JarHash"));
+    assertEquals(0L, TestUtils.entity_count(entityManager, "EapConfiguration"));
+    assertEquals(0L, TestUtils.entity_count(entityManager, "EapDeployment"));
+    assertEquals(0L, TestUtils.entity_count(entityManager, "EapExtension"));
 
     /*******************
      *  Persist and check counts
      *******************/
     entityManager.persist(inst);
-    assertEquals(1L, entity_count("EapInstance"));
-    assertEquals(1L, entity_count("EapConfiguration"));
-    assertEquals(2L, table_count("eap_configuration_deployments"));
-    assertEquals(40L, table_count("eap_configuration_subsystems"));
-    assertEquals(2L, entity_count("EapDeployment"));
-    assertEquals(39L, entity_count("EapExtension"));
-    assertEquals(41L, table_count("eap_extension_subsystems"));
+    assertEquals(1L, TestUtils.entity_count(entityManager, "EapInstance"));
+    assertEquals(1L, TestUtils.entity_count(entityManager, "EapConfiguration"));
+    assertEquals(2L, TestUtils.table_count(entityManager, "eap_configuration_deployments"));
+    assertEquals(40L, TestUtils.table_count(entityManager, "eap_configuration_subsystems"));
+    assertEquals(2L, TestUtils.entity_count(entityManager, "EapDeployment"));
+    assertEquals(39L, TestUtils.entity_count(entityManager, "EapExtension"));
+    assertEquals(41L, TestUtils.table_count(entityManager, "eap_extension_subsystems"));
 
     // Jars are stored in multiple places, so lots of JarHashes
-    assertEquals(3561L, entity_count("JarHash"));
-    assertEquals(1L, table_count("jvm_instance_jar_hash"));
-    assertEquals(3555L, table_count("eap_instance_module_jar_hash"));
-    assertEquals(5L, table_count("eap_deployment_archive_jar_hash"));
+    assertEquals(3561L, TestUtils.entity_count(entityManager, "JarHash"));
+    assertEquals(1L, TestUtils.table_count(entityManager, "jvm_instance_jar_hash"));
+    assertEquals(3555L, TestUtils.table_count(entityManager, "eap_instance_module_jar_hash"));
+    assertEquals(5L, TestUtils.table_count(entityManager, "eap_deployment_archive_jar_hash"));
 
     // The JarHash entities should equal the totals in these tables
     assertEquals(
-        entity_count("JarHash"),
-        table_count("jvm_instance_jar_hash")
-            + table_count("eap_instance_module_jar_hash")
-            + table_count("eap_deployment_archive_jar_hash"));
+        TestUtils.entity_count(entityManager, "JarHash"),
+        TestUtils.table_count(entityManager, "jvm_instance_jar_hash")
+            + TestUtils.table_count(entityManager, "eap_instance_module_jar_hash")
+            + TestUtils.table_count(entityManager, "eap_deployment_archive_jar_hash"));
 
     /*******************
      *  Instance removal checks
      *******************/
     entityManager.remove(inst);
-    assertEquals(0L, entity_count("EapInstance"));
-    assertEquals(0L, entity_count("EapConfiguration"));
-    assertEquals(0L, table_count("eap_configuration_deployments"));
-    assertEquals(0L, table_count("eap_configuration_subsystems"));
-    assertEquals(0L, entity_count("EapDeployment"));
+    assertEquals(0L, TestUtils.entity_count(entityManager, "EapInstance"));
+    assertEquals(0L, TestUtils.entity_count(entityManager, "EapConfiguration"));
+    assertEquals(0L, TestUtils.table_count(entityManager, "eap_configuration_deployments"));
+    assertEquals(0L, TestUtils.table_count(entityManager, "eap_configuration_subsystems"));
+    assertEquals(0L, TestUtils.entity_count(entityManager, "EapDeployment"));
 
     // TODO: These won't pass right now because orphans still need to be handled
-    // assertEquals(0L, entity_count("EapExtension"));
-    // assertEquals(0L, table_count("eap_extension_subsystems"));
-    // assertEquals(0L, entity_count("JarHash"));
-    assertEquals(0L, table_count("jvm_instance_jar_hash"));
-    assertEquals(0L, table_count("eap_instance_module_jar_hash"));
-    assertEquals(0L, table_count("eap_deployment_archive_jar_hash"));
-  }
-
-  private void clearTables() {
-    // Order is important here
-    entityManager.createNativeQuery("DELETE FROM jvm_instance_jar_hash").executeUpdate();
-    entityManager.createNativeQuery("DELETE FROM eap_instance_module_jar_hash").executeUpdate();
-    entityManager.createNativeQuery("DELETE FROM eap_deployment_archive_jar_hash").executeUpdate();
-    entityManager.createNativeQuery("DELETE FROM jar_hash").executeUpdate();
-    entityManager.createNativeQuery("DELETE FROM jvm_instance").executeUpdate();
-    entityManager.createNativeQuery("DELETE FROM eap_instance").executeUpdate();
-    entityManager.createNativeQuery("DELETE FROM eap_configuration").executeUpdate();
-    entityManager.createNativeQuery("DELETE FROM eap_configuration_eap_extension").executeUpdate();
-    entityManager.createNativeQuery("DELETE FROM eap_configuration_deployments").executeUpdate();
-    entityManager.createNativeQuery("DELETE FROM eap_configuration_subsystems").executeUpdate();
-    entityManager.createNativeQuery("DELETE FROM eap_deployment").executeUpdate();
-    entityManager.createNativeQuery("DELETE FROM eap_extension").executeUpdate();
-    entityManager.createNativeQuery("DELETE FROM eap_extension_subsystems").executeUpdate();
-  }
-
-  private Long entity_count(String entity) {
-    // I don't know why, but but hibernate throws a ParsingException
-    // when I try a named or positional query parameter
-    return entityManager
-        .createQuery("SELECT COUNT (*) FROM " + entity, Long.class)
-        .getSingleResult();
-  }
-
-  private Long table_count(String table) {
-    // I don't know why, but but hibernate throws a ParsingException
-    // when I try a named or positional query parameter
-    return (Long)
-        entityManager
-            .createNativeQuery("SELECT COUNT (*) FROM " + table, Long.class)
-            .getSingleResult();
+    // assertEquals(0L, TestUtils.entity_count(entityManager, "EapExtension"));
+    // assertEquals(0L, TestUtils.table_count(entityManager, "eap_extension_subsystems"));
+    // assertEquals(0L, TestUtils.entity_count(entityManager, "JarHash"));
+    assertEquals(0L, TestUtils.table_count(entityManager, "jvm_instance_jar_hash"));
+    assertEquals(0L, TestUtils.table_count(entityManager, "eap_instance_module_jar_hash"));
+    assertEquals(0L, TestUtils.table_count(entityManager, "eap_deployment_archive_jar_hash"));
   }
 }

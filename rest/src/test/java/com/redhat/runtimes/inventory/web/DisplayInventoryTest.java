@@ -3,17 +3,36 @@ package com.redhat.runtimes.inventory.web;
 
 import static com.redhat.runtimes.inventory.models.Constants.X_RH_IDENTITY_HEADER;
 import static io.restassured.RestAssured.given;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.redhat.runtimes.inventory.events.ArchiveAnnouncement;
+import com.redhat.runtimes.inventory.events.EventConsumer;
+import com.redhat.runtimes.inventory.events.TestUtils;
+import com.redhat.runtimes.inventory.events.Utils;
+import com.redhat.runtimes.inventory.models.InsightsMessage;
+import com.redhat.runtimes.inventory.models.JarHash;
+import com.redhat.runtimes.inventory.models.JvmInstance;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.Header;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import java.io.IOException;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
@@ -23,6 +42,12 @@ import org.junit.jupiter.api.Test;
 public class DisplayInventoryTest {
 
   @Inject EntityManager entityManager;
+
+  @AfterEach
+  @Transactional
+  void tearDown() {
+    TestUtils.clearTables(entityManager);
+  }
 
   private static Header createRHIdentityHeader(String encodedIdentityHeader) {
     return new Header(X_RH_IDENTITY_HEADER, encodedIdentityHeader);
@@ -50,13 +75,63 @@ public class DisplayInventoryTest {
     return encode(head.toString());
   }
 
+  private ArchiveAnnouncement setupArchiveAnnouncement() {
+    ArchiveAnnouncement announcement = new ArchiveAnnouncement();
+    announcement.setAccountId("accountId");
+    announcement.setOrgId("orgId");
+    announcement.setTimestamp(Instant.now());
+    return announcement;
+  }
+
+  private JvmInstance getJvmInstanceFromZipJsonFile(String filename) throws IOException {
+    byte[] buffy = TestUtils.readBytesFromResources(filename);
+    String json = EventConsumer.unzipJson(buffy);
+    InsightsMessage message = Utils.jvmInstanceOf(setupArchiveAnnouncement(), json);
+    assertTrue(message instanceof JvmInstance);
+    JvmInstance instance = (JvmInstance) message;
+    return instance;
+  }
+
+  private JvmInstance getJvmInstanceFromJsonFile(String filename) throws IOException {
+    String json = TestUtils.readFromResources(filename);
+    InsightsMessage message = Utils.jvmInstanceOf(setupArchiveAnnouncement(), json);
+    assertTrue(message instanceof JvmInstance);
+    JvmInstance instance = (JvmInstance) message;
+    return instance;
+  }
+
+  @Transactional
+  void persistJvmInstanceToDatabase(JvmInstance instance) {
+    entityManager.persist(instance);
+  }
+
   @Test
-  public void testInstanceEndpointWithoutValidHeader() {
+  void testInstanceEndpointWithoutValidHeader() {
     given().when().get("/api/runtimes-inventory-service/v1/instance").then().statusCode(500);
   }
 
   @Test
-  public void testInstanceEndpointWithValidHeader() throws IOException {
+  void testInstanceEndpointsWithInvalidGroupId() {
+    Header identityHeader = createRHIdentityHeader(encode("not-a-real-identity"));
+    String[] endpoints = {"instance-ids", "instance", "instances"};
+    for (String endpoint : endpoints) {
+      String response =
+          given()
+              .header(identityHeader)
+              .when()
+              .queryParam("hostname", "fedora")
+              .get("/api/runtimes-inventory-service/v1/" + endpoint)
+              .then()
+              .statusCode(200)
+              .extract()
+              .body()
+              .asString();
+      assertEquals("{\"response\": \"[error]\"}", response);
+    }
+  }
+
+  @Test
+  void testInstanceIdsWithNoJvmInstances() throws IOException {
     String accountNumber = "accountId";
     String orgId = "orgId";
     String username = "user";
@@ -67,12 +142,420 @@ public class DisplayInventoryTest {
             .header(identityHeader)
             .when()
             .queryParam("hostname", "fedora")
-            .get("/api/runtimes-inventory-service/v1/instance")
+            .get("/api/runtimes-inventory-service/v1/instance-ids/")
             .then()
             .statusCode(200)
             .extract()
             .body()
             .asString();
-    assertEquals("{\"response\": \"[not found]\"}", response);
+    assertEquals("{\"response\": \"[]\"}", response);
+  }
+
+  @Test
+  void testInstanceIdsWithSingleJvmInstance() throws IOException {
+    JvmInstance instance = getJvmInstanceFromZipJsonFile("jdk8_MWTELE-66.gz");
+    persistJvmInstanceToDatabase(instance);
+    String accountNumber = "accountId";
+    String orgId = "orgId";
+    String username = "user";
+    String identityHeaderValue = encodeRHIdentityInfo(accountNumber, orgId, username);
+    Header identityHeader = createRHIdentityHeader(identityHeaderValue);
+    String response =
+        given()
+            .header(identityHeader)
+            .when()
+            .queryParam("hostname", instance.getHostname())
+            .get("/api/runtimes-inventory-service/v1/instance-ids/")
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .asString();
+    ObjectMapper mapper = new ObjectMapper();
+    JsonNode jsonNode = mapper.readTree(response).get("response");
+    assertEquals(true, jsonNode.isArray());
+    assertEquals(1, jsonNode.size());
+  }
+
+  @Test
+  void testInstanceIdsWithMultipleJvmInstances() throws IOException {
+    persistJvmInstanceToDatabase(getJvmInstanceFromZipJsonFile("jdk8_MWTELE-66.gz"));
+    JvmInstance modifiedInstance = getJvmInstanceFromJsonFile("test17.json");
+    // set the hostname to match the previous instance
+    modifiedInstance.setHostname("fedora");
+    persistJvmInstanceToDatabase(modifiedInstance);
+    assertEquals(2L, TestUtils.entity_count(entityManager, "JvmInstance"));
+
+    String accountNumber = "accountId";
+    String orgId = "orgId";
+    String username = "user";
+    String identityHeaderValue = encodeRHIdentityInfo(accountNumber, orgId, username);
+    Header identityHeader = createRHIdentityHeader(identityHeaderValue);
+    String response =
+        given()
+            .header(identityHeader)
+            .when()
+            .queryParam("hostname", modifiedInstance.getHostname())
+            .get("/api/runtimes-inventory-service/v1/instance-ids/")
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .asString();
+    ObjectMapper mapper = new ObjectMapper();
+    JsonNode jsonNode = mapper.readTree(response).get("response");
+    assertEquals(true, jsonNode.isArray());
+    assertEquals(2, jsonNode.size());
+  }
+
+  private List<String> mapResponseIdsToList(String response)
+      throws JsonMappingException, JsonProcessingException {
+    ObjectMapper mapper = new ObjectMapper();
+    JsonNode jsonNode = mapper.readTree(response).get("response");
+    List<String> ids = new ArrayList<String>();
+    if (jsonNode.isArray()) {
+      for (JsonNode node : jsonNode) {
+        ids.add(node.asText());
+      }
+    }
+    return ids;
+  }
+
+  @Test
+  void testInstanceWithValidId() throws IOException {
+    JvmInstance instance = getJvmInstanceFromZipJsonFile("jdk8_MWTELE-66.gz");
+    persistJvmInstanceToDatabase(instance);
+    String accountNumber = "accountId";
+    String orgId = "orgId";
+    String username = "user";
+    String identityHeaderValue = encodeRHIdentityInfo(accountNumber, orgId, username);
+    Header identityHeader = createRHIdentityHeader(identityHeaderValue);
+    String response =
+        given()
+            .header(identityHeader)
+            .when()
+            .queryParam("hostname", instance.getHostname())
+            .get("/api/runtimes-inventory-service/v1/instance-ids/")
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .asString();
+    List<String> ids = mapResponseIdsToList(response);
+    assertEquals(1, ids.size());
+    String secondResponse =
+        given()
+            .header(identityHeader)
+            .when()
+            .queryParam("jvmInstanceId", ids.get(0))
+            .get("/api/runtimes-inventory-service/v1/instance/")
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .asString();
+    ObjectMapper mapper = new ObjectMapper();
+    JsonNode responseNode = mapper.readTree(secondResponse).get("response");
+    assertEquals(instance.getId(), UUID.fromString(responseNode.get("id").asText()));
+    assertEquals(instance.getLaunchTime(), responseNode.get("launchTime").asLong());
+    assertEquals(instance.getVendor(), responseNode.get("vendor").asText());
+    assertEquals(instance.getVersionString(), responseNode.get("versionString").asText());
+  }
+
+  @Test
+  void testInstanceWithInvalidId() throws IOException {
+    JvmInstance instance = getJvmInstanceFromZipJsonFile("jdk8_MWTELE-66.gz");
+    persistJvmInstanceToDatabase(instance);
+    String accountNumber = "accountId";
+    String orgId = "orgId";
+    String username = "user";
+    String identityHeaderValue = encodeRHIdentityInfo(accountNumber, orgId, username);
+    Header identityHeader = createRHIdentityHeader(identityHeaderValue);
+    given()
+        .header(identityHeader)
+        .when()
+        .queryParam("hostname", instance.getHostname())
+        .get("/api/runtimes-inventory-service/v1/instance-ids/")
+        .then()
+        .statusCode(200);
+    String response =
+        given()
+            .header(identityHeader)
+            .when()
+            .queryParam("jvmInstanceId", UUID.randomUUID().toString())
+            .get("/api/runtimes-inventory-service/v1/instance/")
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .asString();
+    assertEquals("{\"response\": \"[]\"}", response);
+  }
+
+  @Test
+  void testInstancesWithNoInstances() {
+    String accountNumber = "accountId";
+    String orgId = "orgId";
+    String username = "user";
+    String identityHeaderValue = encodeRHIdentityInfo(accountNumber, orgId, username);
+    Header identityHeader = createRHIdentityHeader(identityHeaderValue);
+    String response =
+        given()
+            .header(identityHeader)
+            .when()
+            .queryParam("hostname", "fedora")
+            .get("/api/runtimes-inventory-service/v1/instances/")
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .asString();
+    assertEquals("{\"response\": \"[]\"}", response);
+  }
+
+  @Test
+  void testInstancesWithMultipleJvmInstances() throws IOException {
+    persistJvmInstanceToDatabase(getJvmInstanceFromZipJsonFile("jdk8_MWTELE-66.gz"));
+    JvmInstance modifiedInstance = getJvmInstanceFromJsonFile("test17.json");
+    // set the hostname to match the previous instance
+    modifiedInstance.setHostname("fedora");
+    persistJvmInstanceToDatabase(modifiedInstance);
+    assertEquals(2L, TestUtils.entity_count(entityManager, "JvmInstance"));
+    String accountNumber = "accountId";
+    String orgId = "orgId";
+    String username = "user";
+    String identityHeaderValue = encodeRHIdentityInfo(accountNumber, orgId, username);
+    Header identityHeader = createRHIdentityHeader(identityHeaderValue);
+    String response =
+        given()
+            .header(identityHeader)
+            .when()
+            .queryParam("hostname", modifiedInstance.getHostname())
+            .get("/api/runtimes-inventory-service/v1/instances/")
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .asString();
+    ObjectMapper mapper = new ObjectMapper();
+    JsonNode jsonNode = mapper.readTree(response).get("response");
+    assertEquals(true, jsonNode.isArray());
+    assertEquals(2, jsonNode.size());
+  }
+
+  @Test
+  void testJarHashIdsWithNoRecords() throws IOException {
+    String response =
+        given()
+            .when()
+            .queryParam("jvmInstanceId", UUID.randomUUID().toString())
+            .get("/api/runtimes-inventory-service/v1/jarhash-ids/")
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .asString();
+    assertEquals("{\"response\": \"[]\"}", response);
+  }
+
+  @Test
+  void testJarHashIdsWithRecords() throws IOException {
+    // this jvm instance has 11 jar hashes associated with it
+    JvmInstance instance = getJvmInstanceFromJsonFile("test17.json");
+    persistJvmInstanceToDatabase(getJvmInstanceFromJsonFile("test17.json"));
+    String accountNumber = "accountId";
+    String orgId = "orgId";
+    String username = "user";
+    String identityHeaderValue = encodeRHIdentityInfo(accountNumber, orgId, username);
+    Header identityHeader = createRHIdentityHeader(identityHeaderValue);
+    String jvmInstanceIdsResponse =
+        given()
+            .header(identityHeader)
+            .when()
+            .queryParam("hostname", instance.getHostname())
+            .get("/api/runtimes-inventory-service/v1/instance-ids/")
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .asString();
+    List<String> ids = mapResponseIdsToList(jvmInstanceIdsResponse);
+    assertEquals(1, ids.size());
+    String response =
+        given()
+            .when()
+            .queryParam("jvmInstanceId", UUID.fromString(ids.get(0)))
+            .get("/api/runtimes-inventory-service/v1/jarhash-ids/")
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .asString();
+    ObjectMapper mapper = new ObjectMapper();
+    JsonNode jsonNode = mapper.readTree(response).get("response");
+    assertEquals(true, jsonNode.isArray());
+    assertEquals(11, jsonNode.size());
+  }
+
+  @Test
+  void testJarHashWithNoRecords() throws IOException {
+    String response =
+        given()
+            .when()
+            .queryParam("jarHashId", UUID.randomUUID().toString())
+            .get("/api/runtimes-inventory-service/v1/jarhash/")
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .asString();
+    assertEquals("{\"response\": \"[]\"}", response);
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  void testJarHashWithRecords() throws IOException {
+    // this jvm instance has 11 jar hashes associated with it
+    JvmInstance instance = getJvmInstanceFromJsonFile("test17.json");
+    persistJvmInstanceToDatabase(instance);
+    String accountNumber = "accountId";
+    String orgId = "orgId";
+    String username = "user";
+    String identityHeaderValue = encodeRHIdentityInfo(accountNumber, orgId, username);
+    Header identityHeader = createRHIdentityHeader(identityHeaderValue);
+    String jvmInstanceIdsResponse =
+        given()
+            .header(identityHeader)
+            .when()
+            .queryParam("hostname", instance.getHostname())
+            .get("/api/runtimes-inventory-service/v1/instance-ids/")
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .asString();
+    List<String> ids = mapResponseIdsToList(jvmInstanceIdsResponse);
+    assertEquals(1, ids.size());
+    String jarHashIdsResponse =
+        given()
+            .when()
+            .queryParam("jvmInstanceId", UUID.fromString(ids.get(0)))
+            .get("/api/runtimes-inventory-service/v1/jarhash-ids/")
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .asString();
+    ids = mapResponseIdsToList(jarHashIdsResponse);
+    assertEquals(11, ids.size());
+    String jarHashResponse =
+        given()
+            .when()
+            .queryParam("jarHashId", ids.get(0))
+            .get("/api/runtimes-inventory-service/v1/jarhash/")
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .asString();
+    ObjectMapper mapper = new ObjectMapper();
+    JsonNode jsonNode = mapper.readTree(jarHashResponse).get("response");
+    Map<String, Object> map = mapper.convertValue(jsonNode, Map.class);
+    JarHash jarHash = Utils.jarHashOf(map);
+    assertNotNull(jarHash.getName());
+    assertNotNull(jarHash.getVersion());
+  }
+
+  @Test
+  void testJarHashesWithNoRecords() throws IOException {
+    String response =
+        given()
+            .when()
+            .queryParam("jvmInstanceId", UUID.randomUUID().toString())
+            .get("/api/runtimes-inventory-service/v1/jarhashes/")
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .asString();
+    assertEquals("{\"response\": \"[]\"}", response);
+  }
+
+  @Test
+  void testJarHashesWithSingleRecord() throws IOException {
+    // this jvm instance has 1 jar hash associated with it
+    JvmInstance instance = getJvmInstanceFromZipJsonFile("jdk8_MWTELE-66.gz");
+    persistJvmInstanceToDatabase(instance);
+    String accountNumber = "accountId";
+    String orgId = "orgId";
+    String username = "user";
+    String identityHeaderValue = encodeRHIdentityInfo(accountNumber, orgId, username);
+    Header identityHeader = createRHIdentityHeader(identityHeaderValue);
+    String jvmInstanceIdsResponse =
+        given()
+            .header(identityHeader)
+            .when()
+            .queryParam("hostname", instance.getHostname())
+            .get("/api/runtimes-inventory-service/v1/instance-ids/")
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .asString();
+    List<String> ids = mapResponseIdsToList(jvmInstanceIdsResponse);
+    assertEquals(1, ids.size());
+    String response =
+        given()
+            .when()
+            .queryParam("jvmInstanceId", UUID.fromString(ids.get(0)))
+            .get("/api/runtimes-inventory-service/v1/jarhashes/")
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .asString();
+    ObjectMapper mapper = new ObjectMapper();
+    JsonNode jsonNode = mapper.readTree(response).get("response");
+    assertEquals(true, jsonNode.isArray());
+    assertEquals(1, jsonNode.size());
+  }
+
+  @Test
+  void testJarHashesWithMultipleRecords() throws IOException {
+    // this jvm instance has 11 jar hashes associated with it
+    JvmInstance instance = getJvmInstanceFromJsonFile("test17.json");
+    persistJvmInstanceToDatabase(getJvmInstanceFromJsonFile("test17.json"));
+    String accountNumber = "accountId";
+    String orgId = "orgId";
+    String username = "user";
+    String identityHeaderValue = encodeRHIdentityInfo(accountNumber, orgId, username);
+    Header identityHeader = createRHIdentityHeader(identityHeaderValue);
+    String jvmInstanceIdsResponse =
+        given()
+            .header(identityHeader)
+            .when()
+            .queryParam("hostname", instance.getHostname())
+            .get("/api/runtimes-inventory-service/v1/instance-ids/")
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .asString();
+    List<String> ids = mapResponseIdsToList(jvmInstanceIdsResponse);
+    assertEquals(1, ids.size());
+    String response =
+        given()
+            .when()
+            .queryParam("jvmInstanceId", UUID.fromString(ids.get(0)))
+            .get("/api/runtimes-inventory-service/v1/jarhashes/")
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .asString();
+    ObjectMapper mapper = new ObjectMapper();
+    JsonNode jsonNode = mapper.readTree(response).get("response");
+    assertEquals(true, jsonNode.isArray());
+    assertEquals(11, jsonNode.size());
   }
 }

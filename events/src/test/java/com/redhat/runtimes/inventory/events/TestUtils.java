@@ -1,6 +1,7 @@
 /* Copyright (C) Red Hat 2023 */
 package com.redhat.runtimes.inventory.events;
 
+import jakarta.persistence.EntityManager;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,5 +27,39 @@ public final class TestUtils {
       }
       return baos.toByteArray();
     }
+  }
+
+  public static Long entity_count(EntityManager entityManager, String entity) {
+    // I don't know why, but but hibernate throws a ParsingException
+    // when I try a named or positional query parameter
+    return entityManager
+        .createQuery("SELECT COUNT (*) FROM " + entity, Long.class)
+        .getSingleResult();
+  }
+
+  public static Long table_count(EntityManager entityManager, String table) {
+    // I don't know why, but but hibernate throws a ParsingException
+    // when I try a named or positional query parameter
+    return (Long)
+        entityManager
+            .createNativeQuery("SELECT COUNT (*) FROM " + table, Long.class)
+            .getSingleResult();
+  }
+
+  public static void clearTables(EntityManager entityManager) {
+    // Order is important here
+    entityManager.createNativeQuery("DELETE FROM jvm_instance_jar_hash").executeUpdate();
+    entityManager.createNativeQuery("DELETE FROM eap_instance_module_jar_hash").executeUpdate();
+    entityManager.createNativeQuery("DELETE FROM eap_deployment_archive_jar_hash").executeUpdate();
+    entityManager.createNativeQuery("DELETE FROM jar_hash").executeUpdate();
+    entityManager.createNativeQuery("DELETE FROM jvm_instance").executeUpdate();
+    entityManager.createNativeQuery("DELETE FROM eap_instance").executeUpdate();
+    entityManager.createNativeQuery("DELETE FROM eap_configuration").executeUpdate();
+    entityManager.createNativeQuery("DELETE FROM eap_configuration_eap_extension").executeUpdate();
+    entityManager.createNativeQuery("DELETE FROM eap_configuration_deployments").executeUpdate();
+    entityManager.createNativeQuery("DELETE FROM eap_configuration_subsystems").executeUpdate();
+    entityManager.createNativeQuery("DELETE FROM eap_deployment").executeUpdate();
+    entityManager.createNativeQuery("DELETE FROM eap_extension").executeUpdate();
+    entityManager.createNativeQuery("DELETE FROM eap_extension_subsystems").executeUpdate();
   }
 }

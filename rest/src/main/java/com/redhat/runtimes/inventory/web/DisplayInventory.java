@@ -6,6 +6,7 @@ import static com.redhat.runtimes.inventory.models.Constants.X_RH_IDENTITY_HEADE
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.redhat.runtimes.inventory.models.JvmInstance;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -72,6 +73,7 @@ public class DisplayInventory {
     }
 
     var mapper = new ObjectMapper();
+    mapper.registerModule(new JavaTimeModule());
     try {
       var map = Map.of("response", results.get(0));
       return mapper.writeValueAsString(map);
@@ -89,6 +91,7 @@ public class DisplayInventory {
     String out = "";
 
     var mapper = new ObjectMapper();
+    mapper.registerModule(new JavaTimeModule());
     try {
       var o = mapper.readValue(rhIdJson, typeRef);
       var identity = (Map<String, Object>) o.get("identity");

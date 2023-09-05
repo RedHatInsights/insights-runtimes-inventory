@@ -2,6 +2,7 @@
 package com.redhat.runtimes.inventory.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.Set;
 import java.util.UUID;
@@ -16,10 +17,16 @@ public final class EapDeployment {
   @NaturalId
   private EapInstance eapInstance;
 
+  @NotNull
   @Size(max = 255)
   private String name;
 
-  @ElementCollection private Set<JarHash> archives;
+  @ManyToMany(cascade = CascadeType.PERSIST)
+  @JoinTable(
+      name = "eap_deployment_archive_jar_hash",
+      joinColumns = {@JoinColumn(name = "eap_deployment_id")},
+      inverseJoinColumns = {@JoinColumn(name = "jar_hash_id")})
+  private Set<JarHash> archives;
 
   public EapInstance getEapInstance() {
     return eapInstance;

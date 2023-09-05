@@ -75,7 +75,11 @@ public non-sealed class JvmInstance implements InsightsMessage {
   // Data record created
   @NotNull private ZonedDateTime created;
 
-  @OneToMany(mappedBy = "instance", cascade = CascadeType.ALL)
+  @ManyToMany(cascade = CascadeType.ALL)
+  @JoinTable(
+      name = "jvm_instance_jar_hash",
+      joinColumns = {@JoinColumn(name = "jvm_instance_id")},
+      inverseJoinColumns = {@JoinColumn(name = "jar_hash_id")})
   private Set<JarHash> jarHashes;
 
   //////////////////////////////////////////////////////

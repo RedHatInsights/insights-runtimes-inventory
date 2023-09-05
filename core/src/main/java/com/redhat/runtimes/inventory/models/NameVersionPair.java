@@ -2,10 +2,17 @@
 package com.redhat.runtimes.inventory.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Embeddable
 public final class NameVersionPair {
+  @NotNull
+  @Size(max = 255)
   private String name;
+
+  @NotNull
+  @Size(max = 255)
   private String version;
 
   public String getVersion() {

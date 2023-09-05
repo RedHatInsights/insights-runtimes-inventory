@@ -2,6 +2,8 @@
 package com.redhat.runtimes.inventory.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -20,18 +22,22 @@ public final class EapConfiguration {
   @NaturalId
   private EapInstance eapInstance;
 
-  @ManyToMany
+  @ManyToMany(cascade = CascadeType.PERSIST)
   @JoinTable(
-      name = "eap_configuration_extensions",
+      name = "eap_configuration_eap_extension",
       joinColumns = {@JoinColumn(name = "eap_configuration_id")},
       inverseJoinColumns = {@JoinColumn(name = "eap_extension_id")})
   public Set<EapExtension> extensions;
 
   // Each subsystem name maps to a json dump of its config
-  @ElementCollection private Map<String, String> subsystems;
+  @ElementCollection
+  @CollectionTable(name = "eap_configuration_subsystems")
+  private Map<String, String> subsystems;
 
   // Each deployment name maps to a json dump of its config
-  @ElementCollection private Map<String, String> deployments;
+  @ElementCollection
+  @CollectionTable(name = "eap_configuration_deployments")
+  private Map<String, String> deployments;
 
   public EapInstance getEapInstance() {
     return eapInstance;
@@ -68,21 +74,60 @@ public final class EapConfiguration {
   /****************************************************************************
    *                            Simple Fields
    ***************************************************************************/
-
+  @NotNull
+  @Size(max = 255)
   private String version;
 
+  @NotNull
+  @Size(max = 255)
   private String launchType;
+
+  @NotNull
+  @Size(max = 255)
   private String name;
+
+  @NotNull
+  @Size(max = 255)
   private String organization;
+
+  @NotNull
+  @Size(max = 255)
   private String processType;
+
+  @NotNull
+  @Size(max = 255)
   private String productName;
+
+  @NotNull
+  @Size(max = 255)
   private String productVersion;
+
+  @NotNull
+  @Size(max = 255)
   private String profileName;
+
+  @NotNull
+  @Size(max = 255)
   private String releaseCodename;
+
+  @NotNull
+  @Size(max = 255)
   private String releaseVersion;
+
+  @NotNull
+  @Size(max = 255)
   private String runningMode;
+
+  @NotNull
+  @Size(max = 255)
   private String runtimeConfigurationState;
+
+  @NotNull
+  @Size(max = 255)
   private String serverState;
+
+  @NotNull
+  @Size(max = 255)
   private String suspendState;
 
   public String getVersion() {
@@ -200,12 +245,11 @@ public final class EapConfiguration {
   /****************************************************************************
    *                            Raw JSON Dumps
    ***************************************************************************/
+  @Lob private String socketBindingGroups;
 
-  private String socketBindingGroups;
-
-  private String paths;
-  private String interfaces;
-  private String coreServices;
+  @Lob private String paths;
+  @Lob private String interfaces;
+  @Lob private String coreServices;
 
   public String getSocketBindingGroups() {
     return socketBindingGroups;

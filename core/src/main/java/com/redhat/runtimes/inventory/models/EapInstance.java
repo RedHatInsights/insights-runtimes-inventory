@@ -2,7 +2,8 @@
 package com.redhat.runtimes.inventory.models;
 
 import jakarta.persistence.*;
-import java.util.List;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.util.Set;
 import java.util.UUID;
 
@@ -15,10 +16,18 @@ public final class EapInstance extends JvmInstance {
    *                            Complex Fields
    ***************************************************************************/
 
-  @OneToMany(mappedBy = "instance", cascade = CascadeType.ALL, orphanRemoval = true)
+  @ManyToMany(cascade = CascadeType.PERSIST)
+  @JoinTable(
+      name = "eap_instance_jar_hash",
+      joinColumns = {@JoinColumn(name = "eap_instance_id")},
+      inverseJoinColumns = {@JoinColumn(name = "jar_hash_id")})
   private Set<JarHash> jars; // These seem to be only jboss jars. Maybe only one instead of a set?
 
-  @OneToMany(mappedBy = "instance", cascade = CascadeType.ALL, orphanRemoval = true)
+  @ManyToMany(cascade = CascadeType.PERSIST)
+  @JoinTable(
+      name = "eap_instance_module_jar_hash",
+      joinColumns = {@JoinColumn(name = "eap_instance_id")},
+      inverseJoinColumns = {@JoinColumn(name = "jar_hash_id")})
   private Set<JarHash> modules;
 
   @OneToOne(
@@ -30,6 +39,22 @@ public final class EapInstance extends JvmInstance {
 
   @OneToMany(mappedBy = "eapInstance", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<EapDeployment> deployments;
+
+  @Lob private String javaCommand;
+
+  @Lob private String jvmPackages;
+
+  @Lob private String jvmArgs;
+
+  @Lob private String raw;
+
+  public Set<JarHash> getJars() {
+    return this.jars;
+  }
+
+  public void setJars(Set<JarHash> jars) {
+    this.jars = jars;
+  }
 
   public EapConfiguration getConfiguration() {
     return this.configuration;
@@ -55,12 +80,6 @@ public final class EapInstance extends JvmInstance {
     this.deployments = deployments;
   }
 
-  /****************************************************************************
-   *                            Simple Fields
-   ***************************************************************************/
-
-  private String raw;
-
   public String getRaw() {
     return raw;
   }
@@ -69,35 +88,129 @@ public final class EapInstance extends JvmInstance {
     this.raw = raw;
   }
 
+  public String getJvmPackages() {
+    return jvmPackages;
+  }
+
+  public void setJvmPackages(String jvmPackages) {
+    this.jvmPackages = raw;
+  }
+
+  public String getJvmArgs() {
+    return jvmArgs;
+  }
+
+  public void setJvmArgs(String jvmArgs) {
+    this.jvmArgs = raw;
+  }
+
+  /****************************************************************************
+   *                            Simple Fields
+   ***************************************************************************/
+
+  @NotNull
+  @Size(max = 255)
   private String appClientException;
+
+  @NotNull
+  @Size(max = 255)
   private String appName;
+
+  @NotNull
+  @Size(max = 255)
   private String appTransportCertHttps;
+
+  @NotNull
+  @Size(max = 255)
   private String appTransportTypeFile;
+
+  @NotNull
+  @Size(max = 255)
   private String appTransportTypeHttps;
+
+  @NotNull
+  @Size(max = 255)
   private String appUserDir;
+
+  @NotNull
+  @Size(max = 255)
   private String appUserName;
+
+  @NotNull
+  @Size(max = 255)
   private String javaClassPath;
+
+  @NotNull
+  @Size(max = 255)
   private String javaClassVersion;
-  private String javaCommand;
+
+  @NotNull
+  @Size(max = 255)
   private String javaHome;
+
+  @NotNull
+  @Size(max = 255)
   private String javaLibraryPath;
+
+  @NotNull
+  @Size(max = 255)
   private String javaSpecificationVendor;
+
+  @NotNull
+  @Size(max = 255)
   private String javaVendor;
+
+  @NotNull
+  @Size(max = 255)
   private String javaVendorVersion;
+
+  @NotNull
+  @Size(max = 255)
   private String javaVmName;
+
+  @NotNull
+  @Size(max = 255)
   private String javaVmVendor;
+
+  @NotNull
+  @Size(max = 255)
   private String jvmHeapGcDetails;
+
+  @NotNull
+  @Size(max = 255)
   private String jvmHeapMin;
+
+  @NotNull
+  @Size(max = 255)
   private String jvmPid;
+
+  @NotNull
+  @Size(max = 255)
   private String jvmReportTime;
+
+  @NotNull
+  @Size(max = 255)
   private String systemHostname;
+
+  @NotNull
+  @Size(max = 255)
   private String systemOsName;
 
+  @NotNull
+  @Size(max = 255)
+  private String systemOsVersion;
+
+  @NotNull
+  @Size(max = 255)
   private String eapVersion;
-  private Boolean eapXp;
-  private Boolean eapYamlExtension;
-  private Boolean eapBootableJar;
-  private Boolean eapUseGit;
+
+  @NotNull private Boolean eapXp;
+
+  @NotNull private Boolean eapYamlExtension;
+
+  @NotNull private Boolean eapBootableJar;
+
+  @NotNull private Boolean eapUseGit;
 
   public String getAppName() {
     return appName;
@@ -259,6 +372,14 @@ public final class EapInstance extends JvmInstance {
     this.systemOsName = systemOsName;
   }
 
+  public String getSystemOsVersion() {
+    return systemOsVersion;
+  }
+
+  public void setSystemOsVersion(String systemOsVersion) {
+    this.systemOsVersion = systemOsVersion;
+  }
+
   public String getAppTransportTypeFile() {
     return appTransportTypeFile;
   }
@@ -333,5 +454,4 @@ public final class EapInstance extends JvmInstance {
   // private String systemCoresLogical;
   // private String jvmHeapMax;
 
-  @ElementCollection private List<String> jvmPackages;
 }

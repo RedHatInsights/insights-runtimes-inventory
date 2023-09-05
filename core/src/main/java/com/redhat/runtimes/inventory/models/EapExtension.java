@@ -2,6 +2,7 @@
 package com.redhat.runtimes.inventory.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.Set;
 import java.util.UUID;
@@ -11,13 +12,13 @@ import java.util.UUID;
 public final class EapExtension {
   @Id @GeneratedValue private UUID id;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  private EapConfiguration eapConfiguration;
-
+  @NotNull
   @Size(max = 255)
   private String module;
 
-  @ElementCollection private Set<NameVersionPair> subsystems;
+  @ElementCollection
+  @CollectionTable(name = "eap_extension_subsystems")
+  private Set<NameVersionPair> subsystems;
 
   public String getModule() {
     return module;

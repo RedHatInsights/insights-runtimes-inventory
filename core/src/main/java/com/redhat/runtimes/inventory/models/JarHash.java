@@ -6,17 +6,12 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.Objects;
 import java.util.UUID;
-import org.hibernate.annotations.NaturalId;
 
 @Entity
 @Table(name = "jar_hash")
 public final class JarHash {
 
   @Id @GeneratedValue private UUID id;
-
-  @ManyToOne(optional = false)
-  @NaturalId
-  private JvmInstance instance;
 
   @NotNull
   @Size(max = 255)
@@ -54,7 +49,6 @@ public final class JarHash {
 
   public JarHash(
       UUID id,
-      JvmInstance instance,
       String name,
       String groupId,
       String vendor,
@@ -63,7 +57,6 @@ public final class JarHash {
       String sha256Checksum,
       String sha512Checksum) {
     this.id = id;
-    this.instance = instance;
     this.name = name;
     this.groupId = groupId;
     this.vendor = vendor;
@@ -81,14 +74,6 @@ public final class JarHash {
 
   public void setId(UUID id) {
     this.id = id;
-  }
-
-  public JvmInstance getInstance() {
-    return instance;
-  }
-
-  public void setInstance(JvmInstance instance) {
-    this.instance = instance;
   }
 
   public String getName() {
@@ -153,7 +138,6 @@ public final class JarHash {
     if (o == null || getClass() != o.getClass()) return false;
     JarHash jarHash = (JarHash) o;
     return Objects.equals(id, jarHash.id)
-        && Objects.equals(instance, jarHash.instance)
         && Objects.equals(name, jarHash.name)
         && Objects.equals(groupId, jarHash.groupId)
         && Objects.equals(vendor, jarHash.vendor)
@@ -166,14 +150,13 @@ public final class JarHash {
   @Override
   public int hashCode() {
     return Objects.hash(
-        id, instance, name, groupId, vendor, version, sha1Checksum, sha256Checksum, sha512Checksum);
+        id, name, groupId, vendor, version, sha1Checksum, sha256Checksum, sha512Checksum);
   }
 
   @Override
   public String toString() {
     final StringBuffer sb = new StringBuffer("JarHash{");
     sb.append("id=").append(id);
-    sb.append(", instance=").append(instance);
     sb.append(", name='").append(name).append('\'');
     sb.append(", groupId='").append(groupId).append('\'');
     sb.append(", vendor='").append(vendor).append('\'');

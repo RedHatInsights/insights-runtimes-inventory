@@ -1,9 +1,9 @@
 /* Copyright (C) Red Hat 2023 */
 package com.redhat.runtimes.inventory.events;
 
-import static com.redhat.runtimes.inventory.events.EventConsumer.eapInstanceOf;
 import static com.redhat.runtimes.inventory.events.TestUtils.readBytesFromResources;
 import static com.redhat.runtimes.inventory.events.TestUtils.readFromResources;
+import static com.redhat.runtimes.inventory.events.Utils.eapInstanceOf;
 import static com.redhat.runtimes.inventory.events.Utils.jvmInstanceOf;
 import static org.junit.jupiter.api.Assertions.*;
 

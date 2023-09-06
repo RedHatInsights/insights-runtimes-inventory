@@ -10,10 +10,12 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.runtimes.inventory.models.EapInstance;
+import com.redhat.runtimes.inventory.models.JarHash;
 import com.redhat.runtimes.inventory.models.JvmInstance;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -96,5 +98,26 @@ public class EventConsumerTest {
     assertNotNull(inst.getConfiguration().getInterfaces());
     assertNotNull(inst.getConfiguration().getPaths());
     assertNotNull(inst.getConfiguration().getSocketBindingGroups());
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void testJarHashAttributes() throws IOException {
+    byte[] buffy = readBytesFromResources("jdk8_MWTELE-66.gz");
+    String json = EventConsumer.unzipJson(buffy);
+    ObjectMapper objectMapper = new ObjectMapper();
+    Map<String, Object> map =
+        objectMapper.readValue(json, new TypeReference<Map<String, Object>>() {});
+    Set<JarHash> jarHashes = Utils.jarHashesOf((Map<String, Object>) map.get("jars"));
+    assertEquals(1, jarHashes.size());
+    JarHash jar = jarHashes.iterator().next();
+    assertEquals("JBoss by Red Hat", jar.getVendor());
+    assertEquals("82a8c99551533f4448675f273665cb6d7b750511", jar.getSha1Checksum());
+    assertEquals(
+        "d808a03cf5f844f0d1cf52b340a5c4ad836c052e1288a9b5ac8ca6df6ae9e000",
+        jar.getSha256Checksum());
+    assertEquals(
+        "4c85d6f74cb8a34dca6748873f9b38457c04f253c4b7d1e088010d13eec7021145b338979adf8991f54c2b6241da7d350c2cfac849e603c286aa5fb13edf560f",
+        jar.getSha512Checksum());
   }
 }

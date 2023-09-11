@@ -17,13 +17,13 @@ import io.quarkus.logging.Log;
 import java.time.ZoneOffset;
 import java.util.*;
 
-final class Utils {
+public final class Utils {
   private Utils() {}
 
   /****************************************************************************
    *                             JVM Methods
    ***************************************************************************/
-  static InsightsMessage jvmInstanceOf(ArchiveAnnouncement announce, String json) {
+  public static InsightsMessage jvmInstanceOf(ArchiveAnnouncement announce, String json) {
     var inst = new JvmInstance();
     // Announce fields first
     inst.setAccountId(announce.getAccountId());
@@ -118,7 +118,7 @@ final class Utils {
     return out;
   }
 
-  static JarHash jarHashOf(Map<String, Object> jarJson) {
+  public static JarHash jarHashOf(Map<String, Object> jarJson) {
     var out = new JarHash();
     out.setName((String) jarJson.getOrDefault("name", ""));
     out.setVersion((String) jarJson.getOrDefault("version", ""));

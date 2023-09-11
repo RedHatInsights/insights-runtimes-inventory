@@ -198,7 +198,7 @@ public class EventConsumer {
    *                           Utility Methods
    ***************************************************************************/
 
-  static String unzipJson(byte[] buffy) {
+  public static String unzipJson(byte[] buffy) {
     try (var bais = new ByteArrayInputStream(buffy);
         var gunzip = new GZIPInputStream(bais)) {
       return new String(gunzip.readAllBytes());

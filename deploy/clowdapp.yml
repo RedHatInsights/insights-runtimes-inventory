@@ -48,6 +48,9 @@ objects:
             volumes:
               - emptyDir: {}
                 name: tmpdir
+            env:
+              - name: QUARKUS_PROFILE
+                value: ${ENV_NAME}
           webServices:
             metrics: {}
             private: {}
@@ -88,6 +91,9 @@ objects:
             volumes:
               - emptyDir: {}
                 name: tmpdir
+            env:
+              - name: QUARKUS_PROFILE
+                value: ${ENV_NAME}
           webServices:
             metrics: {}
             private: {}

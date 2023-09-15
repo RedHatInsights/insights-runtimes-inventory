@@ -30,12 +30,6 @@ You may need to set up DNS routing for a few domains to go via the VPN:
 $ sudo systemd-resolve -i tun0 --set-domain=redhat.com --set-domain=~amazonaws.com --set-domain=~devshift.net --set-domain=openshiftapps.com
 ```
 
-or with `resolvectl`
-
-```
-$ resolvectl domain tun0 ~amazonaws.com redhat.com ~devshift.net openshiftapps.com
-```
-
 If you are running with overrides (e.g. a locally-built container with modified code), then you will need to make sure that the containers have been built and push to quay.io first:
 
 ```

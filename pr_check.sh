@@ -17,7 +17,7 @@ source build_deploy.sh
 # source deploy_ephemeral_env.sh
 
 # Need to make a dummy results file to make tests pass
-cd ../..
+#cd ../..
 mkdir -p artifacts
 cat << EOF > artifacts/junit-dummy.xml
 <testsuite tests="1">

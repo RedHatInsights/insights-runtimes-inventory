@@ -9,13 +9,12 @@ IQE_PLUGINS="runtimes-inventory"
 IQE_MARKER_EXPRESSION="smoke"
 IQE_FILTER_EXPRESSION=""
 
-
 source build_deploy.sh
 
-CICD_URL=https://raw.githubusercontent.com/RedHatInsights/bonfire/master/cicd
-curl -s $CICD_URL/bootstrap.sh -o bootstrap.sh
-source bootstrap.sh  # checks out bonfire and changes to "cicd" dir...
-source deploy_ephemeral_env.sh
+# CICD_URL=https://raw.githubusercontent.com/RedHatInsights/bonfire/master/cicd
+# curl -s $CICD_URL/bootstrap.sh -o bootstrap.sh
+# source bootstrap.sh  # checks out bonfire and changes to "cicd" dir...
+# source deploy_ephemeral_env.sh
 
 # Need to make a dummy results file to make tests pass
 cd ../..

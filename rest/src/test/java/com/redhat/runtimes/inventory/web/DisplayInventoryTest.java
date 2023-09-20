@@ -260,6 +260,7 @@ public class DisplayInventoryTest {
     assertEquals(instance.getLaunchTime(), responseNode.get("launchTime").asLong());
     assertEquals(instance.getVendor(), responseNode.get("vendor").asText());
     assertEquals(instance.getVersionString(), responseNode.get("versionString").asText());
+    assertEquals(instance.getHeapMin(), responseNode.get("heapMin").asInt());
   }
 
   @Test

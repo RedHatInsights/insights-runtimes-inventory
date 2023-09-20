@@ -80,7 +80,7 @@ public final class Utils {
       }
       inst.setMajorVersion(Integer.parseInt(strVersion));
 
-      // FIXME Add heap min
+      inst.setHeapMin((int) Double.parseDouble(String.valueOf(basic.get("jvm.heap.min"))));
       inst.setHeapMax((int) Double.parseDouble(String.valueOf(basic.get("jvm.heap.max"))));
       inst.setLaunchTime(Long.parseLong(String.valueOf(basic.get("jvm.report_time"))));
 
@@ -173,7 +173,6 @@ public final class Utils {
       inst.setJavaVmName(String.valueOf(basic.get("java.vm.name")));
       inst.setJavaVmVendor(String.valueOf(basic.get("java.vm.vendor")));
       inst.setJvmHeapGcDetails(String.valueOf(basic.get("jvm.heap.gc.details")));
-      inst.setJvmHeapMin(String.valueOf(basic.get("jvm.heap.min")));
       inst.setJvmPid(String.valueOf(basic.get("jvm.pid")));
       inst.setJvmReportTime(String.valueOf(basic.get("jvm.report_time")));
       inst.setJvmPackages(String.valueOf(basic.get("jvm.packages")));

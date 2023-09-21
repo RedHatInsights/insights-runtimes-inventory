@@ -177,68 +177,6 @@ public class DisplayInventory {
   }
 
   /**
-   * Given the id of a JVM instance, return all ids of associated jar hashes
-   *
-   * @param jvmInstanceId identifier of the JVM instance
-   * @return JSON String containing a list of jar hash ids associated with a JVM instance
-   */
-  @GET
-  @Path("/jarhash-ids/")
-  @Produces(MediaType.APPLICATION_JSON)
-  public String getJarHashIdRecords(@QueryParam("jvmInstanceId") String jvmInstanceId) {
-    Query query =
-        entityManager.createNativeQuery(
-            """
-              SELECT j.jar_hash_id
-              FROM jvm_instance_jar_hash j
-              WHERE j.jvm_instance_id = :instanceId
-            """,
-            UUID.class);
-    query.setParameter("instanceId", UUID.fromString(jvmInstanceId));
-    var results = query.getResultList();
-    return mapResultListToJson(results);
-  }
-
-  /**
-   * Given the id of a jar hash, return the associated jar hash
-   *
-   * @param jarHashId identifier of the jar hash
-   * @return JSON String containing the specified jar hash
-   */
-  @GET
-  @Path("/jarhash/")
-  @Produces(MediaType.APPLICATION_JSON)
-  public String getJarHashRecord(@QueryParam("jarHashId") String jarHashId) {
-    TypedQuery<JarHash> query =
-        entityManager.createQuery(
-            """
-              SELECT new com.redhat.runtimes.inventory.models.JarHash(
-                j.id, j.name, j.groupId, j.vendor, j.version,
-                j.sha1Checksum, j.sha256Checksum, j.sha512Checksum)
-              FROM JarHash j
-              WHERE j.id = :jarHashId
-            """,
-            JarHash.class);
-    query.setParameter("jarHashId", UUID.fromString(jarHashId));
-    JarHash result;
-    try {
-      result = query.getSingleResult();
-    } catch (NoResultException e) {
-      return "{\"response\": \"[]\"}";
-    }
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.registerModule(new JavaTimeModule());
-    try {
-      Map<String, JarHash> map = Map.of("response", result);
-      return mapper.writeValueAsString(map);
-    } catch (JsonProcessingException e) {
-      Log.error("JSON Exception", e);
-      processingErrorCounter.increment();
-      return "{\"response\": \"[error]\"}";
-    }
-  }
-
-  /**
    * Given a JVM instance identifier, return all associated jar hashes
    *
    * @param jvmInstanceId identifier of the JVM instance

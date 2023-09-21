@@ -151,15 +151,13 @@ CREATE TABLE public.jvm_instance_jar_hash(
     CONSTRAINT FK_JVM_INSTANCE FOREIGN KEY (jvm_instance_id) REFERENCES jvm_instance (id),
     CONSTRAINT FK_JAR_HASH FOREIGN KEY (jar_hash_id) REFERENCES jar_hash (id)
 );
--- Don't need an eap_instance_jar_hash because it already uses
--- jvm_instance_jar_hash since it is a child class of it
--- CREATE TABLE public.eap_instance_jar_hash(
-    -- eap_instance_id uuid NOT NULL,
-    -- jar_hash_id uuid NOT NULL,
-    -- PRIMARY KEY (eap_instance_id, jar_hash_id),
-    -- CONSTRAINT FK_EAP_INSTANCE FOREIGN KEY (eap_instance_id) REFERENCES eap_instance (id),
-    -- CONSTRAINT FK_JAR_HASH FOREIGN KEY (jar_hash_id) REFERENCES jar_hash (id)
--- );
+CREATE TABLE public.eap_instance_jar_hash(
+    eap_instance_id uuid NOT NULL,
+    jar_hash_id uuid NOT NULL,
+    PRIMARY KEY (eap_instance_id, jar_hash_id),
+    CONSTRAINT FK_EAP_INSTANCE FOREIGN KEY (eap_instance_id) REFERENCES eap_instance (id),
+    CONSTRAINT FK_JAR_HASH FOREIGN KEY (jar_hash_id) REFERENCES jar_hash (id)
+);
 CREATE TABLE public.eap_instance_module_jar_hash(
     eap_instance_id uuid NOT NULL,
     jar_hash_id uuid NOT NULL,

@@ -1,6 +1,7 @@
 /* Copyright (C) Red Hat 2023 */
 package com.redhat.runtimes.inventory.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -36,9 +37,11 @@ public final class EapInstance extends JvmInstance {
       cascade = CascadeType.ALL,
       orphanRemoval = true,
       fetch = FetchType.LAZY)
+  @JsonManagedReference
   private EapConfiguration configuration;
 
   @OneToMany(mappedBy = "eapInstance", cascade = CascadeType.ALL, orphanRemoval = true)
+  @JsonManagedReference
   private Set<EapDeployment> deployments;
 
   /****************************************************************************

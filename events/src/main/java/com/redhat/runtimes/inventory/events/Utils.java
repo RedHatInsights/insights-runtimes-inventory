@@ -154,7 +154,7 @@ public final class Utils {
   /****************************************************************************
    *                             EAP Methods
    ***************************************************************************/
-  static InsightsMessage eapInstanceOf(ArchiveAnnouncement announce, String json) {
+  public static InsightsMessage eapInstanceOf(ArchiveAnnouncement announce, String json) {
     var inst = new EapInstance();
     inst.setRaw(json);
     // Announce fields first

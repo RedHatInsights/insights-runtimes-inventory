@@ -1,6 +1,7 @@
 /* Copyright (C) Red Hat 2023 */
 package com.redhat.runtimes.inventory.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -16,6 +17,7 @@ public final class EapDeployment {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @NaturalId
+  @JsonBackReference
   private EapInstance eapInstance;
 
   @NotNull

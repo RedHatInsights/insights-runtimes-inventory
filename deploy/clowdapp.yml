@@ -109,6 +109,7 @@ objects:
       dependencies:
         - ingress
         - host-inventory
+        - rbac
       testing:
         iqePlugin: ''
 parameters:

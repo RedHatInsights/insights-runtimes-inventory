@@ -9,17 +9,16 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.Response;
-import java.util.UUID;
+import org.eclipse.microprofile.rest.client.annotation.RegisterProvider;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
+// Derived from notifications-backend
 @Path("/api/rbac/v1")
 @RegisterRestClient(configKey = "rbac-authentication")
-// @RegisterProvider(RbacRestClientRequestFilter.class)
-// @RegisterProvider(RbacClientResponseFilter.class)
+@RegisterProvider(RbacRestClientRequestFilter.class)
+@RegisterProvider(RbacClientResponseFilter.class)
 public interface RbacServer {
 
   @GET
@@ -30,10 +29,4 @@ public interface RbacServer {
   Uni<RbacRaw> getRbacInfo(
       @QueryParam("application") String application,
       @HeaderParam(X_RH_IDENTITY_HEADER) String rhIdentity);
-
-  @GET
-  @Path("/groups/{groupID}/") // trailing slash is required by api
-  @Produces("application/json")
-  Response getGroup(
-      @PathParam("groupID") UUID groupId, @HeaderParam(X_RH_IDENTITY_HEADER) String rhIdentity);
 }

@@ -5,9 +5,8 @@ import static com.redhat.runtimes.inventory.models.Constants.X_RH_IDENTITY_HEADE
 
 import com.redhat.runtimes.inventory.auth.principal.rhid.RhIdPrincipal;
 import com.redhat.runtimes.inventory.auth.principal.rhid.RhIdentity;
-import com.redhat.runtimes.inventory.auth.principal.turnpike.TurnpikeIdentity;
-import com.redhat.runtimes.inventory.auth.principal.turnpike.TurnpikePrincipal;
 
+// Derived from notifications-backend
 public class ConsolePrincipalFactory {
 
   private static final String MISSING_ORG_ID_MSG =
@@ -21,8 +20,6 @@ public class ConsolePrincipalFactory {
         throw new IllegalIdentityHeaderException(MISSING_ORG_ID_MSG);
       }
       return principal;
-    } else if (identity instanceof TurnpikeIdentity) {
-      return new TurnpikePrincipal((TurnpikeIdentity) identity);
     }
 
     throw new IllegalArgumentException(

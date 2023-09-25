@@ -3,6 +3,7 @@ package com.redhat.runtimes.inventory.auth.principal.rhid;
 
 import com.redhat.runtimes.inventory.auth.principal.ConsolePrincipal;
 
+// Derived from notifications-backend
 public class RhIdPrincipal extends ConsolePrincipal<RhIdentity> {
 
   public RhIdPrincipal(RhIdentity identity) {

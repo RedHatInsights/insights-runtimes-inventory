@@ -7,8 +7,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.redhat.runtimes.inventory.auth.principal.rhid.RhIdentity;
-import com.redhat.runtimes.inventory.auth.principal.turnpike.TurnpikeSamlIdentity;
-import com.redhat.runtimes.inventory.auth.principal.turnpike.TurnpikeX509Identity;
+
+// Derived from notifications-backend
 
 /**
  * x-rh-identity header can have several identity 'payloads' depending on who generates it. Turnpike
@@ -24,8 +24,6 @@ import com.redhat.runtimes.inventory.auth.principal.turnpike.TurnpikeX509Identit
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type", visible = true)
 @JsonSubTypes({
   @JsonSubTypes.Type(value = RhIdentity.class, name = "User"),
-  @JsonSubTypes.Type(value = TurnpikeX509Identity.class, name = "X509"),
-  @JsonSubTypes.Type(value = TurnpikeSamlIdentity.class, name = "Associate"),
 })
 public abstract class ConsoleIdentity {
   @JsonProperty(required = true)

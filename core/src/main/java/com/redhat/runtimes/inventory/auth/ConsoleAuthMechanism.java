@@ -1,11 +1,9 @@
 /* Copyright (C) Red Hat 2023 */
 package com.redhat.runtimes.inventory.auth;
 
-import static com.redhat.runtimes.inventory.models.Constants.API_INTERNAL;
 import static com.redhat.runtimes.inventory.models.Constants.X_RH_IDENTITY_HEADER;
 
 import com.redhat.runtimes.inventory.auth.principal.ConsolePrincipal;
-// import com.redhat.cloud.notifications.models.InternalRoleAccess; TODO Consider removing
 import io.quarkus.security.AuthenticationFailedException;
 import io.quarkus.security.identity.IdentityProviderManager;
 import io.quarkus.security.identity.SecurityIdentity;
@@ -18,26 +16,16 @@ import io.smallrye.mutiny.Uni;
 import io.vertx.ext.web.RoutingContext;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.Collections;
-import java.util.Optional;
 import java.util.Set;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
+
+// Derived from notifications-backend
 
 /**
- * Implements Jakarta EE JSR-375 (Security API) HttpAuthenticationMechanism for the insight's
+ * Implements Jakarta EE JSR-375 (Security API) HttpAuthenticationMechanism for the Insights
  * x-rh-identity header and RBAC
  */
 @ApplicationScoped
 public class ConsoleAuthMechanism implements HttpAuthenticationMechanism {
-
-  @ConfigProperty(name = "internal-rbac.enabled")
-  boolean isInternalRbacEnabled;
-
-  /**
-   * Mocks the application id this user has permission to. This property is only used if the
-   * internal-rbac is disabled.
-   */
-  @ConfigProperty(name = "internal-rbac.dev.app-role")
-  Optional<String> devAppRole;
 
   @Override
   public Uni<SecurityIdentity> authenticate(
@@ -45,43 +33,15 @@ public class ConsoleAuthMechanism implements HttpAuthenticationMechanism {
     String xRhIdentityHeaderValue = routingContext.request().getHeader(X_RH_IDENTITY_HEADER);
     String path = routingContext.normalizedPath();
 
-    if (path.startsWith(API_INTERNAL) && !isInternalRbacEnabled) {
-
-      // TODO Consider removing
-      // if (devAppRole.isPresent()) {
-      //     return Uni.createFrom().item(() -> QuarkusSecurityIdentity.builder()
-      //             .setPrincipal(ConsolePrincipal.noIdentity())
-      //             .addRole(ConsoleIdentityProvider.RBAC_INTERNAL_USER)
-      //             .addRole(InternalRoleAccess.getInternalRole(devAppRole.get()))
-      //             .addRole(InternalRoleAccess.getInternalRole("test-role-01"))
-      //             .addRole(InternalRoleAccess.getInternalRole("test-role-02"))
-      //             .build()
-      //     );
-      // }
-
-      // Disable internal auth - could be useful for ephemeral environments
-      return Uni.createFrom()
-          .item(
-              () ->
-                  QuarkusSecurityIdentity.builder()
-                      .setPrincipal(ConsolePrincipal.noIdentity())
-                      .addRole(ConsoleIdentityProvider.RBAC_INTERNAL_USER)
-                      .addRole(ConsoleIdentityProvider.RBAC_INTERNAL_ADMIN)
-                      .build());
-    } else if (xRhIdentityHeaderValue
-        == null) { // Access that did not go through 3Scale or turnpike
+    if (xRhIdentityHeaderValue == null) { // Access that did not go through 3Scale
       boolean good = false;
 
       // We block access unless the openapi file is requested.
-      if (path.startsWith("/api/runtimes-inventory-service") || path.startsWith(API_INTERNAL)) {
-        if (path.endsWith("openapi.json")) {
-          good = true;
-        }
+      if (path.startsWith("/api/runtimes-inventory-service") && path.endsWith("openapi.json")) {
+        good = true;
       }
 
       if (path.startsWith("/openapi.json")
-          || path.startsWith(API_INTERNAL + "/validation")
-          || path.startsWith(API_INTERNAL + "/version")
           || path.startsWith("/health")
           || path.startsWith("/metrics")) {
         good = true;

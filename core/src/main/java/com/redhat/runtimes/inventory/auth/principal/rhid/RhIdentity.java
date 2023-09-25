@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.redhat.runtimes.inventory.auth.principal.ConsoleIdentity;
 
+// Derived from notifications-backend
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RhIdentity extends ConsoleIdentity {
 

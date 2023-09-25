@@ -5,6 +5,7 @@ import static com.redhat.runtimes.inventory.models.Constants.X_RH_IDENTITY_HEADE
 
 import io.quarkus.security.identity.request.BaseAuthenticationRequest;
 
+// Derived from notifications-backend
 public class ConsoleAuthenticationRequest extends BaseAuthenticationRequest {
 
   public ConsoleAuthenticationRequest(String xRhIdentity) {

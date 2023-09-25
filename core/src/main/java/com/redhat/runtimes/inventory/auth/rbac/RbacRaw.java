@@ -4,6 +4,7 @@ package com.redhat.runtimes.inventory.auth.rbac;
 import java.util.List;
 import java.util.Map;
 
+// Derived from notifications-backend
 public class RbacRaw {
   public Map<String, String> links;
   public Map<String, Integer> meta;

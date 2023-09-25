@@ -3,6 +3,7 @@ package com.redhat.runtimes.inventory.auth.principal;
 
 import java.security.Principal;
 
+// Derived from notifications-backend
 public abstract class ConsolePrincipal<T extends ConsoleIdentity> implements Principal {
   private final String name;
   private final T identity;

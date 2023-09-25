@@ -64,6 +64,9 @@ public non-sealed class JvmInstance implements InsightsMessage {
   //      "Logical Processors" : 12,
   @NotNull private int processors;
 
+  //  "jvm.heap.min" : 1304,
+  @NotNull private int heapMin;
+
   //  "Heap max (MB)" : 8192.0,
   @NotNull private int heapMax;
 
@@ -98,6 +101,7 @@ public non-sealed class JvmInstance implements InsightsMessage {
       int majorVersion,
       String osArch,
       int processors,
+      int heapMin,
       int heapMax,
       Object details,
       ZonedDateTime created) {
@@ -112,6 +116,7 @@ public non-sealed class JvmInstance implements InsightsMessage {
     this.majorVersion = majorVersion;
     this.osArch = osArch;
     this.processors = processors;
+    this.heapMin = heapMin;
     this.heapMax = heapMax;
     this.details = (Map<String, Object>) details;
     this.created = created;
@@ -207,6 +212,14 @@ public non-sealed class JvmInstance implements InsightsMessage {
     this.processors = processors;
   }
 
+  public int getHeapMin() {
+    return heapMin;
+  }
+
+  public void setHeapMin(int heapMin) {
+    this.heapMin = heapMin;
+  }
+
   public int getHeapMax() {
     return heapMax;
   }
@@ -254,6 +267,7 @@ public non-sealed class JvmInstance implements InsightsMessage {
     JvmInstance that = (JvmInstance) o;
     return majorVersion == that.majorVersion
         && processors == that.processors
+        && heapMin == that.heapMin
         && heapMax == that.heapMax
         && Objects.equals(id, that.id)
         && Objects.equals(accountId, that.accountId)
@@ -282,6 +296,7 @@ public non-sealed class JvmInstance implements InsightsMessage {
         majorVersion,
         osArch,
         processors,
+        heapMin,
         heapMax,
         details,
         created);
@@ -301,6 +316,7 @@ public non-sealed class JvmInstance implements InsightsMessage {
     sb.append(", majorVersion=").append(majorVersion);
     sb.append(", osArch='").append(osArch).append('\'');
     sb.append(", processors=").append(processors);
+    sb.append(", heapMin=").append(heapMin);
     sb.append(", heapMax=").append(heapMax);
     sb.append(", details=").append(details);
     sb.append(", created=").append(created);

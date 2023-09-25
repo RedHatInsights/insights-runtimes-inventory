@@ -107,9 +107,7 @@ public class DisplayInventory {
     TypedQuery<JvmInstance> query =
         entityManager.createQuery(
             """
-              SELECT new com.redhat.runtimes.inventory.models.JvmInstance(
-                i.id, i.accountId, i.orgId, i.hostname, i.launchTime, i.vendor, i.versionString,
-                i.version, i.majorVersion, i.osArch, i.processors, i.heapMax, i.details, i.created)
+              SELECT i
               FROM JvmInstance i
               WHERE i.orgId = :orgId AND i.id = :id
               ORDER BY i.created desc
@@ -162,9 +160,7 @@ public class DisplayInventory {
     TypedQuery<JvmInstance> query =
         entityManager.createQuery(
             """
-              SELECT new com.redhat.runtimes.inventory.models.JvmInstance(
-                i.id, i.accountId, i.orgId, i.hostname, i.launchTime, i.vendor, i.versionString,
-                i.version, i.majorVersion, i.osArch, i.processors, i.heapMax, i.details, i.created)
+              SELECT i
               FROM JvmInstance i
               WHERE i.orgId = :orgId AND i.hostname = :hostname
               ORDER BY i.created desc

@@ -115,10 +115,6 @@ public final class EapInstance extends JvmInstance {
 
   @NotNull
   @Size(max = 255)
-  private String jvmHeapMin;
-
-  @NotNull
-  @Size(max = 255)
   private String jvmPid;
 
   @NotNull
@@ -166,7 +162,8 @@ public final class EapInstance extends JvmInstance {
   // private String javaSpecificationVersion;
   // private String systemArch;
   // private String systemCoresLogical;
-  // private String jvmHeapMax;
+  // private int heapMin;
+  // private int heapMax;
 
   public EapInstance() {}
 
@@ -193,7 +190,6 @@ public final class EapInstance extends JvmInstance {
       @NotNull @Size(max = 255) String javaVmName,
       @NotNull @Size(max = 255) String javaVmVendor,
       @NotNull @Size(max = 255) String jvmHeapGcDetails,
-      @NotNull @Size(max = 255) String jvmHeapMin,
       @NotNull @Size(max = 255) String jvmPid,
       @NotNull @Size(max = 255) String jvmReportTime,
       @NotNull @Size(max = 255) String systemHostname,
@@ -230,7 +226,6 @@ public final class EapInstance extends JvmInstance {
     this.javaVmName = javaVmName;
     this.javaVmVendor = javaVmVendor;
     this.jvmHeapGcDetails = jvmHeapGcDetails;
-    this.jvmHeapMin = jvmHeapMin;
     this.jvmPid = jvmPid;
     this.jvmReportTime = jvmReportTime;
     this.systemHostname = systemHostname;
@@ -282,7 +277,6 @@ public final class EapInstance extends JvmInstance {
                 javaVmVendor,
                 jvmArgs,
                 jvmHeapGcDetails,
-                jvmHeapMin,
                 jvmPackages,
                 jvmPid,
                 jvmReportTime,
@@ -328,7 +322,6 @@ public final class EapInstance extends JvmInstance {
         && Objects.equals(javaVmVendor, other.javaVmVendor)
         && Objects.equals(jvmArgs, other.jvmArgs)
         && Objects.equals(jvmHeapGcDetails, other.jvmHeapGcDetails)
-        && Objects.equals(jvmHeapMin, other.jvmHeapMin)
         && Objects.equals(jvmPackages, other.jvmPackages)
         && Objects.equals(jvmPid, other.jvmPid)
         && Objects.equals(jvmReportTime, other.jvmReportTime)
@@ -385,8 +378,6 @@ public final class EapInstance extends JvmInstance {
         + javaVmVendor
         + ", jvmHeapGcDetails="
         + jvmHeapGcDetails
-        + ", jvmHeapMin="
-        + jvmHeapMin
         + ", jvmPid="
         + jvmPid
         + ", jvmReportTime="
@@ -592,14 +583,6 @@ public final class EapInstance extends JvmInstance {
 
   public void setJvmHeapGcDetails(String jvmHeapGcDetails) {
     this.jvmHeapGcDetails = jvmHeapGcDetails;
-  }
-
-  public String getJvmHeapMin() {
-    return jvmHeapMin;
-  }
-
-  public void setJvmHeapMin(String jvmHeapMin) {
-    this.jvmHeapMin = jvmHeapMin;
   }
 
   public String getJvmPid() {

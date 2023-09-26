@@ -88,7 +88,9 @@ public final class EapInstance extends JvmInstance {
   /****************************************************************************
    *                            Raw JSON Dumps
    ***************************************************************************/
-  @NotNull private String raw;
+  @NotNull
+  @Size(max = org.hibernate.Length.LOB_DEFAULT)
+  private String raw;
 
   public EapInstance() {}
 

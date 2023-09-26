@@ -102,11 +102,21 @@ public final class EapConfiguration {
   /****************************************************************************
    *                            Raw JSON Dumps
    ***************************************************************************/
-  @NotNull private String socketBindingGroups;
+  @NotNull
+  @Size(max = org.hibernate.Length.LOB_DEFAULT)
+  private String socketBindingGroups;
 
-  @NotNull private String paths;
-  @NotNull private String interfaces;
-  @NotNull private String coreServices;
+  @NotNull
+  @Size(max = org.hibernate.Length.LOB_DEFAULT)
+  private String paths;
+
+  @NotNull
+  @Size(max = org.hibernate.Length.LOB_DEFAULT)
+  private String interfaces;
+
+  @NotNull
+  @Size(max = org.hibernate.Length.LOB_DEFAULT)
+  private String coreServices;
 
   public EapConfiguration() {}
 

@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "eap_extension")
-public final class EapExtension {
+public class EapExtension {
   @Id @GeneratedValue private UUID id;
 
   @NotNull

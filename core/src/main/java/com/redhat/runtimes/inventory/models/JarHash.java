@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "jar_hash")
-public final class JarHash {
+public class JarHash {
 
   @Id @GeneratedValue private UUID id;
 

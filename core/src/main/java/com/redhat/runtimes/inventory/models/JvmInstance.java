@@ -88,14 +88,6 @@ public non-sealed class JvmInstance implements InsightsMessage {
 
   @NotNull
   @Size(max = 255)
-  protected String javaHome;
-
-  @NotNull
-  @Size(max = 255)
-  protected String javaLibraryPath;
-
-  @NotNull
-  @Size(max = 255)
   protected String javaSpecificationVendor;
 
   @NotNull
@@ -133,6 +125,10 @@ public non-sealed class JvmInstance implements InsightsMessage {
   @NotNull
   @Size(max = 255)
   protected String systemOsVersion;
+
+  @NotNull protected String javaHome;
+
+  @NotNull protected String javaLibraryPath;
 
   @NotNull protected String javaCommand;
 

@@ -17,7 +17,6 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 // Derived from notifications-backend
 @Path("/api/rbac/v1")
 @RegisterRestClient(configKey = "rbac-authentication")
-@RegisterProvider(RbacRestClientRequestFilter.class)
 @RegisterProvider(RbacClientResponseFilter.class)
 public interface RbacServer {
 

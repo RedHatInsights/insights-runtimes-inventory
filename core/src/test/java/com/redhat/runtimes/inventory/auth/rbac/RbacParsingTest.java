@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /** Test RBAC parsing. Brought over from notifications-backend and extended */
@@ -19,89 +20,89 @@ class RbacParsingTest {
   @Test
   void testParseExample() throws Exception {
     RbacRaw rbac = readValueFromFile("rbac_example.json");
-    assert rbac.data.size() == 2;
+    Assertions.assertEquals(2, rbac.data.size());
 
-    assert rbac.canWrite("bar", "resname");
-    assert !rbac.canRead("resname", ALL);
-    assert !rbac.canWrite(ALL, ALL);
-    assert !rbac.canWrite("no-perm", ALL);
+    Assertions.assertTrue(rbac.canWrite("bar", "resname"));
+    Assertions.assertFalse(rbac.canRead("resname", ALL));
+    Assertions.assertFalse(rbac.canWrite(ALL, ALL));
+    Assertions.assertFalse(rbac.canWrite("no-perm", ALL));
   }
 
   @Test
   void testNoAccess() throws Exception {
     RbacRaw rbac = readValueFromFile("rbac_example_no_access.json");
 
-    assert !rbac.canRead(ALL, ALL);
-    assert !rbac.canWrite(ALL, ALL);
+    Assertions.assertFalse(rbac.canRead(ALL, ALL));
+    Assertions.assertFalse(rbac.canWrite(ALL, ALL));
   }
 
   @Test
   void testFullAccess() throws Exception {
     RbacRaw rbac = readValueFromFile("rbac_example_full_access.json");
 
-    assert rbac.canRead("inventory", ALL);
-    assert !rbac.canRead("dummy", ALL);
-    assert rbac.canWrite("inventory", ALL);
-    assert rbac.canWrite("inventory", "hosts");
-    assert rbac.canWrite("inventory", "does-not-exist");
-    assert !rbac.canWrite("dummy", ALL);
+    Assertions.assertTrue(rbac.canRead("inventory", ALL));
+    Assertions.assertFalse(rbac.canRead("dummy", ALL));
+    Assertions.assertTrue(rbac.canWrite("inventory", ALL));
+    Assertions.assertTrue(rbac.canWrite("inventory", "hosts"));
+    Assertions.assertTrue(rbac.canWrite("inventory", "does-not-exist"));
+    Assertions.assertFalse(rbac.canWrite("dummy", ALL));
   }
 
   @Test
   void testHostsRead() throws Exception {
     RbacRaw rbac = readValueFromFile("rbac_example_events_hosts_access_only.json");
 
-    assert rbac.canRead("inventory", "hosts");
-    assert rbac.canDo("inventory", "hosts", "read");
-    assert !rbac.canRead("inventory", ALL);
-    assert !rbac.canRead("inventory", "does-not-exist");
-    assert !rbac.canWrite("inventory", ALL);
-    assert !rbac.canRead("dummy", ALL);
-    assert !rbac.canWrite("dummy", ALL);
+    Assertions.assertTrue(rbac.canRead("inventory", "hosts"));
+    Assertions.assertTrue(rbac.canDo("inventory", "hosts", "read"));
+    Assertions.assertFalse(rbac.canRead("inventory", ALL));
+    Assertions.assertFalse(rbac.canRead("inventory", "does-not-exist"));
+    Assertions.assertFalse(rbac.canWrite("inventory", ALL));
+    Assertions.assertFalse(rbac.canRead("dummy", ALL));
+    Assertions.assertFalse(rbac.canWrite("dummy", ALL));
   }
 
   @Test
   void testInventoryRead() throws Exception {
     RbacRaw rbac = readValueFromFile("rbac_example_events_inventory_read_access_only.json");
 
-    assert rbac.canRead("inventory", "hosts");
-    assert rbac.canDo("inventory", "hosts", "read");
-    assert rbac.canRead("inventory", ALL);
-    assert rbac.canRead("inventory", "does-not-exist");
-    assert !rbac.canWrite("inventory", ALL);
-    assert !rbac.canRead("dummy", ALL);
-    assert !rbac.canWrite("dummy", ALL);
+    Assertions.assertTrue(rbac.canRead("inventory", "hosts"));
+    Assertions.assertTrue(rbac.canDo("inventory", "hosts", "read"));
+    Assertions.assertTrue(rbac.canRead("inventory", ALL));
+    Assertions.assertTrue(rbac.canRead("inventory", "does-not-exist"));
+    Assertions.assertFalse(rbac.canWrite("inventory", ALL));
+    Assertions.assertFalse(rbac.canRead("dummy", ALL));
+    Assertions.assertFalse(rbac.canWrite("dummy", ALL));
   }
 
   @Test
   void testPartialAccess() throws IOException {
     RbacRaw rbac = readValueFromFile("rbac_example_partial_access.json");
 
-    assert rbac.canRead("policies", ALL);
-    assert !rbac.canRead("dummy", ALL);
-    assert !rbac.canWrite("policies", ALL);
-    assert !rbac.canWrite("dummy", ALL);
-    assert rbac.canDo("policies", ALL, "execute");
-    assert !rbac.canDo("policies", ALL, "list");
+    Assertions.assertTrue(rbac.canRead("policies", ALL));
+    Assertions.assertFalse(rbac.canRead("dummy", ALL));
+    Assertions.assertFalse(rbac.canWrite("policies", ALL));
+    Assertions.assertFalse(rbac.canWrite("dummy", ALL));
+    Assertions.assertTrue(rbac.canDo("policies", ALL, "execute"));
+    Assertions.assertFalse(rbac.canDo("policies", ALL, "list"));
   }
 
   @Test
   void testTwoApps() throws IOException {
     RbacRaw rbac = readValueFromFile("rbac_example_two_apps1.json");
 
-    assert !rbac.canRead("inventory", ALL);
-    assert !rbac.canWrite("inventory", ALL);
-    assert rbac.canDo("inventory", ALL, "execute");
+    Assertions.assertFalse(rbac.canRead("inventory", ALL));
+    Assertions.assertFalse(rbac.canWrite("inventory", ALL));
+    Assertions.assertTrue(rbac.canDo("inventory", ALL, "execute"));
 
-    assert rbac.canRead("integrations", "endpoints");
-    assert !rbac.canWrite("integrations", "endpoints");
+    Assertions.assertTrue(rbac.canRead("integrations", "endpoints"));
+    Assertions.assertFalse(rbac.canWrite("integrations", "endpoints"));
     // We have no * item
-    assert !rbac.canRead("integrations", ALL);
-    assert !rbac.canWrite("integrations", ALL);
+    Assertions.assertFalse(rbac.canRead("integrations", ALL));
+    Assertions.assertFalse(rbac.canWrite("integrations", ALL));
 
-    assert !rbac.canDo("integrations", ALL, "read");
-    assert !rbac.canDo("integrations", ALL, "execute");
-    assert rbac.canDo("integrations", "admin", "execute");
+    Assertions.assertFalse(rbac.canDo("integrations", ALL, "read"));
+    Assertions.assertFalse(rbac.canDo("integrations", ALL, "execute"));
+    Assertions.assertTrue(rbac.canDo("integrations", "admin", "execute"));
   }
 
   private RbacRaw readValueFromFile(String fileName) throws IOException {

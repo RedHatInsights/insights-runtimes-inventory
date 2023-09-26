@@ -28,7 +28,8 @@ public class RbacRaw {
     }
 
     for (Map<String, Object> permissionEntry : data) {
-      String[] fields = getPermissionFields(permissionEntry);
+      String perms = (String) permissionEntry.get("permission");
+      String[] fields = perms.split(":");
       if (fields.length < 3) {
         return false;
       }
@@ -41,10 +42,5 @@ public class RbacRaw {
       }
     }
     return false;
-  }
-
-  private String[] getPermissionFields(Map<String, Object> map) {
-    String perms = (String) map.get("permission");
-    return perms.split(":");
   }
 }

@@ -88,6 +88,24 @@ public final class Utils {
       inst.setProcessors(Integer.parseInt(String.valueOf(basic.get("system.cores.logical"))));
       inst.setHostname(String.valueOf(basic.get("system.hostname")));
 
+      inst.setJavaClassPath(String.valueOf(basic.get("java.class.path")));
+      inst.setJavaClassVersion(String.valueOf(basic.get("java.class.version")));
+      inst.setJavaCommand(String.valueOf(basic.get("java.command")));
+      inst.setJavaHome(String.valueOf(basic.get("java.home")));
+      inst.setJavaLibraryPath(String.valueOf(basic.get("java.library.path")));
+      inst.setJavaVendor(String.valueOf(basic.get("java.vendor")));
+      inst.setJavaSpecificationVendor(String.valueOf(basic.get("java.specification.vendor")));
+      inst.setJavaVendorVersion(String.valueOf(basic.get("java.vendor.version")));
+      inst.setJavaVmName(String.valueOf(basic.get("java.vm.name")));
+      inst.setJavaVmVendor(String.valueOf(basic.get("java.vm.vendor")));
+      inst.setJvmHeapGcDetails(String.valueOf(basic.get("jvm.heap.gc.details")));
+      inst.setJvmPid(String.valueOf(basic.get("jvm.pid")));
+      inst.setJvmReportTime(String.valueOf(basic.get("jvm.report_time")));
+      inst.setJvmPackages(String.valueOf(basic.get("jvm.packages")));
+      inst.setJvmArgs(String.valueOf(basic.get("jvm.args")));
+      inst.setSystemOsName(String.valueOf(basic.get("system.os.name")));
+      inst.setSystemOsVersion(String.valueOf(basic.get("system.os.version")));
+
       inst.setDetails(basic);
     } catch (ClassCastException | NumberFormatException e) {
       Log.error("Error in unmarshalling JSON", e);
@@ -160,26 +178,6 @@ public final class Utils {
       inst.setAppTransportTypeHttps(String.valueOf(basic.get("app.transport.type.https")));
       inst.setAppUserDir(String.valueOf(basic.get("app.user.dir")));
       inst.setAppUserName(String.valueOf(basic.get("app.user.name")));
-
-      // TODO: Do any of these need to be in JvmInstance?
-      inst.setJavaClassPath(String.valueOf(basic.get("java.class.path")));
-      inst.setJavaClassVersion(String.valueOf(basic.get("java.class.version")));
-      inst.setJavaCommand(String.valueOf(basic.get("java.command")));
-      inst.setJavaHome(String.valueOf(basic.get("java.home")));
-      inst.setJavaLibraryPath(String.valueOf(basic.get("java.library.path")));
-      inst.setJavaVendor(String.valueOf(basic.get("java.vendor")));
-      inst.setJavaSpecificationVendor(String.valueOf(basic.get("java.specification.vendor")));
-      inst.setJavaVendorVersion(String.valueOf(basic.get("java.vendor.version")));
-      inst.setJavaVmName(String.valueOf(basic.get("java.vm.name")));
-      inst.setJavaVmVendor(String.valueOf(basic.get("java.vm.vendor")));
-      inst.setJvmHeapGcDetails(String.valueOf(basic.get("jvm.heap.gc.details")));
-      inst.setJvmPid(String.valueOf(basic.get("jvm.pid")));
-      inst.setJvmReportTime(String.valueOf(basic.get("jvm.report_time")));
-      inst.setJvmPackages(String.valueOf(basic.get("jvm.packages")));
-      inst.setJvmArgs(String.valueOf(basic.get("jvm.args")));
-      inst.setSystemHostname(String.valueOf(basic.get("system.hostname")));
-      inst.setSystemOsName(String.valueOf(basic.get("system.os.name")));
-      inst.setSystemOsVersion(String.valueOf(basic.get("system.os.version")));
 
       // Jar hashes...
       inst.setJarHashes(jarHashesOf((Map<String, Object>) o.get("jars")));

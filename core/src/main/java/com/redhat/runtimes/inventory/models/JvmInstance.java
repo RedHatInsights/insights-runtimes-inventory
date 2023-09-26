@@ -15,75 +15,132 @@ import org.hibernate.annotations.JdbcTypeCode;
 @Inheritance(strategy = InheritanceType.JOINED)
 public non-sealed class JvmInstance implements InsightsMessage {
 
-  @Id @GeneratedValue private UUID id;
+  @Id @GeneratedValue protected UUID id;
 
   @NotNull
   @Size(max = 255)
-  private String linkingHash;
+  protected String linkingHash;
 
   @Size(max = 50)
-  private String accountId;
-
-  //  @Size(max = 255)
-  //  private String appName;
+  protected String accountId;
 
   @NotNull
   @Size(max = 50)
-  private String orgId;
+  protected String orgId;
 
   @NotNull
   @Size(max = 50)
-  private String hostname;
+  protected String hostname;
 
   // Process launched at
-  @NotNull private long launchTime;
+  @NotNull protected long launchTime;
 
   //   "java.vm.specification.vendor" : "Oracle Corporation",
   @NotNull
   @Size(max = 255)
-  private String vendor;
+  protected String vendor;
 
   //      "java.runtime.version" : "17.0.1+12",
   @NotNull
   @Size(max = 255)
-  private String versionString;
+  protected String versionString;
 
   //      "java.version" : "17.0.1",
   @NotNull
   @Size(max = 255)
-  private String version;
+  protected String version;
 
   //    "java.vm.specification.version" : "17",
-  @NotNull private int majorVersion;
+  @NotNull protected int majorVersion;
 
   //  "system.arch" : "x86_64",
   @NotNull
   @Size(max = 50)
-  private String osArch;
+  protected String osArch;
 
   //      "Logical Processors" : 12,
-  @NotNull private int processors;
+  @NotNull protected int processors;
 
   //  "jvm.heap.min" : 1304,
-  @NotNull private int heapMin;
+  @NotNull protected int heapMin;
 
   //  "Heap max (MB)" : 8192.0,
-  @NotNull private int heapMax;
+  @NotNull protected int heapMax;
 
   @NotNull
   @JdbcTypeCode(JSON)
   @Column(columnDefinition = "jsonb")
-  private Map<String, Object> details;
+  protected Map<String, Object> details;
 
   // Data record created
-  @NotNull private ZonedDateTime created;
+  @NotNull protected ZonedDateTime created;
 
   @ManyToMany(cascade = CascadeType.ALL)
   @JoinTable(
       name = "jvm_instance_jar_hash",
       joinColumns = {@JoinColumn(name = "jvm_instance_id")},
       inverseJoinColumns = {@JoinColumn(name = "jar_hash_id")})
-  private Set<JarHash> jarHashes;
+  protected Set<JarHash> jarHashes;
+
+  @NotNull
+  @Size(max = 255)
+  protected String javaClassVersion;
+
+  @NotNull
+  @Size(max = 255)
+  protected String javaHome;
+
+  @NotNull
+  @Size(max = 255)
+  protected String javaLibraryPath;
+
+  @NotNull
+  @Size(max = 255)
+  protected String javaSpecificationVendor;
+
+  @NotNull
+  @Size(max = 255)
+  protected String javaVendor;
+
+  @NotNull
+  @Size(max = 255)
+  protected String javaVendorVersion;
+
+  @NotNull
+  @Size(max = 255)
+  protected String javaVmName;
+
+  @NotNull
+  @Size(max = 255)
+  protected String javaVmVendor;
+
+  @NotNull
+  @Size(max = 255)
+  protected String jvmHeapGcDetails;
+
+  @NotNull
+  @Size(max = 255)
+  protected String jvmPid;
+
+  @NotNull
+  @Size(max = 255)
+  protected String jvmReportTime;
+
+  @NotNull
+  @Size(max = 255)
+  protected String systemOsName;
+
+  @NotNull
+  @Size(max = 255)
+  protected String systemOsVersion;
+
+  @NotNull protected String javaCommand;
+
+  @NotNull protected String javaClassPath;
+
+  @NotNull protected String jvmPackages;
+
+  @NotNull protected String jvmArgs;
 
   //////////////////////////////////////////////////////
 
@@ -104,7 +161,24 @@ public non-sealed class JvmInstance implements InsightsMessage {
       int heapMin,
       int heapMax,
       Object details,
-      ZonedDateTime created) {
+      ZonedDateTime created,
+      String javaClassPath,
+      String javaClassVersion,
+      String javaHome,
+      String javaLibraryPath,
+      String javaSpecificationVendor,
+      String javaVendor,
+      String javaVendorVersion,
+      String javaVmName,
+      String javaVmVendor,
+      String jvmHeapGcDetails,
+      String jvmPid,
+      String jvmReportTime,
+      String systemOsName,
+      String systemOsVersion,
+      String javaCommand,
+      String jvmPackages,
+      String jvmArgs) {
     this.id = id;
     this.accountId = accountId;
     this.orgId = orgId;
@@ -120,6 +194,23 @@ public non-sealed class JvmInstance implements InsightsMessage {
     this.heapMax = heapMax;
     this.details = (Map<String, Object>) details;
     this.created = created;
+    this.javaClassPath = javaClassPath;
+    this.javaClassVersion = javaClassVersion;
+    this.javaHome = javaHome;
+    this.javaLibraryPath = javaLibraryPath;
+    this.javaSpecificationVendor = javaSpecificationVendor;
+    this.javaVendor = javaVendor;
+    this.javaVendorVersion = javaVendorVersion;
+    this.javaVmName = javaVmName;
+    this.javaVmVendor = javaVmVendor;
+    this.jvmHeapGcDetails = jvmHeapGcDetails;
+    this.jvmPid = jvmPid;
+    this.jvmReportTime = jvmReportTime;
+    this.systemOsName = systemOsName;
+    this.systemOsVersion = systemOsVersion;
+    this.javaCommand = javaCommand;
+    this.jvmPackages = jvmPackages;
+    this.jvmArgs = jvmArgs;
   }
 
   //////////////////////////////////////////////////////
@@ -260,6 +351,142 @@ public non-sealed class JvmInstance implements InsightsMessage {
     this.jarHashes = jarHashes;
   }
 
+  public String getJavaClassPath() {
+    return javaClassPath;
+  }
+
+  public void setJavaClassPath(String javaClassPath) {
+    this.javaClassPath = javaClassPath;
+  }
+
+  public String getJavaClassVersion() {
+    return javaClassVersion;
+  }
+
+  public void setJavaClassVersion(String javaClassVersion) {
+    this.javaClassVersion = javaClassVersion;
+  }
+
+  public String getJavaCommand() {
+    return javaCommand;
+  }
+
+  public void setJavaCommand(String javaCommand) {
+    this.javaCommand = javaCommand;
+  }
+
+  public String getJavaHome() {
+    return javaHome;
+  }
+
+  public void setJavaHome(String javaHome) {
+    this.javaHome = javaHome;
+  }
+
+  public String getJavaLibraryPath() {
+    return javaLibraryPath;
+  }
+
+  public void setJavaLibraryPath(String javaLibraryPath) {
+    this.javaLibraryPath = javaLibraryPath;
+  }
+
+  public String getJavaSpecificationVendor() {
+    return javaSpecificationVendor;
+  }
+
+  public void setJavaSpecificationVendor(String javaSpecificationVendor) {
+    this.javaSpecificationVendor = javaSpecificationVendor;
+  }
+
+  public String getJavaVendor() {
+    return javaVendor;
+  }
+
+  public void setJavaVendor(String javaVendor) {
+    this.javaVendor = javaVendor;
+  }
+
+  public String getJavaVendorVersion() {
+    return javaVendorVersion;
+  }
+
+  public void setJavaVendorVersion(String javaVendorVersion) {
+    this.javaVendorVersion = javaVendorVersion;
+  }
+
+  public String getJavaVmName() {
+    return javaVmName;
+  }
+
+  public void setJavaVmName(String javaVmName) {
+    this.javaVmName = javaVmName;
+  }
+
+  public String getJavaVmVendor() {
+    return javaVmVendor;
+  }
+
+  public void setJavaVmVendor(String javaVmVendor) {
+    this.javaVmVendor = javaVmVendor;
+  }
+
+  public String getJvmHeapGcDetails() {
+    return jvmHeapGcDetails;
+  }
+
+  public void setJvmHeapGcDetails(String jvmHeapGcDetails) {
+    this.jvmHeapGcDetails = jvmHeapGcDetails;
+  }
+
+  public String getJvmPid() {
+    return jvmPid;
+  }
+
+  public void setJvmPid(String jvmPid) {
+    this.jvmPid = jvmPid;
+  }
+
+  public String getJvmReportTime() {
+    return jvmReportTime;
+  }
+
+  public void setJvmReportTime(String jvmReportTime) {
+    this.jvmReportTime = jvmReportTime;
+  }
+
+  public String getSystemOsName() {
+    return systemOsName;
+  }
+
+  public void setSystemOsName(String systemOsName) {
+    this.systemOsName = systemOsName;
+  }
+
+  public String getSystemOsVersion() {
+    return systemOsVersion;
+  }
+
+  public void setSystemOsVersion(String systemOsVersion) {
+    this.systemOsVersion = systemOsVersion;
+  }
+
+  public String getJvmPackages() {
+    return jvmPackages;
+  }
+
+  public void setJvmPackages(String jvmPackages) {
+    this.jvmPackages = jvmPackages;
+  }
+
+  public String getJvmArgs() {
+    return jvmArgs;
+  }
+
+  public void setJvmArgs(String jvmArgs) {
+    this.jvmArgs = jvmArgs;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -279,7 +506,24 @@ public non-sealed class JvmInstance implements InsightsMessage {
         && Objects.equals(version, that.version)
         && Objects.equals(osArch, that.osArch)
         && Objects.equals(details, that.details)
-        && Objects.equals(created, that.created);
+        && Objects.equals(created, that.created)
+        && Objects.equals(javaClassPath, that.javaClassPath)
+        && Objects.equals(javaClassVersion, that.javaClassVersion)
+        && Objects.equals(javaCommand, that.javaCommand)
+        && Objects.equals(javaHome, that.javaHome)
+        && Objects.equals(javaLibraryPath, that.javaLibraryPath)
+        && Objects.equals(javaSpecificationVendor, that.javaSpecificationVendor)
+        && Objects.equals(javaVendor, that.javaVendor)
+        && Objects.equals(javaVendorVersion, that.javaVendorVersion)
+        && Objects.equals(javaVmName, that.javaVmName)
+        && Objects.equals(javaVmVendor, that.javaVmVendor)
+        && Objects.equals(jvmArgs, that.jvmArgs)
+        && Objects.equals(jvmHeapGcDetails, that.jvmHeapGcDetails)
+        && Objects.equals(jvmPackages, that.jvmPackages)
+        && Objects.equals(jvmPid, that.jvmPid)
+        && Objects.equals(jvmReportTime, that.jvmReportTime)
+        && Objects.equals(systemOsName, that.systemOsName)
+        && Objects.equals(systemOsVersion, that.systemOsVersion);
   }
 
   @Override
@@ -299,7 +543,24 @@ public non-sealed class JvmInstance implements InsightsMessage {
         heapMin,
         heapMax,
         details,
-        created);
+        created,
+        javaClassPath,
+        javaClassVersion,
+        javaCommand,
+        javaHome,
+        javaLibraryPath,
+        javaSpecificationVendor,
+        javaVendor,
+        javaVendorVersion,
+        javaVmName,
+        javaVmVendor,
+        jvmArgs,
+        jvmHeapGcDetails,
+        jvmPackages,
+        jvmPid,
+        jvmReportTime,
+        systemOsName,
+        systemOsVersion);
   }
 
   @Override
@@ -320,6 +581,23 @@ public non-sealed class JvmInstance implements InsightsMessage {
     sb.append(", heapMax=").append(heapMax);
     sb.append(", details=").append(details);
     sb.append(", created=").append(created);
+    sb.append(", javaClassPath=").append(javaClassPath);
+    sb.append(", javaClassVersion=").append(javaClassVersion);
+    sb.append(", javaHome=").append(javaHome);
+    sb.append(", javaLibraryPath=").append(javaLibraryPath);
+    sb.append(", javaSpecificationVendor=").append(javaSpecificationVendor);
+    sb.append(", javaVendor=").append(javaVendor);
+    sb.append(", javaVendorVersion=").append(javaVendorVersion);
+    sb.append(", javaVmName=").append(javaVmName);
+    sb.append(", javaVmVendor=").append(javaVmVendor);
+    sb.append(", jvmHeapGcDetails=").append(jvmHeapGcDetails);
+    sb.append(", jvmPid=").append(jvmPid);
+    sb.append(", jvmReportTime=").append(jvmReportTime);
+    sb.append(", systemOsName=").append(systemOsName);
+    sb.append(", systemOsVersion=").append(systemOsVersion);
+    sb.append(", javaCommand=").append(javaCommand);
+    sb.append(", jvmPackages=").append(jvmPackages);
+    sb.append(", jvmArgs=").append(jvmArgs);
     sb.append('}');
     return sb.toString();
   }

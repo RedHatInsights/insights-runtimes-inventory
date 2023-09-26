@@ -102,11 +102,11 @@ public final class EapConfiguration {
   /****************************************************************************
    *                            Raw JSON Dumps
    ***************************************************************************/
-  @Lob private String socketBindingGroups;
+  @NotNull private String socketBindingGroups;
 
-  @Lob private String paths;
-  @Lob private String interfaces;
-  @Lob private String coreServices;
+  @NotNull private String paths;
+  @NotNull private String interfaces;
+  @NotNull private String coreServices;
 
   public EapConfiguration() {}
 

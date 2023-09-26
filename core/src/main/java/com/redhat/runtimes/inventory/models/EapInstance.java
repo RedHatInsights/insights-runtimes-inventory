@@ -75,66 +75,6 @@ public final class EapInstance extends JvmInstance {
 
   @NotNull
   @Size(max = 255)
-  private String javaClassPath;
-
-  @NotNull
-  @Size(max = 255)
-  private String javaClassVersion;
-
-  @NotNull
-  @Size(max = 255)
-  private String javaHome;
-
-  @NotNull
-  @Size(max = 255)
-  private String javaLibraryPath;
-
-  @NotNull
-  @Size(max = 255)
-  private String javaSpecificationVendor;
-
-  @NotNull
-  @Size(max = 255)
-  private String javaVendor;
-
-  @NotNull
-  @Size(max = 255)
-  private String javaVendorVersion;
-
-  @NotNull
-  @Size(max = 255)
-  private String javaVmName;
-
-  @NotNull
-  @Size(max = 255)
-  private String javaVmVendor;
-
-  @NotNull
-  @Size(max = 255)
-  private String jvmHeapGcDetails;
-
-  @NotNull
-  @Size(max = 255)
-  private String jvmPid;
-
-  @NotNull
-  @Size(max = 255)
-  private String jvmReportTime;
-
-  @NotNull
-  @Size(max = 255)
-  private String systemHostname;
-
-  @NotNull
-  @Size(max = 255)
-  private String systemOsName;
-
-  @NotNull
-  @Size(max = 255)
-  private String systemOsVersion;
-
-  @NotNull
-  @Size(max = 255)
   private String eapVersion;
 
   @NotNull private Boolean eapXp;
@@ -148,22 +88,7 @@ public final class EapInstance extends JvmInstance {
   /****************************************************************************
    *                            Raw JSON Dumps
    ***************************************************************************/
-  @Lob private String javaCommand;
-
-  @Lob private String jvmPackages;
-  @Lob private String jvmArgs;
-  @Lob private String raw;
-
-  /********** These are in the JvmInstance **********/
-  // private String javaVmSpecificationVendor;
-  // private String javaVmSpecificationVersion;
-  // private String javaRuntimeVersion;
-  // private String javaVersion;
-  // private String javaSpecificationVersion;
-  // private String systemArch;
-  // private String systemCoresLogical;
-  // private int heapMin;
-  // private int heapMax;
+  @NotNull private String raw;
 
   public EapInstance() {}
 
@@ -180,29 +105,11 @@ public final class EapInstance extends JvmInstance {
       @NotNull @Size(max = 255) String appTransportTypeHttps,
       @NotNull @Size(max = 255) String appUserDir,
       @NotNull @Size(max = 255) String appUserName,
-      @NotNull @Size(max = 255) String javaClassPath,
-      @NotNull @Size(max = 255) String javaClassVersion,
-      @NotNull @Size(max = 255) String javaHome,
-      @NotNull @Size(max = 255) String javaLibraryPath,
-      @NotNull @Size(max = 255) String javaSpecificationVendor,
-      @NotNull @Size(max = 255) String javaVendor,
-      @NotNull @Size(max = 255) String javaVendorVersion,
-      @NotNull @Size(max = 255) String javaVmName,
-      @NotNull @Size(max = 255) String javaVmVendor,
-      @NotNull @Size(max = 255) String jvmHeapGcDetails,
-      @NotNull @Size(max = 255) String jvmPid,
-      @NotNull @Size(max = 255) String jvmReportTime,
-      @NotNull @Size(max = 255) String systemHostname,
-      @NotNull @Size(max = 255) String systemOsName,
-      @NotNull @Size(max = 255) String systemOsVersion,
       @NotNull @Size(max = 255) String eapVersion,
       @NotNull Boolean eapXp,
       @NotNull Boolean eapYamlExtension,
       @NotNull Boolean eapBootableJar,
       @NotNull Boolean eapUseGit,
-      String javaCommand,
-      String jvmPackages,
-      String jvmArgs,
       String raw) {
     this.id = id;
     this.jars = jars;
@@ -216,29 +123,11 @@ public final class EapInstance extends JvmInstance {
     this.appTransportTypeHttps = appTransportTypeHttps;
     this.appUserDir = appUserDir;
     this.appUserName = appUserName;
-    this.javaClassPath = javaClassPath;
-    this.javaClassVersion = javaClassVersion;
-    this.javaHome = javaHome;
-    this.javaLibraryPath = javaLibraryPath;
-    this.javaSpecificationVendor = javaSpecificationVendor;
-    this.javaVendor = javaVendor;
-    this.javaVendorVersion = javaVendorVersion;
-    this.javaVmName = javaVmName;
-    this.javaVmVendor = javaVmVendor;
-    this.jvmHeapGcDetails = jvmHeapGcDetails;
-    this.jvmPid = jvmPid;
-    this.jvmReportTime = jvmReportTime;
-    this.systemHostname = systemHostname;
-    this.systemOsName = systemOsName;
-    this.systemOsVersion = systemOsVersion;
     this.eapVersion = eapVersion;
     this.eapXp = eapXp;
     this.eapYamlExtension = eapYamlExtension;
     this.eapBootableJar = eapBootableJar;
     this.eapUseGit = eapUseGit;
-    this.javaCommand = javaCommand;
-    this.jvmPackages = jvmPackages;
-    this.jvmArgs = jvmArgs;
     this.raw = raw;
   }
 
@@ -249,6 +138,7 @@ public final class EapInstance extends JvmInstance {
     result =
         prime * result
             + Objects.hash(
+                id,
                 appClientException,
                 appName,
                 appTransportCertHttps,
@@ -263,28 +153,9 @@ public final class EapInstance extends JvmInstance {
                 eapVersion,
                 eapXp,
                 eapYamlExtension,
-                id,
                 jars,
-                javaClassPath,
-                javaClassVersion,
-                javaCommand,
-                javaHome,
-                javaLibraryPath,
-                javaSpecificationVendor,
-                javaVendor,
-                javaVendorVersion,
-                javaVmName,
-                javaVmVendor,
-                jvmArgs,
-                jvmHeapGcDetails,
-                jvmPackages,
-                jvmPid,
-                jvmReportTime,
                 modules,
-                raw,
-                systemHostname,
-                systemOsName,
-                systemOsVersion);
+                raw);
     return result;
   }
 
@@ -310,103 +181,64 @@ public final class EapInstance extends JvmInstance {
         && Objects.equals(eapYamlExtension, other.eapYamlExtension)
         && Objects.equals(id, other.id)
         && Objects.equals(jars, other.jars)
-        && Objects.equals(javaClassPath, other.javaClassPath)
-        && Objects.equals(javaClassVersion, other.javaClassVersion)
-        && Objects.equals(javaCommand, other.javaCommand)
-        && Objects.equals(javaHome, other.javaHome)
-        && Objects.equals(javaLibraryPath, other.javaLibraryPath)
-        && Objects.equals(javaSpecificationVendor, other.javaSpecificationVendor)
-        && Objects.equals(javaVendor, other.javaVendor)
-        && Objects.equals(javaVendorVersion, other.javaVendorVersion)
-        && Objects.equals(javaVmName, other.javaVmName)
-        && Objects.equals(javaVmVendor, other.javaVmVendor)
-        && Objects.equals(jvmArgs, other.jvmArgs)
-        && Objects.equals(jvmHeapGcDetails, other.jvmHeapGcDetails)
-        && Objects.equals(jvmPackages, other.jvmPackages)
-        && Objects.equals(jvmPid, other.jvmPid)
-        && Objects.equals(jvmReportTime, other.jvmReportTime)
         && Objects.equals(modules, other.modules)
-        && Objects.equals(raw, other.raw)
-        && Objects.equals(systemHostname, other.systemHostname)
-        && Objects.equals(systemOsName, other.systemOsName)
-        && Objects.equals(systemOsVersion, other.systemOsVersion);
+        && Objects.equals(raw, other.raw);
   }
 
   @Override
   public String toString() {
-    return "EapInstance [id="
-        + id
-        + ", jars="
-        + jars
-        + ", modules="
-        + modules
-        + ", configuration="
-        + configuration
-        + ", deployments="
-        + deployments
-        + ", appClientException="
-        + appClientException
-        + ", appName="
-        + appName
-        + ", appTransportCertHttps="
-        + appTransportCertHttps
-        + ", appTransportTypeFile="
-        + appTransportTypeFile
-        + ", appTransportTypeHttps="
-        + appTransportTypeHttps
-        + ", appUserDir="
-        + appUserDir
-        + ", appUserName="
-        + appUserName
-        + ", javaClassPath="
-        + javaClassPath
-        + ", javaClassVersion="
-        + javaClassVersion
-        + ", javaHome="
-        + javaHome
-        + ", javaLibraryPath="
-        + javaLibraryPath
-        + ", javaSpecificationVendor="
-        + javaSpecificationVendor
-        + ", javaVendor="
-        + javaVendor
-        + ", javaVendorVersion="
-        + javaVendorVersion
-        + ", javaVmName="
-        + javaVmName
-        + ", javaVmVendor="
-        + javaVmVendor
-        + ", jvmHeapGcDetails="
-        + jvmHeapGcDetails
-        + ", jvmPid="
-        + jvmPid
-        + ", jvmReportTime="
-        + jvmReportTime
-        + ", systemHostname="
-        + systemHostname
-        + ", systemOsName="
-        + systemOsName
-        + ", systemOsVersion="
-        + systemOsVersion
-        + ", eapVersion="
-        + eapVersion
-        + ", eapXp="
-        + eapXp
-        + ", eapYamlExtension="
-        + eapYamlExtension
-        + ", eapBootableJar="
-        + eapBootableJar
-        + ", eapUseGit="
-        + eapUseGit
-        + ", javaCommand="
-        + javaCommand
-        + ", jvmPackages="
-        + jvmPackages
-        + ", jvmArgs="
-        + jvmArgs
-        + ", raw="
-        + raw
-        + "]";
+    final StringBuffer sb = new StringBuffer("EapInstance{");
+    sb.append("id=").append(id);
+    sb.append(", accountId='").append(accountId).append('\'');
+    sb.append(", orgId='").append(orgId).append('\'');
+    sb.append(", hostname='").append(hostname).append('\'');
+    sb.append(", launchTime=").append(launchTime);
+    sb.append(", vendor='").append(vendor).append('\'');
+    sb.append(", versionString='").append(versionString).append('\'');
+    sb.append(", version='").append(version).append('\'');
+    sb.append(", majorVersion=").append(majorVersion);
+    sb.append(", osArch='").append(osArch).append('\'');
+    sb.append(", processors=").append(processors);
+    sb.append(", heapMin=").append(heapMin);
+    sb.append(", heapMax=").append(heapMax);
+    sb.append(", details=").append(details);
+    sb.append(", created=").append(created);
+    sb.append(", javaClassPath=").append(javaClassPath);
+    sb.append(", javaClassVersion=").append(javaClassVersion);
+    sb.append(", javaHome=").append(javaHome);
+    sb.append(", javaLibraryPath=").append(javaLibraryPath);
+    sb.append(", javaSpecificationVendor=").append(javaSpecificationVendor);
+    sb.append(", javaVendor=").append(javaVendor);
+    sb.append(", javaVendorVersion=").append(javaVendorVersion);
+    sb.append(", javaVmName=").append(javaVmName);
+    sb.append(", javaVmVendor=").append(javaVmVendor);
+    sb.append(", jvmHeapGcDetails=").append(jvmHeapGcDetails);
+    sb.append(", jvmPid=").append(jvmPid);
+    sb.append(", jvmReportTime=").append(jvmReportTime);
+    sb.append(", systemOsName=").append(systemOsName);
+    sb.append(", systemOsVersion=").append(systemOsVersion);
+    sb.append(", javaCommand=").append(javaCommand);
+    sb.append(", jvmPackages=").append(jvmPackages);
+    sb.append(", jvmArgs=").append(jvmArgs);
+    sb.append(", jars=").append(jars);
+    sb.append(", modules=").append(modules);
+    sb.append(", configuration=").append(configuration);
+    sb.append(", deployments=").append(deployments);
+    sb.append(", appClientException=").append(appClientException);
+    sb.append(", appName=").append(appName);
+    sb.append(", appTransportCertHttps=").append(appTransportCertHttps);
+    sb.append(", appTransportTypeFile=").append(appTransportTypeFile);
+    sb.append(", appTransportTypeHttps=").append(appTransportTypeHttps);
+    sb.append(", appUserDir=").append(appUserDir);
+    sb.append(", appUserName=").append(appUserName);
+    sb.append(", eapVersion=").append(eapVersion);
+    sb.append(", eapXp=").append(eapXp);
+    sb.append(", eapYamlExtension=").append(eapYamlExtension);
+    sb.append(", eapBootableJar=").append(eapBootableJar);
+    sb.append(", eapUseGit=").append(eapUseGit);
+    sb.append(", raw=").append(raw);
+    sb.append('}');
+    return sb.toString();
   }
 
   public Set<JarHash> getJars() {
@@ -449,22 +281,6 @@ public final class EapInstance extends JvmInstance {
     this.raw = raw;
   }
 
-  public String getJvmPackages() {
-    return jvmPackages;
-  }
-
-  public void setJvmPackages(String jvmPackages) {
-    this.jvmPackages = raw;
-  }
-
-  public String getJvmArgs() {
-    return jvmArgs;
-  }
-
-  public void setJvmArgs(String jvmArgs) {
-    this.jvmArgs = raw;
-  }
-
   public String getAppName() {
     return appName;
   }
@@ -495,134 +311,6 @@ public final class EapInstance extends JvmInstance {
 
   public void setAppUserName(String appUserName) {
     this.appUserName = appUserName;
-  }
-
-  public String getJavaClassPath() {
-    return javaClassPath;
-  }
-
-  public void setJavaClassPath(String javaClassPath) {
-    this.javaClassPath = javaClassPath;
-  }
-
-  public String getJavaClassVersion() {
-    return javaClassVersion;
-  }
-
-  public void setJavaClassVersion(String javaClassVersion) {
-    this.javaClassVersion = javaClassVersion;
-  }
-
-  public String getJavaCommand() {
-    return javaCommand;
-  }
-
-  public void setJavaCommand(String javaCommand) {
-    this.javaCommand = javaCommand;
-  }
-
-  public String getJavaHome() {
-    return javaHome;
-  }
-
-  public void setJavaHome(String javaHome) {
-    this.javaHome = javaHome;
-  }
-
-  public String getJavaLibraryPath() {
-    return javaLibraryPath;
-  }
-
-  public void setJavaLibraryPath(String javaLibraryPath) {
-    this.javaLibraryPath = javaLibraryPath;
-  }
-
-  public String getJavaSpecificationVendor() {
-    return javaSpecificationVendor;
-  }
-
-  public void setJavaSpecificationVendor(String javaSpecificationVendor) {
-    this.javaSpecificationVendor = javaSpecificationVendor;
-  }
-
-  public String getJavaVendor() {
-    return javaVendor;
-  }
-
-  public void setJavaVendor(String javaVendor) {
-    this.javaVendor = javaVendor;
-  }
-
-  public String getJavaVendorVersion() {
-    return javaVendorVersion;
-  }
-
-  public void setJavaVendorVersion(String javaVendorVersion) {
-    this.javaVendorVersion = javaVendorVersion;
-  }
-
-  public String getJavaVmName() {
-    return javaVmName;
-  }
-
-  public void setJavaVmName(String javaVmName) {
-    this.javaVmName = javaVmName;
-  }
-
-  public String getJavaVmVendor() {
-    return javaVmVendor;
-  }
-
-  public void setJavaVmVendor(String javaVmVendor) {
-    this.javaVmVendor = javaVmVendor;
-  }
-
-  public String getJvmHeapGcDetails() {
-    return jvmHeapGcDetails;
-  }
-
-  public void setJvmHeapGcDetails(String jvmHeapGcDetails) {
-    this.jvmHeapGcDetails = jvmHeapGcDetails;
-  }
-
-  public String getJvmPid() {
-    return jvmPid;
-  }
-
-  public void setJvmPid(String jvmPid) {
-    this.jvmPid = jvmPid;
-  }
-
-  public String getJvmReportTime() {
-    return jvmReportTime;
-  }
-
-  public void setJvmReportTime(String jvmReportTime) {
-    this.jvmReportTime = jvmReportTime;
-  }
-
-  public String getSystemHostname() {
-    return systemHostname;
-  }
-
-  public void setSystemHostname(String systemHostname) {
-    this.systemHostname = systemHostname;
-  }
-
-  public String getSystemOsName() {
-    return systemOsName;
-  }
-
-  public void setSystemOsName(String systemOsName) {
-    this.systemOsName = systemOsName;
-  }
-
-  public String getSystemOsVersion() {
-    return systemOsVersion;
-  }
-
-  public void setSystemOsVersion(String systemOsVersion) {
-    this.systemOsVersion = systemOsVersion;
   }
 
   public String getAppTransportTypeFile() {

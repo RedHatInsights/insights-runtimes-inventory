@@ -243,6 +243,7 @@ public class DisplayInventory {
    * Given a RH identity header and a EAP instance id, return the associated EAP instance
    *
    * @param eapInstanceId id of the EAP instance
+   * @param includeRaw determines whether to include the raw json in the response
    * @param rhIdentity
    * @return JSON String containing the specified EAP instance
    */
@@ -251,6 +252,7 @@ public class DisplayInventory {
   @Produces(MediaType.APPLICATION_JSON)
   public String getEapInstanceRecord(
       @QueryParam("eapInstanceId") String eapInstanceId,
+      @QueryParam("includeRaw") String includeRaw,
       @HeaderParam(X_RH_IDENTITY_HEADER) String rhIdentity) {
     // X_RH header is just B64 encoded - decode for the org ID
     String rhIdJson = new String(Base64.getDecoder().decode(rhIdentity));
@@ -277,6 +279,9 @@ public class DisplayInventory {
     EapInstance result;
     try {
       result = query.getSingleResult();
+      if (!Boolean.parseBoolean(includeRaw)) {
+        result.setRaw("");
+      }
     } catch (NoResultException e) {
       return "{\"response\": \"[]\"}";
     }
@@ -296,6 +301,7 @@ public class DisplayInventory {
    * Given a RH identity header and a hostname, return all the associated EAP instances
    *
    * @param hostname associated with the EAP Instance
+   * @param includeRaw determines whether to include the raw json in the response
    * @param rhIdentity
    * @return JSON String containing a list of EAP instances
    */
@@ -304,6 +310,7 @@ public class DisplayInventory {
   @Produces(MediaType.APPLICATION_JSON)
   public String getAllEapInstanceRecords(
       @QueryParam("hostname") String hostname,
+      @QueryParam("includeRaw") String includeRaw,
       @HeaderParam(X_RH_IDENTITY_HEADER) String rhIdentity) {
     // X_RH header is just B64 encoded - decode for the org ID
     String rhIdJson = new String(Base64.getDecoder().decode(rhIdentity));
@@ -328,6 +335,11 @@ public class DisplayInventory {
     query.setParameter("orgId", orgId);
     query.setParameter("hostname", hostname);
     List<EapInstance> results = query.getResultList();
+    if (!Boolean.parseBoolean(includeRaw)) {
+      for (EapInstance result : results) {
+        result.setRaw("");
+      }
+    }
     return mapResultListToJson(results);
   }
 

@@ -4,6 +4,7 @@ package com.redhat.runtimes.inventory.web;
 import static com.redhat.runtimes.inventory.models.Constants.X_RH_IDENTITY_HEADER;
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -499,7 +500,7 @@ public class DisplayInventoryTest {
   }
 
   @Test
-  void testEapInstanceWithValidId() throws IOException {
+  void testEapInstanceWithValidIdAndOnlyHostnameParam() throws IOException {
     EapInstance instance = getEapInstanceFromJsonFile("eap_example1.json");
     persistInstanceToDatabase(instance);
     String accountNumber = "accountId";
@@ -536,6 +537,89 @@ public class DisplayInventoryTest {
     assertEquals(instance.getId(), UUID.fromString(responseNode.get("id").asText()));
     assertEquals(instance.getEapVersion(), responseNode.get("eapVersion").asText());
     assertEquals(instance.getEapXp(), responseNode.get("eapXp").asBoolean());
+    assertEquals("", responseNode.get("raw").asText());
+  }
+
+  @Test
+  void testEapInstanceWithValidIdAndIncludeRawTrue() throws IOException {
+    EapInstance instance = getEapInstanceFromJsonFile("eap_example1.json");
+    persistInstanceToDatabase(instance);
+    String accountNumber = "accountId";
+    String orgId = "orgId";
+    String username = "user";
+    String identityHeaderValue = encodeRHIdentityInfo(accountNumber, orgId, username);
+    Header identityHeader = createRHIdentityHeader(identityHeaderValue);
+    String response =
+        given()
+            .header(identityHeader)
+            .when()
+            .queryParam("hostname", instance.getHostname())
+            .get("/api/runtimes-inventory-service/v1/eap-instance-ids/")
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .asString();
+    List<String> ids = mapResponseIdsToList(response);
+    assertEquals(1, ids.size());
+    String secondResponse =
+        given()
+            .header(identityHeader)
+            .when()
+            .queryParam("eapInstanceId", ids.get(0))
+            .queryParam("includeRaw", "true")
+            .get("/api/runtimes-inventory-service/v1/eap-instance/")
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .asString();
+    ObjectMapper mapper = new ObjectMapper();
+    JsonNode responseNode = mapper.readTree(secondResponse).get("response");
+    assertEquals(instance.getId(), UUID.fromString(responseNode.get("id").asText()));
+    assertEquals(instance.getEapVersion(), responseNode.get("eapVersion").asText());
+    assertNotEquals("", responseNode.get("raw").asText());
+  }
+
+  @Test
+  void testEapInstanceWithValidIdAndIncludeRawFalse() throws IOException {
+    EapInstance instance = getEapInstanceFromJsonFile("eap_example1.json");
+    persistInstanceToDatabase(instance);
+    String accountNumber = "accountId";
+    String orgId = "orgId";
+    String username = "user";
+    String identityHeaderValue = encodeRHIdentityInfo(accountNumber, orgId, username);
+    Header identityHeader = createRHIdentityHeader(identityHeaderValue);
+    String response =
+        given()
+            .header(identityHeader)
+            .when()
+            .queryParam("hostname", instance.getHostname())
+            .queryParam("includeRaw", "false")
+            .get("/api/runtimes-inventory-service/v1/eap-instance-ids/")
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .asString();
+    List<String> ids = mapResponseIdsToList(response);
+    assertEquals(1, ids.size());
+    String secondResponse =
+        given()
+            .header(identityHeader)
+            .when()
+            .queryParam("eapInstanceId", ids.get(0))
+            .get("/api/runtimes-inventory-service/v1/eap-instance/")
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .asString();
+    ObjectMapper mapper = new ObjectMapper();
+    JsonNode responseNode = mapper.readTree(secondResponse).get("response");
+    assertEquals(instance.getId(), UUID.fromString(responseNode.get("id").asText()));
+    assertEquals(instance.getEapVersion(), responseNode.get("eapVersion").asText());
+    assertEquals("", responseNode.get("raw").asText());
   }
 
   @Test
@@ -590,7 +674,7 @@ public class DisplayInventoryTest {
   }
 
   @Test
-  void testEapInstances() throws IOException {
+  void testEapInstancesWithOnlyHostnameParam() throws IOException {
     EapInstance instance = getEapInstanceFromJsonFile("eap_example1.json");
     persistInstanceToDatabase(instance);
     String accountNumber = "accountId";
@@ -613,6 +697,63 @@ public class DisplayInventoryTest {
     JsonNode jsonNode = mapper.readTree(response).get("response");
     assertEquals(true, jsonNode.isArray());
     assertEquals(1, jsonNode.size());
+    assertEquals("", jsonNode.get(0).get("raw").asText());
+  }
+
+  @Test
+  void testEapInstancesWithoutRaw() throws IOException {
+    EapInstance instance = getEapInstanceFromJsonFile("eap_example1.json");
+    persistInstanceToDatabase(instance);
+    String accountNumber = "accountId";
+    String orgId = "orgId";
+    String username = "user";
+    String identityHeaderValue = encodeRHIdentityInfo(accountNumber, orgId, username);
+    Header identityHeader = createRHIdentityHeader(identityHeaderValue);
+    String response =
+        given()
+            .header(identityHeader)
+            .when()
+            .queryParam("hostname", instance.getHostname())
+            .queryParam("includeRaw", "false")
+            .get("/api/runtimes-inventory-service/v1/eap-instances/")
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .asString();
+    ObjectMapper mapper = new ObjectMapper();
+    JsonNode jsonNode = mapper.readTree(response).get("response");
+    assertEquals(true, jsonNode.isArray());
+    assertEquals(1, jsonNode.size());
+    assertEquals("", jsonNode.get(0).get("raw").asText());
+  }
+
+  @Test
+  void testEapInstancesWithRaw() throws IOException {
+    EapInstance instance = getEapInstanceFromJsonFile("eap_example1.json");
+    persistInstanceToDatabase(instance);
+    String accountNumber = "accountId";
+    String orgId = "orgId";
+    String username = "user";
+    String identityHeaderValue = encodeRHIdentityInfo(accountNumber, orgId, username);
+    Header identityHeader = createRHIdentityHeader(identityHeaderValue);
+    String response =
+        given()
+            .header(identityHeader)
+            .when()
+            .queryParam("hostname", instance.getHostname())
+            .queryParam("includeRaw", "true")
+            .get("/api/runtimes-inventory-service/v1/eap-instances/")
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .asString();
+    ObjectMapper mapper = new ObjectMapper();
+    JsonNode jsonNode = mapper.readTree(response).get("response");
+    assertEquals(true, jsonNode.isArray());
+    assertEquals(1, jsonNode.size());
+    assertNotEquals("", jsonNode.get(0).get("raw").asText());
   }
 
   private List<String> mapResponseIdsToList(String response)

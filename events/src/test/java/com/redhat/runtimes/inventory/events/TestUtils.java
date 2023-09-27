@@ -2,6 +2,7 @@
 package com.redhat.runtimes.inventory.events;
 
 import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,6 +47,7 @@ public final class TestUtils {
             .getSingleResult();
   }
 
+  @Transactional
   public static void clearTables(EntityManager entityManager) {
     // Order is important here
     entityManager.createNativeQuery("DELETE FROM jvm_instance_jar_hash").executeUpdate();

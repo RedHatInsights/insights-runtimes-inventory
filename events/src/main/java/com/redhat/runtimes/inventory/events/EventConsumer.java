@@ -4,6 +4,8 @@ package com.redhat.runtimes.inventory.events;
 import static com.redhat.runtimes.inventory.events.Utils.*;
 import static org.eclipse.microprofile.reactive.messaging.Acknowledgment.Strategy.PRE_PROCESSING;
 
+import com.redhat.runtimes.inventory.models.EapInstance;
+import com.redhat.runtimes.inventory.models.InsightsMessage;
 import com.redhat.runtimes.inventory.models.JvmInstance;
 import com.redhat.runtimes.inventory.models.UpdateInstance;
 import io.micrometer.core.instrument.Counter;
@@ -93,10 +95,12 @@ public class EventConsumer {
         var archiveJson = getJsonFromS3(announce.getUrl());
         Log.debugf("Retrieved from S3: %s", archiveJson);
 
-        var msg = jvmInstanceOf(announce, archiveJson);
+        InsightsMessage msg = instanceOf(announce, archiveJson);
         // This should be a true pattern match on type
         if (msg instanceof JvmInstance) {
           inst = (JvmInstance) msg;
+        } else if (msg instanceof EapInstance) {
+          inst = (EapInstance) msg;
         } else if (msg instanceof UpdateInstance update) {
           var linkingHash = update.getLinkingHash();
           var maybeInst = getInstanceFromHash(linkingHash);
@@ -118,6 +122,7 @@ public class EventConsumer {
       if (inst != null) {
         Log.debugf("About to persist: %s", inst);
         entityManager.persist(inst);
+        entityManager.flush();
       }
     } catch (Throwable t) {
       processingExceptionCounter.increment();
@@ -159,7 +164,7 @@ public class EventConsumer {
           var archiveJson = getJsonFromS3(announce.getUrl());
           Log.debugf("Retrieved from S3: %s", archiveJson);
 
-          var msg = jvmInstanceOf(announce, archiveJson);
+          var msg = instanceOf(announce, archiveJson);
           // The egg topic does not deliver update events, so this
           if (msg instanceof JvmInstance) {
             inst = (JvmInstance) msg;

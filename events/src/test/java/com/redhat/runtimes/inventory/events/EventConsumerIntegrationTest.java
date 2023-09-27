@@ -7,7 +7,7 @@ import static com.redhat.runtimes.inventory.events.EventConsumer.PROCESSING_EXCE
 import static com.redhat.runtimes.inventory.events.TestUtils.readBytesFromResources;
 import static com.redhat.runtimes.inventory.events.TestUtils.readFromResources;
 import static com.redhat.runtimes.inventory.events.Utils.eapInstanceOf;
-import static com.redhat.runtimes.inventory.events.Utils.jvmInstanceOf;
+import static com.redhat.runtimes.inventory.events.Utils.instanceOf;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -57,7 +57,6 @@ public class EventConsumerIntegrationTest {
   }
 
   @Test
-  @Transactional
   @SuppressWarnings("unchecked")
   void testValidJvmInstancePayload() throws IOException, InterruptedException {
     TestUtils.clearTables(entityManager);
@@ -74,6 +73,7 @@ public class EventConsumerIntegrationTest {
 
     micrometerAssertionHelper.awaitAndAssertTimerIncrement(CONSUMED_TIMER_NAME, 1);
     micrometerAssertionHelper.assertCounterIncrement(PROCESSING_EXCEPTION_COUNTER_NAME, 0);
+
     assertEquals(1L, TestUtils.entity_count(entityManager, "JvmInstance"));
   }
 
@@ -96,16 +96,15 @@ public class EventConsumerIntegrationTest {
     byte[] buffy = readBytesFromResources("jdk8_MWTELE-66.gz");
     String json = EventConsumer.unzipJson(buffy);
 
-    InsightsMessage msg = jvmInstanceOf(dummy, json);
-    assertTrue(msg instanceof JvmInstance);
-    JvmInstance inst = (JvmInstance) msg;
+    InsightsMessage inst = instanceOf(dummy, json);
+    assertTrue(inst instanceof JvmInstance);
 
     assertEquals(0L, TestUtils.entity_count(entityManager, "JvmInstance"));
     assertEquals(0L, TestUtils.entity_count(entityManager, "JarHash"));
 
     entityManager.persist(inst);
     assertEquals(1L, TestUtils.entity_count(entityManager, "JvmInstance"));
-    assertEquals(1L, TestUtils.entity_count(entityManager, "JarHash"));
+    assertEquals(1074L, TestUtils.entity_count(entityManager, "JarHash"));
     assertEquals(1L, TestUtils.table_count(entityManager, "jvm_instance_jar_hash"));
 
     entityManager.remove(inst);

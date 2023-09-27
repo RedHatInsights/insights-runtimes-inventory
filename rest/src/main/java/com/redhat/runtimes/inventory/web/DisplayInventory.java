@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.redhat.runtimes.inventory.models.EapInstance;
 import com.redhat.runtimes.inventory.models.JarHash;
 import com.redhat.runtimes.inventory.models.JvmInstance;
 import io.micrometer.core.instrument.Counter;
@@ -196,6 +197,149 @@ public class DisplayInventory {
             JarHash.class);
     query.setParameter("instanceId", UUID.fromString(jvmInstanceId));
     var results = query.getResultList();
+    return mapResultListToJson(results);
+  }
+
+  /**
+   * Given a RH identity header and a hostname, return all the associated EAP instance IDs
+   *
+   * @param hostname associated with the EAP instance
+   * @param rhIdentity
+   * @return JSON String containing a list of EAP instance IDs
+   */
+  @GET
+  @Path("/eap-instance-ids/") // trailing slash is required by api
+  @Produces(MediaType.APPLICATION_JSON)
+  public String getEapInstanceIdRecords(
+      @QueryParam("hostname") String hostname,
+      @HeaderParam(X_RH_IDENTITY_HEADER) String rhIdentity) {
+    // X_RH header is just B64 encoded - decode for the org ID
+    String rhIdJson = new String(Base64.getDecoder().decode(rhIdentity));
+    Log.debugf("X_RH_IDENTITY_HEADER: %s", rhIdJson);
+    String orgId = "";
+    try {
+      orgId = extractOrgId(rhIdJson);
+    } catch (Exception e) {
+      processingErrorCounter.increment();
+      return "{\"response\": \"[error]\"}";
+    }
+    // Retrieve from DB
+    TypedQuery<UUID> query =
+        entityManager.createQuery(
+            """
+              SELECT i.id
+              FROM EapInstance i
+              WHERE i.orgId = :orgId and i.hostname = :hostname
+              ORDER BY i.created desc
+            """,
+            UUID.class);
+    query.setParameter("orgId", orgId);
+    query.setParameter("hostname", hostname);
+    List<UUID> results = query.getResultList();
+    return mapResultListToJson(results);
+  }
+
+  /**
+   * Given a RH identity header and a EAP instance id, return the associated EAP instance
+   *
+   * @param eapInstanceId id of the EAP instance
+   * @param includeRaw determines whether to include the raw json in the response
+   * @param rhIdentity
+   * @return JSON String containing the specified EAP instance
+   */
+  @GET
+  @Path("/eap-instance/") // trailing slash is required by api
+  @Produces(MediaType.APPLICATION_JSON)
+  public String getEapInstanceRecord(
+      @QueryParam("eapInstanceId") String eapInstanceId,
+      @QueryParam("includeRaw") String includeRaw,
+      @HeaderParam(X_RH_IDENTITY_HEADER) String rhIdentity) {
+    // X_RH header is just B64 encoded - decode for the org ID
+    String rhIdJson = new String(Base64.getDecoder().decode(rhIdentity));
+    Log.debugf("X_RH_IDENTITY_HEADER: %s", rhIdJson);
+    String orgId = "";
+    try {
+      orgId = extractOrgId(rhIdJson);
+    } catch (Exception e) {
+      processingErrorCounter.increment();
+      return """
+      {"response": "[error]"}""";
+    }
+    // Retrieve from DB
+    TypedQuery<EapInstance> query =
+        entityManager.createQuery(
+            """
+              SELECT i
+              FROM EapInstance i
+              WHERE i.orgId = :orgId AND i.id = :id
+            """,
+            EapInstance.class);
+    query.setParameter("id", UUID.fromString(eapInstanceId));
+    query.setParameter("orgId", orgId);
+    EapInstance result;
+    try {
+      result = query.getSingleResult();
+      if (!Boolean.parseBoolean(includeRaw)) {
+        result.setRaw("");
+      }
+    } catch (NoResultException e) {
+      return "{\"response\": \"[]\"}";
+    }
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.registerModule(new JavaTimeModule());
+    try {
+      Map<String, EapInstance> map = Map.of("response", result);
+      return mapper.writeValueAsString(map);
+    } catch (JsonProcessingException e) {
+      Log.error("JSON Exception", e);
+      processingErrorCounter.increment();
+      return "{\"response\": \"[error]\"}";
+    }
+  }
+
+  /**
+   * Given a RH identity header and a hostname, return all the associated EAP instances
+   *
+   * @param hostname associated with the EAP Instance
+   * @param includeRaw determines whether to include the raw json in the response
+   * @param rhIdentity
+   * @return JSON String containing a list of EAP instances
+   */
+  @GET
+  @Path("/eap-instances/")
+  @Produces(MediaType.APPLICATION_JSON)
+  public String getAllEapInstanceRecords(
+      @QueryParam("hostname") String hostname,
+      @QueryParam("includeRaw") String includeRaw,
+      @HeaderParam(X_RH_IDENTITY_HEADER) String rhIdentity) {
+    // X_RH header is just B64 encoded - decode for the org ID
+    String rhIdJson = new String(Base64.getDecoder().decode(rhIdentity));
+    Log.debugf("X_RH_IDENTITY_HEADER: %s", rhIdJson);
+    String orgId = "";
+    try {
+      orgId = extractOrgId(rhIdJson);
+    } catch (Exception e) {
+      processingErrorCounter.increment();
+      return "{\"response\": \"[error]\"}";
+    }
+    // Retrieve from DB
+    TypedQuery<EapInstance> query =
+        entityManager.createQuery(
+            """
+              SELECT i
+              FROM EapInstance i
+              WHERE i.orgId = :orgId AND i.hostname = :hostname
+              ORDER BY i.created desc
+            """,
+            EapInstance.class);
+    query.setParameter("orgId", orgId);
+    query.setParameter("hostname", hostname);
+    List<EapInstance> results = query.getResultList();
+    if (!Boolean.parseBoolean(includeRaw)) {
+      for (EapInstance result : results) {
+        result.setRaw("");
+      }
+    }
     return mapResultListToJson(results);
   }
 

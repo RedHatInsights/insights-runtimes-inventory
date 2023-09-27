@@ -53,12 +53,12 @@ public final class TestUtils {
     entityManager.createNativeQuery("DELETE FROM eap_deployment_archive_jar_hash").executeUpdate();
     entityManager.createNativeQuery("DELETE FROM jar_hash").executeUpdate();
     entityManager.createNativeQuery("DELETE FROM jvm_instance").executeUpdate();
-    entityManager.createNativeQuery("DELETE FROM eap_instance").executeUpdate();
-    entityManager.createNativeQuery("DELETE FROM eap_configuration").executeUpdate();
+    entityManager.createNativeQuery("DELETE FROM eap_deployment").executeUpdate();
     entityManager.createNativeQuery("DELETE FROM eap_configuration_eap_extension").executeUpdate();
+    entityManager.createNativeQuery("DELETE FROM eap_configuration").executeUpdate();
+    entityManager.createNativeQuery("DELETE FROM eap_instance").executeUpdate();
     entityManager.createNativeQuery("DELETE FROM eap_configuration_deployments").executeUpdate();
     entityManager.createNativeQuery("DELETE FROM eap_configuration_subsystems").executeUpdate();
-    entityManager.createNativeQuery("DELETE FROM eap_deployment").executeUpdate();
     entityManager.createNativeQuery("DELETE FROM eap_extension").executeUpdate();
     entityManager.createNativeQuery("DELETE FROM eap_extension_subsystems").executeUpdate();
   }

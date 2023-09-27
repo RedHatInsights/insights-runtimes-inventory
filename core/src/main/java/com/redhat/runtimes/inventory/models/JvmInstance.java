@@ -126,29 +126,17 @@ public non-sealed class JvmInstance implements InsightsMessage {
   @Size(max = 255)
   protected String systemOsVersion;
 
-  @NotNull
-  @Size(max = org.hibernate.Length.LOB_DEFAULT)
-  protected String javaHome;
+  @NotNull protected String javaHome;
 
-  @NotNull
-  @Size(max = org.hibernate.Length.LOB_DEFAULT)
-  protected String javaLibraryPath;
+  @NotNull protected String javaLibraryPath;
 
-  @NotNull
-  @Size(max = org.hibernate.Length.LOB_DEFAULT)
-  protected String javaCommand;
+  @NotNull protected String javaCommand;
 
-  @NotNull
-  @Size(max = org.hibernate.Length.LOB_DEFAULT)
-  protected String javaClassPath;
+  @NotNull protected String javaClassPath;
 
-  @NotNull
-  @Size(max = org.hibernate.Length.LOB_DEFAULT)
-  protected String jvmPackages;
+  @NotNull protected String jvmPackages;
 
-  @NotNull
-  @Size(max = org.hibernate.Length.LOB_DEFAULT)
-  protected String jvmArgs;
+  @NotNull protected String jvmArgs;
 
   //////////////////////////////////////////////////////
 

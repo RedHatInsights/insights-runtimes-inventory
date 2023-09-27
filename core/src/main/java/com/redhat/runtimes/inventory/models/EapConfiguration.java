@@ -12,7 +12,7 @@ import org.hibernate.annotations.NaturalId;
 
 @Entity
 @Table(name = "eap_configuration")
-public final class EapConfiguration {
+public class EapConfiguration {
   @Id @GeneratedValue private UUID id;
 
   /****************************************************************************

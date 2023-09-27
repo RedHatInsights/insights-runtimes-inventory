@@ -11,7 +11,7 @@ import org.hibernate.annotations.NaturalId;
 
 @Entity
 @Table(name = "eap_deployment")
-public final class EapDeployment {
+public class EapDeployment {
   @Id @GeneratedValue private UUID id;
 
   @ManyToOne(fetch = FetchType.LAZY)

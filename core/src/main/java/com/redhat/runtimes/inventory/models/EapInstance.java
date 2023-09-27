@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "eap_instance")
-public final class EapInstance extends JvmInstance {
+public class EapInstance extends JvmInstance {
   @Id @GeneratedValue private UUID id;
 
   /****************************************************************************
@@ -88,9 +88,7 @@ public final class EapInstance extends JvmInstance {
   /****************************************************************************
    *                            Raw JSON Dumps
    ***************************************************************************/
-  @NotNull
-  @Size(max = org.hibernate.Length.LOB_DEFAULT)
-  private String raw;
+  @NotNull private String raw;
 
   public EapInstance() {}
 

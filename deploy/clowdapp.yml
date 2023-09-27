@@ -51,6 +51,8 @@ objects:
             env:
               - name: QUARKUS_PROFILE
                 value: ${ENV_NAME}
+              - name: QUARKUS_LOG_CLOUDWATCH_ENABLED
+                value: ${CLOUDWATCH_ENABLED}
           webServices:
             metrics: {}
             private: {}
@@ -94,6 +96,8 @@ objects:
             env:
               - name: QUARKUS_PROFILE
                 value: ${ENV_NAME}
+              - name: QUARKUS_LOG_CLOUDWATCH_ENABLED
+                value: ${CLOUDWATCH_ENABLED}
           webServices:
             metrics: {}
             private: {}
@@ -121,3 +125,6 @@ parameters:
   - name: ENV_NAME
     required: true
     value: stage
+  - name: CLOUDWATCH_ENABLED
+    value: "false"
+    displayName: Enable Cloudwatch logging

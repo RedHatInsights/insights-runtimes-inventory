@@ -30,6 +30,7 @@ public final class TestUtils {
     }
   }
 
+  @Transactional
   public static Long entity_count(EntityManager entityManager, String entity) {
     // I don't know why, but but hibernate throws a ParsingException
     // when I try a named or positional query parameter
@@ -38,6 +39,7 @@ public final class TestUtils {
         .getSingleResult();
   }
 
+  @Transactional
   public static Long table_count(EntityManager entityManager, String table) {
     // I don't know why, but but hibernate throws a ParsingException
     // when I try a named or positional query parameter

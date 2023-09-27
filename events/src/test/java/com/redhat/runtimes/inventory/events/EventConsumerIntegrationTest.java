@@ -8,6 +8,7 @@ import static com.redhat.runtimes.inventory.events.TestUtils.readBytesFromResour
 import static com.redhat.runtimes.inventory.events.TestUtils.readFromResources;
 import static com.redhat.runtimes.inventory.events.Utils.eapInstanceOf;
 import static com.redhat.runtimes.inventory.events.Utils.instanceOf;
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -27,6 +28,7 @@ import java.io.IOException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.time.Instant;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -73,6 +75,14 @@ public class EventConsumerIntegrationTest {
 
     micrometerAssertionHelper.awaitAndAssertTimerIncrement(CONSUMED_TIMER_NAME, 1);
     micrometerAssertionHelper.assertCounterIncrement(PROCESSING_EXCEPTION_COUNTER_NAME, 0);
+
+    // Wait for the transaction to actually get committed
+    await()
+        .atMost(Duration.ofSeconds(5L))
+        .until(
+            () -> {
+              return TestUtils.entity_count(entityManager, "JvmInstance") == 1;
+            });
 
     assertEquals(1L, TestUtils.entity_count(entityManager, "JvmInstance"));
   }

@@ -23,13 +23,7 @@ public final class Utils {
   /****************************************************************************
    *                             JVM Methods
    ***************************************************************************/
-  public static InsightsMessage jvmInstanceOf(ArchiveAnnouncement announce, String json) {
-    var inst = new JvmInstance();
-    // Announce fields first
-    inst.setAccountId(announce.getAccountId());
-    inst.setOrgId(announce.getOrgId());
-    inst.setCreated(announce.getTimestamp().atZone(ZoneOffset.UTC));
-
+  public static InsightsMessage instanceOf(ArchiveAnnouncement announce, String json) {
     TypeReference<Map<String, Object>> typeRef = new TypeReference<>() {};
 
     var mapper = new ObjectMapper();
@@ -45,14 +39,28 @@ public final class Utils {
             "Error in unmarshalling JSON - does not contain a basic or updated-jars tag");
       }
 
+      // Now we need to check for any product-specific data, currently EAP only
+      var eap = (Map<String, Object>) o.get("eap");
+      if (eap != null) {
+        return eapInstanceOf(announce, json);
+      }
+
+      // Datagrid, Quarkus etc go here...
+
+      // Still here, so we're vanilla OpenJDK
+      var inst = new JvmInstance();
+      // Announce fields first
+      inst.setAccountId(announce.getAccountId());
+      inst.setOrgId(announce.getOrgId());
+      inst.setCreated(announce.getTimestamp().atZone(ZoneOffset.UTC));
+
       mapJvmInstanceValues(inst, o, basic);
       inst.setJarHashes(jarHashesOf((Map<String, Object>) o.get("jars")));
+      return inst;
     } catch (JsonProcessingException | ClassCastException | NumberFormatException e) {
       Log.error("Error in unmarshalling JSON", e);
       throw new RuntimeException("Error in unmarshalling JSON", e);
     }
-
-    return inst;
   }
 
   static void mapJvmInstanceValues(
@@ -154,7 +162,7 @@ public final class Utils {
   /****************************************************************************
    *                             EAP Methods
    ***************************************************************************/
-  public static InsightsMessage eapInstanceOf(ArchiveAnnouncement announce, String json) {
+  public static EapInstance eapInstanceOf(ArchiveAnnouncement announce, String json) {
     var inst = new EapInstance();
     inst.setRaw(json);
     // Announce fields first
@@ -315,10 +323,12 @@ public final class Utils {
       // Config Deployments parsing
       Map<String, String> deployments = new HashMap<String, String>();
       Map<String, Object> deploymentRep = (Map<String, Object>) configRep.get("deployment");
-      for (Map.Entry<String, Object> entry : deploymentRep.entrySet()) {
-        deployments.put(entry.getKey(), mapper.writeValueAsString(entry.getValue()));
+      if (deploymentRep != null) {
+        for (Map.Entry<String, Object> entry : deploymentRep.entrySet()) {
+          deployments.put(entry.getKey(), mapper.writeValueAsString(entry.getValue()));
+        }
+        config.setDeployments(deployments);
       }
-      config.setDeployments(deployments);
 
     } catch (JsonProcessingException | ClassCastException | NumberFormatException e) {
       Log.error("Error in unmarshalling JSON", e);

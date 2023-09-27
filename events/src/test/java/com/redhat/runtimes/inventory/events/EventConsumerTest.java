@@ -4,7 +4,7 @@ package com.redhat.runtimes.inventory.events;
 import static com.redhat.runtimes.inventory.events.TestUtils.readBytesFromResources;
 import static com.redhat.runtimes.inventory.events.TestUtils.readFromResources;
 import static com.redhat.runtimes.inventory.events.Utils.eapInstanceOf;
-import static com.redhat.runtimes.inventory.events.Utils.jvmInstanceOf;
+import static com.redhat.runtimes.inventory.events.Utils.instanceOf;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -41,7 +41,7 @@ public class EventConsumerTest {
     var buffy = readBytesFromResources("jdk8_MWTELE-66.gz");
     var json = EventConsumer.unzipJson(buffy);
 
-    var msg = jvmInstanceOf(dummy, json);
+    var msg = instanceOf(dummy, json);
     assertTrue(msg instanceof JvmInstance);
     var inst = (JvmInstance) msg;
 
@@ -49,7 +49,7 @@ public class EventConsumerTest {
     assertEquals(hostname, inst.getHostname());
 
     json = readFromResources("test17.json");
-    msg = jvmInstanceOf(dummy, json);
+    msg = instanceOf(dummy, json);
     assertTrue(msg instanceof JvmInstance);
     inst = (JvmInstance) msg;
 
@@ -65,7 +65,7 @@ public class EventConsumerTest {
 
     var buffy = readBytesFromResources("update1.json.gz");
     var json = EventConsumer.unzipJson(buffy);
-    var msg = jvmInstanceOf(dummy, json);
+    var msg = instanceOf(dummy, json);
     assertTrue(msg instanceof JvmInstance);
     var inst = (JvmInstance) msg;
 

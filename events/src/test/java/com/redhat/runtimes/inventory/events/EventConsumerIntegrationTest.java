@@ -7,7 +7,7 @@ import static com.redhat.runtimes.inventory.events.EventConsumer.PROCESSING_EXCE
 import static com.redhat.runtimes.inventory.events.TestUtils.readBytesFromResources;
 import static com.redhat.runtimes.inventory.events.TestUtils.readFromResources;
 import static com.redhat.runtimes.inventory.events.Utils.eapInstanceOf;
-import static com.redhat.runtimes.inventory.events.Utils.jvmInstanceOf;
+import static com.redhat.runtimes.inventory.events.Utils.instanceOf;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -96,7 +96,7 @@ public class EventConsumerIntegrationTest {
     byte[] buffy = readBytesFromResources("jdk8_MWTELE-66.gz");
     String json = EventConsumer.unzipJson(buffy);
 
-    InsightsMessage msg = jvmInstanceOf(dummy, json);
+    InsightsMessage msg = instanceOf(dummy, json);
     assertTrue(msg instanceof JvmInstance);
     JvmInstance inst = (JvmInstance) msg;
 

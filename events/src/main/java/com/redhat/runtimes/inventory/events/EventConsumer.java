@@ -93,7 +93,7 @@ public class EventConsumer {
         var archiveJson = getJsonFromS3(announce.getUrl());
         Log.debugf("Retrieved from S3: %s", archiveJson);
 
-        var msg = jvmInstanceOf(announce, archiveJson);
+        var msg = instanceOf(announce, archiveJson);
         // This should be a true pattern match on type
         if (msg instanceof JvmInstance) {
           inst = (JvmInstance) msg;
@@ -159,8 +159,8 @@ public class EventConsumer {
           var archiveJson = getJsonFromS3(announce.getUrl());
           Log.debugf("Retrieved from S3: %s", archiveJson);
 
-          var msg = jvmInstanceOf(announce, archiveJson);
-          // The egg topic does not deliver update events, so this
+          var msg = instanceOf(announce, archiveJson);
+          // The egg topic does not deliver update events, so this should always happen
           if (msg instanceof JvmInstance) {
             inst = (JvmInstance) msg;
             Log.infof("About to persist (from egg): %s", inst);

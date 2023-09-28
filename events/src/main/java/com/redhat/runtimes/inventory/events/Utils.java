@@ -103,6 +103,7 @@ public final class Utils {
       }
       inst.setMajorVersion(Integer.parseInt(strVersion));
 
+      // Handle heap
       inst.setHeapMin((int) Double.parseDouble(String.valueOf(basic.get("jvm.heap.min"))));
       inst.setHeapMax((int) Double.parseDouble(String.valueOf(basic.get("jvm.heap.max"))));
       inst.setLaunchTime(Long.parseLong(String.valueOf(basic.get("jvm.report_time"))));

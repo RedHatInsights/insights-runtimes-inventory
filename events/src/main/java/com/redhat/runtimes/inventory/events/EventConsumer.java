@@ -2,7 +2,6 @@
 package com.redhat.runtimes.inventory.events;
 
 import static com.redhat.runtimes.inventory.events.Utils.*;
-import static org.eclipse.microprofile.reactive.messaging.Acknowledgment.Strategy.PRE_PROCESSING;
 
 import com.redhat.runtimes.inventory.models.EapInstance;
 import com.redhat.runtimes.inventory.models.InsightsMessage;
@@ -71,7 +70,6 @@ public class EventConsumer {
   }
 
   @Incoming(INGRESS_CHANNEL)
-  @Acknowledgment(PRE_PROCESSING)
   @Blocking
   @ActivateRequestContext
   @Transactional
@@ -135,7 +133,6 @@ public class EventConsumer {
   }
 
   @Incoming(EGG_CHANNEL)
-  @Acknowledgment(PRE_PROCESSING)
   @Blocking
   @ActivateRequestContext
   @Transactional

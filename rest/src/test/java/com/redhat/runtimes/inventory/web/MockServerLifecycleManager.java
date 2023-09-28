@@ -5,6 +5,7 @@ import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 
 import org.mockserver.integration.ClientAndServer;
 
+// Derived from notifications-backend
 public class MockServerLifecycleManager {
 
   private static final String LOG_LEVEL_KEY = "mockserver.logLevel";

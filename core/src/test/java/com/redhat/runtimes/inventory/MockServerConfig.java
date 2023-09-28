@@ -12,6 +12,7 @@ import org.apache.commons.io.IOUtils;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.ClearType;
 
+// Derived from notifications-backend
 public class MockServerConfig {
 
   public enum RbacAccess {
@@ -53,7 +54,6 @@ public class MockServerConfig {
   }
 
   private static String getFileAsString(String filename) {
-    System.out.println("MOCKSERVERCONFIG: " + MockServerConfig.class.getResource("/"));
     try (InputStream is = MockServerConfig.class.getClassLoader().getResourceAsStream(filename)) {
       return IOUtils.toString(is, UTF_8);
     } catch (Exception e) {

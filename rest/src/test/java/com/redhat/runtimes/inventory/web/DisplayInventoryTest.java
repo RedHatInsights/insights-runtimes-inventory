@@ -119,7 +119,7 @@ public class DisplayInventoryTest {
 
   @Test
   void testJvmInstanceEndpointWithoutValidHeader() {
-    given().when().get("/api/runtimes-inventory-service/v1/instance").then().statusCode(500);
+    given().when().get("/api/runtimes-inventory-service/v1/instance").then().statusCode(401);
   }
 
   @Test
@@ -129,18 +129,13 @@ public class DisplayInventoryTest {
     MockServerConfig.addMockRbacAccess(getClient(), identityHeaderValue, FULL_ACCESS);
     String[] endpoints = {"instance-ids", "instance", "instances"};
     for (String endpoint : endpoints) {
-      String response =
-          given()
-              .header(identityHeader)
-              .when()
-              .queryParam("hostname", "fedora")
-              .get("/api/runtimes-inventory-service/v1/" + endpoint)
-              .then()
-              .statusCode(200)
-              .extract()
-              .body()
-              .asString();
-      assertEquals("{\"response\": \"[error]\"}", response);
+      given()
+          .header(identityHeader)
+          .when()
+          .queryParam("hostname", "fedora")
+          .get("/api/runtimes-inventory-service/v1/" + endpoint)
+          .then()
+          .statusCode(401);
     }
   }
 
@@ -354,10 +349,15 @@ public class DisplayInventoryTest {
 
   @Test
   void testJarHashesWithNoRecords() throws IOException {
-    String identityHeaderValue = encode("not-a-real-identity");
+    String accountNumber = "accountId";
+    String orgId = "orgId";
+    String username = "user";
+    String identityHeaderValue = encodeRHIdentityInfo(accountNumber, orgId, username);
+    Header identityHeader = createRHIdentityHeader(identityHeaderValue);
     MockServerConfig.addMockRbacAccess(getClient(), identityHeaderValue, FULL_ACCESS);
     String response =
         given()
+            .header(identityHeader)
             .when()
             .queryParam("jvmInstanceId", UUID.randomUUID().toString())
             .get("/api/runtimes-inventory-service/v1/jarhashes/")
@@ -395,6 +395,7 @@ public class DisplayInventoryTest {
     assertEquals(1, ids.size());
     String response =
         given()
+            .header(identityHeader)
             .when()
             .queryParam("jvmInstanceId", UUID.fromString(ids.get(0)))
             .get("/api/runtimes-inventory-service/v1/jarhashes/")
@@ -435,6 +436,7 @@ public class DisplayInventoryTest {
     assertEquals(1, ids.size());
     String response =
         given()
+            .header(identityHeader)
             .when()
             .queryParam("jvmInstanceId", UUID.fromString(ids.get(0)))
             .get("/api/runtimes-inventory-service/v1/jarhashes/")
@@ -456,18 +458,13 @@ public class DisplayInventoryTest {
     MockServerConfig.addMockRbacAccess(getClient(), identityHeaderValue, FULL_ACCESS);
     String[] endpoints = {"eap-instance-ids", "eap-instance", "eap-instances"};
     for (String endpoint : endpoints) {
-      String response =
-          given()
-              .header(identityHeader)
-              .when()
-              .queryParam("hostname", "fedora")
-              .get("/api/runtimes-inventory-service/v1/" + endpoint)
-              .then()
-              .statusCode(200)
-              .extract()
-              .body()
-              .asString();
-      assertEquals("{\"response\": \"[error]\"}", response);
+      given()
+          .header(identityHeader)
+          .when()
+          .queryParam("hostname", "fedora")
+          .get("/api/runtimes-inventory-service/v1/" + endpoint)
+          .then()
+          .statusCode(401);
     }
   }
 

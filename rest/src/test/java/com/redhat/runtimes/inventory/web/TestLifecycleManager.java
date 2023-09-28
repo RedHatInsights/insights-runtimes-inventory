@@ -3,6 +3,7 @@ package com.redhat.runtimes.inventory.web;
 
 import static com.redhat.runtimes.inventory.events.EventConsumer.EGG_CHANNEL;
 import static com.redhat.runtimes.inventory.events.EventConsumer.INGRESS_CHANNEL;
+import static com.redhat.runtimes.inventory.web.MockServerLifecycleManager.getMockServerUrl;
 
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
 import io.smallrye.reactive.messaging.memory.InMemoryConnector;
@@ -27,6 +28,7 @@ public class TestLifecycleManager implements QuarkusTestResourceLifecycleManager
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
+    setupMockEngine(properties);
 
     /*
      * We'll use an in-memory Reactive Messaging connector to send payloads.
@@ -51,5 +53,10 @@ public class TestLifecycleManager implements QuarkusTestResourceLifecycleManager
     props.put("quarkus.datasource.username", "test");
     props.put("quarkus.datasource.password", "test");
     props.put("quarkus.datasource.db-kind", "postgresql");
+  }
+
+  void setupMockEngine(Map<String, String> props) {
+    MockServerLifecycleManager.start();
+    props.put("quarkus.rest-client.rbac-authentication.url", getMockServerUrl());
   }
 }

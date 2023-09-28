@@ -86,7 +86,7 @@ public class DisplayInventoryTest {
   private JvmInstance getJvmInstanceFromZipJsonFile(String filename) throws IOException {
     byte[] buffy = TestUtils.readBytesFromResources(filename);
     String json = EventConsumer.unzipJson(buffy);
-    InsightsMessage message = Utils.jvmInstanceOf(setupArchiveAnnouncement(), json);
+    InsightsMessage message = Utils.instanceOf(setupArchiveAnnouncement(), json);
     assertTrue(message instanceof JvmInstance);
     JvmInstance instance = (JvmInstance) message;
     return instance;
@@ -94,7 +94,7 @@ public class DisplayInventoryTest {
 
   private JvmInstance getJvmInstanceFromJsonFile(String filename) throws IOException {
     String json = TestUtils.readFromResources(filename);
-    InsightsMessage message = Utils.jvmInstanceOf(setupArchiveAnnouncement(), json);
+    InsightsMessage message = Utils.instanceOf(setupArchiveAnnouncement(), json);
     assertTrue(message instanceof JvmInstance);
     JvmInstance instance = (JvmInstance) message;
     return instance;
@@ -102,7 +102,7 @@ public class DisplayInventoryTest {
 
   private EapInstance getEapInstanceFromJsonFile(String filename) throws IOException {
     String json = TestUtils.readFromResources(filename);
-    InsightsMessage message = Utils.eapInstanceOf(setupArchiveAnnouncement(), json);
+    InsightsMessage message = Utils.instanceOf(setupArchiveAnnouncement(), json);
     assertTrue(message instanceof EapInstance);
     EapInstance instance = (EapInstance) message;
     return instance;

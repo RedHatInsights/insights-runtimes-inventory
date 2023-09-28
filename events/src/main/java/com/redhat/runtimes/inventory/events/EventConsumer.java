@@ -28,7 +28,6 @@ import java.net.http.HttpResponse;
 import java.util.*;
 import java.util.concurrent.CompletionStage;
 import java.util.zip.GZIPInputStream;
-import org.eclipse.microprofile.reactive.messaging.Acknowledgment;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Message;
 

@@ -20,10 +20,37 @@ import java.util.*;
 public final class Utils {
   private Utils() {}
 
+  public static InsightsMessage instanceOf(ArchiveAnnouncement announce, String json) {
+    TypeReference<Map<String, Object>> typeRef = new TypeReference<>() {};
+
+    var mapper = new ObjectMapper();
+    try {
+      var o = mapper.readValue(json, typeRef);
+      var basic = (Map<String, Object>) o.get("basic");
+      if (basic == null) {
+        var updatedJars = (Map<String, Object>) o.get("updated-jars");
+        if (updatedJars != null) {
+          return updatedInstanceOf(updatedJars);
+        }
+        throw new RuntimeException(
+            "Error in unmarshalling JSON - does not contain a basic or updated-jars tag");
+      }
+
+      // Is this an Eap Instance?
+      var eap = (Map<String, Object>) o.get("eap");
+      if (eap != null) {
+        return eapInstanceOf(announce, json);
+      }
+      return jvmInstanceOf(announce, json);
+    } catch (JsonProcessingException | ClassCastException | NumberFormatException e) {
+      Log.error("Error in unmarshalling JSON", e);
+      throw new RuntimeException("Error in unmarshalling JSON", e);
+    }
+  }
   /****************************************************************************
    *                             JVM Methods
    ***************************************************************************/
-  public static InsightsMessage jvmInstanceOf(ArchiveAnnouncement announce, String json) {
+  public static JvmInstance jvmInstanceOf(ArchiveAnnouncement announce, String json) {
     var inst = new JvmInstance();
     // Announce fields first
     inst.setAccountId(announce.getAccountId());
@@ -37,10 +64,6 @@ public final class Utils {
       var o = mapper.readValue(json, typeRef);
       var basic = (Map<String, Object>) o.get("basic");
       if (basic == null) {
-        var updatedJars = (Map<String, Object>) o.get("updated-jars");
-        if (updatedJars != null) {
-          return updatedInstanceOf(updatedJars);
-        }
         throw new RuntimeException(
             "Error in unmarshalling JSON - does not contain a basic or updated-jars tag");
       }
@@ -154,7 +177,7 @@ public final class Utils {
   /****************************************************************************
    *                             EAP Methods
    ***************************************************************************/
-  public static InsightsMessage eapInstanceOf(ArchiveAnnouncement announce, String json) {
+  public static EapInstance eapInstanceOf(ArchiveAnnouncement announce, String json) {
     var inst = new EapInstance();
     inst.setRaw(json);
     // Announce fields first
@@ -315,8 +338,10 @@ public final class Utils {
       // Config Deployments parsing
       Map<String, String> deployments = new HashMap<String, String>();
       Map<String, Object> deploymentRep = (Map<String, Object>) configRep.get("deployment");
-      for (Map.Entry<String, Object> entry : deploymentRep.entrySet()) {
-        deployments.put(entry.getKey(), mapper.writeValueAsString(entry.getValue()));
+      if (deploymentRep != null) {
+        for (Map.Entry<String, Object> entry : deploymentRep.entrySet()) {
+          deployments.put(entry.getKey(), mapper.writeValueAsString(entry.getValue()));
+        }
       }
       config.setDeployments(deployments);
 

@@ -2,6 +2,7 @@
 package com.redhat.runtimes.inventory.events;
 
 import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,6 +30,7 @@ public final class TestUtils {
     }
   }
 
+  @Transactional
   public static Long entity_count(EntityManager entityManager, String entity) {
     // I don't know why, but but hibernate throws a ParsingException
     // when I try a named or positional query parameter
@@ -37,6 +39,7 @@ public final class TestUtils {
         .getSingleResult();
   }
 
+  @Transactional
   public static Long table_count(EntityManager entityManager, String table) {
     // I don't know why, but but hibernate throws a ParsingException
     // when I try a named or positional query parameter
@@ -46,6 +49,7 @@ public final class TestUtils {
             .getSingleResult();
   }
 
+  @Transactional
   public static void clearTables(EntityManager entityManager) {
     // Order is important here
     entityManager.createNativeQuery("DELETE FROM jvm_instance_jar_hash").executeUpdate();

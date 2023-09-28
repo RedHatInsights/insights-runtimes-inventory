@@ -2,7 +2,6 @@
 package com.redhat.runtimes.inventory.events;
 
 import static com.redhat.runtimes.inventory.events.Utils.*;
-import static org.eclipse.microprofile.reactive.messaging.Acknowledgment.Strategy.PRE_PROCESSING;
 
 import com.redhat.runtimes.inventory.models.EapInstance;
 import com.redhat.runtimes.inventory.models.InsightsMessage;
@@ -29,7 +28,6 @@ import java.net.http.HttpResponse;
 import java.util.*;
 import java.util.concurrent.CompletionStage;
 import java.util.zip.GZIPInputStream;
-import org.eclipse.microprofile.reactive.messaging.Acknowledgment;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Message;
 
@@ -71,7 +69,6 @@ public class EventConsumer {
   }
 
   @Incoming(INGRESS_CHANNEL)
-  @Acknowledgment(PRE_PROCESSING)
   @Blocking
   @ActivateRequestContext
   @Transactional
@@ -135,7 +132,6 @@ public class EventConsumer {
   }
 
   @Incoming(EGG_CHANNEL)
-  @Acknowledgment(PRE_PROCESSING)
   @Blocking
   @ActivateRequestContext
   @Transactional

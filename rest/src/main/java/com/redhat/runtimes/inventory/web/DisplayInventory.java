@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.redhat.runtimes.inventory.auth.ConsoleIdentityProvider;
 import com.redhat.runtimes.inventory.models.EapInstance;
 import com.redhat.runtimes.inventory.models.JarHash;
 import com.redhat.runtimes.inventory.models.JvmInstance;
@@ -14,6 +15,7 @@ import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.quarkus.logging.Log;
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
@@ -27,6 +29,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @Path("/api/runtimes-inventory-service/v1")
+@RolesAllowed(ConsoleIdentityProvider.RBAC_READ_HOSTS)
 public class DisplayInventory {
   public static final String PROCESSING_ERROR_COUNTER_NAME = "input.processing.error";
 

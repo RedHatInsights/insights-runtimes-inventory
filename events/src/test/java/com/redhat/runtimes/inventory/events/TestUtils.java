@@ -1,11 +1,15 @@
 /* Copyright (C) Red Hat 2023 */
 package com.redhat.runtimes.inventory.events;
 
+import static org.awaitility.Awaitility.await;
+
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Duration;
+import java.util.function.BooleanSupplier;
 
 public final class TestUtils {
   private TestUtils() {}
@@ -28,6 +32,24 @@ public final class TestUtils {
       }
       return baos.toByteArray();
     }
+  }
+
+  public static void await_entity_count(EntityManager entityManager, String entity, Long expected) {
+    await_result(
+        () -> {
+          return entity_count(entityManager, entity) == expected;
+        },
+        5);
+  }
+
+  @Transactional
+  public static void await_result(BooleanSupplier f, int timeout) {
+    await()
+        .atMost(Duration.ofSeconds(timeout))
+        .until(
+            () -> {
+              return f.getAsBoolean();
+            });
   }
 
   @Transactional

@@ -8,12 +8,14 @@ import static com.redhat.runtimes.inventory.events.TestUtils.readBytesFromResour
 import static com.redhat.runtimes.inventory.events.TestUtils.readFromResources;
 import static com.redhat.runtimes.inventory.events.Utils.eapInstanceOf;
 import static com.redhat.runtimes.inventory.events.Utils.instanceOf;
-import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.runtimes.inventory.models.EapInstance;
 import com.redhat.runtimes.inventory.models.InsightsMessage;
 import com.redhat.runtimes.inventory.models.JvmInstance;
@@ -28,8 +30,8 @@ import java.io.IOException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.Duration;
 import java.time.Instant;
+import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
@@ -48,6 +50,7 @@ public class EventConsumerIntegrationTest {
 
   @BeforeEach
   void beforeEach() {
+    TestUtils.clearTables(entityManager);
     micrometerAssertionHelper.saveCounterValuesBeforeTest(PROCESSING_EXCEPTION_COUNTER_NAME);
     micrometerAssertionHelper.removeDynamicTimer(CONSUMED_TIMER_NAME);
   }
@@ -61,7 +64,8 @@ public class EventConsumerIntegrationTest {
   @Test
   @SuppressWarnings("unchecked")
   void testValidJvmInstancePayload() throws IOException, InterruptedException {
-    TestUtils.clearTables(entityManager);
+    micrometerAssertionHelper.clearSavedValues();
+    micrometerAssertionHelper.saveCounterValuesBeforeTest(PROCESSING_EXCEPTION_COUNTER_NAME);
     HttpClient mockClient = mock(HttpClient.class);
     HttpResponse<byte[]> mockResponse = mock(HttpResponse.class);
     byte[] buffy = readBytesFromResources("jdk8_MWTELE-66.gz");
@@ -76,15 +80,7 @@ public class EventConsumerIntegrationTest {
     micrometerAssertionHelper.awaitAndAssertTimerIncrement(CONSUMED_TIMER_NAME, 1);
     micrometerAssertionHelper.assertCounterIncrement(PROCESSING_EXCEPTION_COUNTER_NAME, 0);
 
-    // Wait for the transaction to actually get committed
-    await()
-        .atMost(Duration.ofSeconds(5L))
-        .until(
-            () -> {
-              return TestUtils.entity_count(entityManager, "JvmInstance") == 1;
-            });
-
-    assertEquals(1L, TestUtils.entity_count(entityManager, "JvmInstance"));
+    TestUtils.await_entity_count(entityManager, "JvmInstance", 1L);
   }
 
   @Test
@@ -97,7 +93,6 @@ public class EventConsumerIntegrationTest {
   @Test
   @Transactional
   void testJvmInstanceBasicPostgresTransactions() throws IOException {
-    TestUtils.clearTables(entityManager);
     ArchiveAnnouncement dummy = new ArchiveAnnouncement();
     dummy.setAccountId("dummy account id");
     dummy.setOrgId("dummy org");
@@ -127,7 +122,6 @@ public class EventConsumerIntegrationTest {
   @Test
   @Transactional
   void testEapInstanceBasicPostgresTransactions() throws IOException {
-    TestUtils.clearTables(entityManager);
     ArchiveAnnouncement dummy = new ArchiveAnnouncement();
     dummy.setAccountId("dummy account id");
     dummy.setOrgId("dummy org");
@@ -190,5 +184,57 @@ public class EventConsumerIntegrationTest {
     assertEquals(0L, TestUtils.table_count(entityManager, "jvm_instance_jar_hash"));
     assertEquals(0L, TestUtils.table_count(entityManager, "eap_instance_module_jar_hash"));
     assertEquals(0L, TestUtils.table_count(entityManager, "eap_deployment_archive_jar_hash"));
+  }
+
+  // We saw hibernate exceptions causing issues with messages being received
+  // Let's try to make sure that doesn't happen.
+  @Test
+  @SuppressWarnings("unchecked")
+  void testHibernateExceptionCausesHangs() throws IOException, InterruptedException {
+    HttpClient mockClient = mock(HttpClient.class);
+    HttpResponse<byte[]> mockResponse = mock(HttpResponse.class);
+    byte[] buffy = readBytesFromResources("jdk8_MWTELE-66.gz");
+    when(mockClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class)))
+        .thenReturn(mockResponse);
+    when(mockResponse.body()).thenReturn(buffy);
+
+    EventConsumer.setHttpClient(mockClient);
+    String kafkaFirst = readFromResources("incoming_kafka1.json");
+    String kafkaSecond = "";
+    String kafkaThird = "";
+    var mapper = new ObjectMapper();
+    try {
+      TypeReference<Map<String, Object>> typeRef = new TypeReference<>() {};
+      var o = mapper.readValue(kafkaFirst, typeRef);
+      String request_id = String.valueOf(o.get("request_id"));
+      o.put("request_id", request_id + "2");
+      kafkaSecond = mapper.writeValueAsString(o);
+      o.put("request_id", request_id + "3");
+      kafkaThird = mapper.writeValueAsString(o);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException("Error in unmarshalling JSON", e);
+    }
+    // First submit a good object
+    inMemoryConnector.source(INGRESS_CHANNEL).send(kafkaFirst);
+
+    micrometerAssertionHelper.awaitAndAssertTimerIncrement(CONSUMED_TIMER_NAME, 1);
+    micrometerAssertionHelper.assertCounterIncrement(PROCESSING_EXCEPTION_COUNTER_NAME, 0);
+    TestUtils.await_entity_count(entityManager, "JvmInstance", 1L);
+
+    // This should error because of a duplicate object
+    inMemoryConnector.source(INGRESS_CHANNEL).send(kafkaSecond);
+
+    micrometerAssertionHelper.awaitAndAssertTimerIncrement(CONSUMED_TIMER_NAME, 2);
+    micrometerAssertionHelper.assertCounterIncrement(PROCESSING_EXCEPTION_COUNTER_NAME, 1);
+    TestUtils.await_entity_count(entityManager, "JvmInstance", 1L);
+
+    // Now we submit a new object and see that it persists
+    buffy = readBytesFromResources("eap_example1.json.gz");
+    when(mockResponse.body()).thenReturn(buffy);
+    inMemoryConnector.source(INGRESS_CHANNEL).send(kafkaSecond);
+
+    micrometerAssertionHelper.awaitAndAssertTimerIncrement(CONSUMED_TIMER_NAME, 3);
+    micrometerAssertionHelper.assertCounterIncrement(PROCESSING_EXCEPTION_COUNTER_NAME, 1);
+    TestUtils.await_entity_count(entityManager, "JvmInstance", 2L);
   }
 }

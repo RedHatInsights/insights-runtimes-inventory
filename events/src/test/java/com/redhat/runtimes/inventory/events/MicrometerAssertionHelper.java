@@ -9,7 +9,6 @@ import io.micrometer.core.instrument.Timer;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -29,7 +28,7 @@ public class MicrometerAssertionHelper {
 
   @Inject MeterRegistry registry;
 
-  private final Map<String, Double> counterValuesBeforeTest = new ConcurrentHashMap<>();
+  public final Map<String, Double> counterValuesBeforeTest = new ConcurrentHashMap<>();
 
   public void saveCounterValuesBeforeTest(String... counterNames) {
     for (String counterName : counterNames) {
@@ -37,10 +36,10 @@ public class MicrometerAssertionHelper {
     }
   }
 
-  public void assertCounterIncrement(String counterName, double expectedIncrement, String... tags) {
+  public void assertCounterIncrement(String counterName, double expectedIncrement) {
     double actualIncrement =
-        registry.counter(counterName, tags).count()
-            - counterValuesBeforeTest.getOrDefault(counterName + Arrays.toString(tags), 0D);
+        registry.counter(counterName).count()
+            - counterValuesBeforeTest.getOrDefault(counterName, 0D);
     assertEquals(expectedIncrement, actualIncrement);
   }
 

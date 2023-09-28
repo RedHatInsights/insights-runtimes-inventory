@@ -22,10 +22,6 @@
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-cache</artifactId>
     </dependency>
-    <!--    <dependency>-->
-    <!--      <groupId>io.quarkus</groupId>-->
-    <!--      <artifactId>quarkus-flyway</artifactId>-->
-    <!--    </dependency>-->
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-hibernate-orm</artifactId>
@@ -83,12 +79,6 @@
     <!--      <version>999-SNAPSHOT</version>-->
     <!--    </dependency>-->
 
-    <!--    &lt;!&ndash; Quarkus BOM &ndash;&gt;-->
-    <!--    <dependency>-->
-    <!--      <groupId>io.smallrye.reactive</groupId>-->
-    <!--      <artifactId>smallrye-mutiny-vertx-web-client</artifactId>-->
-    <!--    </dependency>-->
-
     <!-- Clowder -->
     <dependency>
       <groupId>com.redhat.cloud.common</groupId>
@@ -102,13 +92,6 @@
       <artifactId>quarkus-logging-cloudwatch</artifactId>
       <version>${quarkus-logging-cloudwatch.version}</version>
     </dependency>
-
-    <!--    &lt;!&ndash; Retries &ndash;&gt;-->
-    <!--    <dependency>-->
-    <!--      <groupId>dev.failsafe</groupId>-->
-    <!--      <artifactId>failsafe</artifactId>-->
-    <!--      <version>${failsafe.version}</version>-->
-    <!--    </dependency>-->
 
     <!-- Test -->
     <dependency>

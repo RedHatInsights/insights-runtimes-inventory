@@ -28,7 +28,7 @@ public class MicrometerAssertionHelper {
 
   @Inject MeterRegistry registry;
 
-  public final Map<String, Double> counterValuesBeforeTest = new ConcurrentHashMap<>();
+  private final Map<String, Double> counterValuesBeforeTest = new ConcurrentHashMap<>();
 
   public void saveCounterValuesBeforeTest(String... counterNames) {
     for (String counterName : counterNames) {

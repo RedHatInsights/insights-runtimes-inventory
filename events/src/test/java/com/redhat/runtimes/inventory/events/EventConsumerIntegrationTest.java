@@ -64,8 +64,6 @@ public class EventConsumerIntegrationTest {
   @Test
   @SuppressWarnings("unchecked")
   void testValidJvmInstancePayload() throws IOException, InterruptedException {
-    micrometerAssertionHelper.clearSavedValues();
-    micrometerAssertionHelper.saveCounterValuesBeforeTest(PROCESSING_EXCEPTION_COUNTER_NAME);
     HttpClient mockClient = mock(HttpClient.class);
     HttpResponse<byte[]> mockResponse = mock(HttpResponse.class);
     byte[] buffy = readBytesFromResources("jdk8_MWTELE-66.gz");

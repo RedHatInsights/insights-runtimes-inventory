@@ -119,6 +119,7 @@ public class EventConsumer {
       if (inst != null) {
         Log.debugf("About to persist: %s", inst);
         entityManager.persist(inst);
+        entityManager.flush();
       }
     } catch (Throwable t) {
       processingExceptionCounter.increment();
@@ -165,6 +166,7 @@ public class EventConsumer {
             inst = (JvmInstance) msg;
             Log.infof("About to persist (from egg): %s", inst);
             entityManager.persist(inst);
+            entityManager.flush();
           }
         }
       }

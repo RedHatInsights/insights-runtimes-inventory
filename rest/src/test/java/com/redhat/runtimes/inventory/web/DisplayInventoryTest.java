@@ -1,7 +1,9 @@
 /* Copyright (C) Red Hat 2023 */
 package com.redhat.runtimes.inventory.web;
 
+import static com.redhat.runtimes.inventory.MockServerConfig.RbacAccess.FULL_ACCESS;
 import static com.redhat.runtimes.inventory.models.Constants.X_RH_IDENTITY_HEADER;
+import static com.redhat.runtimes.inventory.web.MockServerLifecycleManager.getClient;
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -12,6 +14,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.redhat.runtimes.inventory.MockServerConfig;
 import com.redhat.runtimes.inventory.events.ArchiveAnnouncement;
 import com.redhat.runtimes.inventory.events.EventConsumer;
 import com.redhat.runtimes.inventory.events.TestUtils;
@@ -47,6 +50,7 @@ public class DisplayInventoryTest {
   void tearDown() {
     entityManager.createNativeQuery("DELETE FROM eap_instance_jar_hash").executeUpdate();
     TestUtils.clearTables(entityManager);
+    MockServerConfig.clearRbac(getClient());
   }
 
   private static Header createRHIdentityHeader(String encodedIdentityHeader) {
@@ -115,26 +119,23 @@ public class DisplayInventoryTest {
 
   @Test
   void testJvmInstanceEndpointWithoutValidHeader() {
-    given().when().get("/api/runtimes-inventory-service/v1/instance").then().statusCode(500);
+    given().when().get("/api/runtimes-inventory-service/v1/instance").then().statusCode(401);
   }
 
   @Test
   void testJvmInstanceEndpointsWithInvalidGroupId() {
-    Header identityHeader = createRHIdentityHeader(encode("not-a-real-identity"));
+    String identityHeaderValue = encode("not-a-real-identity");
+    Header identityHeader = createRHIdentityHeader(identityHeaderValue);
+    MockServerConfig.addMockRbacAccess(getClient(), identityHeaderValue, FULL_ACCESS);
     String[] endpoints = {"instance-ids", "instance", "instances"};
     for (String endpoint : endpoints) {
-      String response =
-          given()
-              .header(identityHeader)
-              .when()
-              .queryParam("hostname", "fedora")
-              .get("/api/runtimes-inventory-service/v1/" + endpoint)
-              .then()
-              .statusCode(200)
-              .extract()
-              .body()
-              .asString();
-      assertEquals("{\"response\": \"[error]\"}", response);
+      given()
+          .header(identityHeader)
+          .when()
+          .queryParam("hostname", "fedora")
+          .get("/api/runtimes-inventory-service/v1/" + endpoint)
+          .then()
+          .statusCode(401);
     }
   }
 
@@ -145,6 +146,7 @@ public class DisplayInventoryTest {
     String username = "user";
     String identityHeaderValue = encodeRHIdentityInfo(accountNumber, orgId, username);
     Header identityHeader = createRHIdentityHeader(identityHeaderValue);
+    MockServerConfig.addMockRbacAccess(getClient(), identityHeaderValue, FULL_ACCESS);
     String response =
         given()
             .header(identityHeader)
@@ -168,6 +170,7 @@ public class DisplayInventoryTest {
     String username = "user";
     String identityHeaderValue = encodeRHIdentityInfo(accountNumber, orgId, username);
     Header identityHeader = createRHIdentityHeader(identityHeaderValue);
+    MockServerConfig.addMockRbacAccess(getClient(), identityHeaderValue, FULL_ACCESS);
     String response =
         given()
             .header(identityHeader)
@@ -199,6 +202,7 @@ public class DisplayInventoryTest {
     String username = "user";
     String identityHeaderValue = encodeRHIdentityInfo(accountNumber, orgId, username);
     Header identityHeader = createRHIdentityHeader(identityHeaderValue);
+    MockServerConfig.addMockRbacAccess(getClient(), identityHeaderValue, FULL_ACCESS);
     String response =
         given()
             .header(identityHeader)
@@ -225,6 +229,7 @@ public class DisplayInventoryTest {
     String username = "user";
     String identityHeaderValue = encodeRHIdentityInfo(accountNumber, orgId, username);
     Header identityHeader = createRHIdentityHeader(identityHeaderValue);
+    MockServerConfig.addMockRbacAccess(getClient(), identityHeaderValue, FULL_ACCESS);
     String response =
         given()
             .header(identityHeader)
@@ -267,6 +272,7 @@ public class DisplayInventoryTest {
     String username = "user";
     String identityHeaderValue = encodeRHIdentityInfo(accountNumber, orgId, username);
     Header identityHeader = createRHIdentityHeader(identityHeaderValue);
+    MockServerConfig.addMockRbacAccess(getClient(), identityHeaderValue, FULL_ACCESS);
     given()
         .header(identityHeader)
         .when()
@@ -295,6 +301,7 @@ public class DisplayInventoryTest {
     String username = "user";
     String identityHeaderValue = encodeRHIdentityInfo(accountNumber, orgId, username);
     Header identityHeader = createRHIdentityHeader(identityHeaderValue);
+    MockServerConfig.addMockRbacAccess(getClient(), identityHeaderValue, FULL_ACCESS);
     String response =
         given()
             .header(identityHeader)
@@ -322,6 +329,7 @@ public class DisplayInventoryTest {
     String username = "user";
     String identityHeaderValue = encodeRHIdentityInfo(accountNumber, orgId, username);
     Header identityHeader = createRHIdentityHeader(identityHeaderValue);
+    MockServerConfig.addMockRbacAccess(getClient(), identityHeaderValue, FULL_ACCESS);
     String response =
         given()
             .header(identityHeader)
@@ -341,8 +349,15 @@ public class DisplayInventoryTest {
 
   @Test
   void testJarHashesWithNoRecords() throws IOException {
+    String accountNumber = "accountId";
+    String orgId = "orgId";
+    String username = "user";
+    String identityHeaderValue = encodeRHIdentityInfo(accountNumber, orgId, username);
+    Header identityHeader = createRHIdentityHeader(identityHeaderValue);
+    MockServerConfig.addMockRbacAccess(getClient(), identityHeaderValue, FULL_ACCESS);
     String response =
         given()
+            .header(identityHeader)
             .when()
             .queryParam("jvmInstanceId", UUID.randomUUID().toString())
             .get("/api/runtimes-inventory-service/v1/jarhashes/")
@@ -364,6 +379,7 @@ public class DisplayInventoryTest {
     String username = "user";
     String identityHeaderValue = encodeRHIdentityInfo(accountNumber, orgId, username);
     Header identityHeader = createRHIdentityHeader(identityHeaderValue);
+    MockServerConfig.addMockRbacAccess(getClient(), identityHeaderValue, FULL_ACCESS);
     String jvmInstanceIdsResponse =
         given()
             .header(identityHeader)
@@ -379,6 +395,7 @@ public class DisplayInventoryTest {
     assertEquals(1, ids.size());
     String response =
         given()
+            .header(identityHeader)
             .when()
             .queryParam("jvmInstanceId", UUID.fromString(ids.get(0)))
             .get("/api/runtimes-inventory-service/v1/jarhashes/")
@@ -403,6 +420,7 @@ public class DisplayInventoryTest {
     String username = "user";
     String identityHeaderValue = encodeRHIdentityInfo(accountNumber, orgId, username);
     Header identityHeader = createRHIdentityHeader(identityHeaderValue);
+    MockServerConfig.addMockRbacAccess(getClient(), identityHeaderValue, FULL_ACCESS);
     String jvmInstanceIdsResponse =
         given()
             .header(identityHeader)
@@ -418,6 +436,7 @@ public class DisplayInventoryTest {
     assertEquals(1, ids.size());
     String response =
         given()
+            .header(identityHeader)
             .when()
             .queryParam("jvmInstanceId", UUID.fromString(ids.get(0)))
             .get("/api/runtimes-inventory-service/v1/jarhashes/")
@@ -434,21 +453,18 @@ public class DisplayInventoryTest {
 
   @Test
   void testEapInstanceEndpointsWithInvalidGroupId() {
-    Header identityHeader = createRHIdentityHeader(encode("not-a-real-identity"));
+    String identityHeaderValue = encode("not-a-real-identity");
+    Header identityHeader = createRHIdentityHeader(identityHeaderValue);
+    MockServerConfig.addMockRbacAccess(getClient(), identityHeaderValue, FULL_ACCESS);
     String[] endpoints = {"eap-instance-ids", "eap-instance", "eap-instances"};
     for (String endpoint : endpoints) {
-      String response =
-          given()
-              .header(identityHeader)
-              .when()
-              .queryParam("hostname", "fedora")
-              .get("/api/runtimes-inventory-service/v1/" + endpoint)
-              .then()
-              .statusCode(200)
-              .extract()
-              .body()
-              .asString();
-      assertEquals("{\"response\": \"[error]\"}", response);
+      given()
+          .header(identityHeader)
+          .when()
+          .queryParam("hostname", "fedora")
+          .get("/api/runtimes-inventory-service/v1/" + endpoint)
+          .then()
+          .statusCode(401);
     }
   }
 
@@ -459,6 +475,7 @@ public class DisplayInventoryTest {
     String username = "user";
     String identityHeaderValue = encodeRHIdentityInfo(accountNumber, orgId, username);
     Header identityHeader = createRHIdentityHeader(identityHeaderValue);
+    MockServerConfig.addMockRbacAccess(getClient(), identityHeaderValue, FULL_ACCESS);
     String response =
         given()
             .header(identityHeader)
@@ -482,6 +499,7 @@ public class DisplayInventoryTest {
     String username = "user";
     String identityHeaderValue = encodeRHIdentityInfo(accountNumber, orgId, username);
     Header identityHeader = createRHIdentityHeader(identityHeaderValue);
+    MockServerConfig.addMockRbacAccess(getClient(), identityHeaderValue, FULL_ACCESS);
     String response =
         given()
             .header(identityHeader)
@@ -508,6 +526,7 @@ public class DisplayInventoryTest {
     String username = "user";
     String identityHeaderValue = encodeRHIdentityInfo(accountNumber, orgId, username);
     Header identityHeader = createRHIdentityHeader(identityHeaderValue);
+    MockServerConfig.addMockRbacAccess(getClient(), identityHeaderValue, FULL_ACCESS);
     String response =
         given()
             .header(identityHeader)
@@ -549,6 +568,7 @@ public class DisplayInventoryTest {
     String username = "user";
     String identityHeaderValue = encodeRHIdentityInfo(accountNumber, orgId, username);
     Header identityHeader = createRHIdentityHeader(identityHeaderValue);
+    MockServerConfig.addMockRbacAccess(getClient(), identityHeaderValue, FULL_ACCESS);
     String response =
         given()
             .header(identityHeader)
@@ -590,6 +610,7 @@ public class DisplayInventoryTest {
     String username = "user";
     String identityHeaderValue = encodeRHIdentityInfo(accountNumber, orgId, username);
     Header identityHeader = createRHIdentityHeader(identityHeaderValue);
+    MockServerConfig.addMockRbacAccess(getClient(), identityHeaderValue, FULL_ACCESS);
     String response =
         given()
             .header(identityHeader)
@@ -631,6 +652,7 @@ public class DisplayInventoryTest {
     String username = "user";
     String identityHeaderValue = encodeRHIdentityInfo(accountNumber, orgId, username);
     Header identityHeader = createRHIdentityHeader(identityHeaderValue);
+    MockServerConfig.addMockRbacAccess(getClient(), identityHeaderValue, FULL_ACCESS);
     given()
         .header(identityHeader)
         .when()
@@ -659,6 +681,7 @@ public class DisplayInventoryTest {
     String username = "user";
     String identityHeaderValue = encodeRHIdentityInfo(accountNumber, orgId, username);
     Header identityHeader = createRHIdentityHeader(identityHeaderValue);
+    MockServerConfig.addMockRbacAccess(getClient(), identityHeaderValue, FULL_ACCESS);
     String response =
         given()
             .header(identityHeader)
@@ -682,6 +705,7 @@ public class DisplayInventoryTest {
     String username = "user";
     String identityHeaderValue = encodeRHIdentityInfo(accountNumber, orgId, username);
     Header identityHeader = createRHIdentityHeader(identityHeaderValue);
+    MockServerConfig.addMockRbacAccess(getClient(), identityHeaderValue, FULL_ACCESS);
     String response =
         given()
             .header(identityHeader)
@@ -709,6 +733,7 @@ public class DisplayInventoryTest {
     String username = "user";
     String identityHeaderValue = encodeRHIdentityInfo(accountNumber, orgId, username);
     Header identityHeader = createRHIdentityHeader(identityHeaderValue);
+    MockServerConfig.addMockRbacAccess(getClient(), identityHeaderValue, FULL_ACCESS);
     String response =
         given()
             .header(identityHeader)
@@ -737,6 +762,7 @@ public class DisplayInventoryTest {
     String username = "user";
     String identityHeaderValue = encodeRHIdentityInfo(accountNumber, orgId, username);
     Header identityHeader = createRHIdentityHeader(identityHeaderValue);
+    MockServerConfig.addMockRbacAccess(getClient(), identityHeaderValue, FULL_ACCESS);
     String response =
         given()
             .header(identityHeader)

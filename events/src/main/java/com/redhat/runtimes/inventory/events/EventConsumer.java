@@ -85,7 +85,7 @@ public class EventConsumer {
       // Parse JSON using Jackson
       var announce = jsonParser.fromJsonString(payload);
       if (announce.getContentType().equals(VALID_CONTENT_TYPE)) {
-        Log.infof("Processing our Kafka message %s", payload);
+        Log.debugf("Processing our Kafka message %s", payload);
 
         // Get data back from S3
         Log.debugf("Processed message URL: %s", announce.getUrl());
@@ -149,7 +149,7 @@ public class EventConsumer {
       // Parse JSON using Jackson
       var announce = jsonParser.fromJsonString(payload);
       if (VALID_CONTENT_TYPE.equals(announce.getContentType()) || announce.isRuntimes()) {
-        Log.infof("Processing our Kafka message from egg %s", payload);
+        Log.debugf("Processing our Kafka message from egg %s", payload);
 
         var url = announce.getUrl();
         // FIXME I think that we'll need to do more JSON spelunking to get the S3 URL

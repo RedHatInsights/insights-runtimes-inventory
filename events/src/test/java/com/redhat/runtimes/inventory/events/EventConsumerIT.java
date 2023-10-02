@@ -34,13 +34,11 @@ import java.time.Instant;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 @QuarkusTest
 @QuarkusTestResource(TestLifecycleManager.class)
-@Tag("integration-tests")
-public class EventConsumerIntegrationTest {
+public class EventConsumerIT {
 
   @Inject EntityManager entityManager;
 

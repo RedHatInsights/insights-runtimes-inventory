@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 
 /** Test ConsoleIdentityProvider. Brought over from notifications-backend and extended */
 @QuarkusTest
-public class ConsoleIdentityProviderTest {
+public class ConsoleIdentityProviderIT {
 
   @Test
   void testNullOrgId() {

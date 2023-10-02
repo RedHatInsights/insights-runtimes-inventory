@@ -35,13 +35,11 @@ import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 @QuarkusTest
 @QuarkusTestResource(TestLifecycleManager.class)
-@Tag("integration-tests")
-public class DisplayInventoryTest {
+public class DisplayInventoryIT {
 
   @Inject EntityManager entityManager;
 

@@ -43,13 +43,26 @@ public class ArchiveAnnouncement {
 
   public ArchiveAnnouncement() {}
 
-  // The is_runtimes  field in the platform_metadata in stage
+  // For egg uploads, we identify them via the is_runtimes field in the platform_metadata
   public boolean isRuntimes() {
     if (platformMetadata == null) {
       return false;
     }
     var isRuntimes = String.valueOf(platformMetadata.get("is_runtimes"));
     return isRuntimes == "true" ? true : false;
+  }
+
+  // For egg we need to look in the platform_metadata for the URL
+  public String getUrl() {
+    if (platformMetadata == null) {
+      return url;
+    }
+    return String.valueOf(platformMetadata.get("url"));
+  }
+
+  @JsonProperty("url")
+  public void setUrl(String url) {
+    this.url = url;
   }
 
   ////////////////////////////////////////////////////////////////////////
@@ -112,16 +125,6 @@ public class ArchiveAnnouncement {
   @JsonProperty("request_id")
   public void setRequestId(String requestId) {
     this.requestId = requestId;
-  }
-
-  @JsonProperty("url")
-  public String getUrl() {
-    return url;
-  }
-
-  @JsonProperty("url")
-  public void setUrl(String url) {
-    this.url = url;
   }
 
   @JsonProperty("content_type")

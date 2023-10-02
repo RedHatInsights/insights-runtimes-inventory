@@ -2,8 +2,10 @@
 package com.redhat.runtimes.inventory.events;
 
 import static com.redhat.runtimes.inventory.events.EventConsumer.CONSUMED_TIMER_NAME;
+import static com.redhat.runtimes.inventory.events.EventConsumer.EGG_CHANNEL;
 import static com.redhat.runtimes.inventory.events.EventConsumer.INGRESS_CHANNEL;
 import static com.redhat.runtimes.inventory.events.EventConsumer.PROCESSING_EXCEPTION_COUNTER_NAME;
+import static com.redhat.runtimes.inventory.events.TestUtils.inputStreamFromResources;
 import static com.redhat.runtimes.inventory.events.TestUtils.readBytesFromResources;
 import static com.redhat.runtimes.inventory.events.TestUtils.readFromResources;
 import static com.redhat.runtimes.inventory.events.Utils.eapInstanceOf;
@@ -27,13 +29,17 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Clock;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 @QuarkusTest
@@ -46,17 +52,45 @@ public class EventConsumerIT {
 
   @Inject MicrometerAssertionHelper micrometerAssertionHelper;
 
+  private static String fixedDate = "2023-04-01T01:00:00Z";
+
   @BeforeEach
   void beforeEach() {
     TestUtils.clearTables(entityManager);
     micrometerAssertionHelper.saveCounterValuesBeforeTest(PROCESSING_EXCEPTION_COUNTER_NAME);
     micrometerAssertionHelper.removeDynamicTimer(CONSUMED_TIMER_NAME);
+    EventConsumer.setClock(Clock.fixed(Instant.parse(fixedDate), ZoneId.systemDefault()));
   }
 
   @AfterEach
   void clear() {
     micrometerAssertionHelper.clearSavedValues();
     micrometerAssertionHelper.removeDynamicTimer(CONSUMED_TIMER_NAME);
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  // This complains about not being able to find the egg channel
+  // Which is odd because it works in Prod
+  @Disabled
+  void testValidEggPayload() throws IOException, InterruptedException {
+    HttpClient mockClient = mock(HttpClient.class);
+    HttpResponse<InputStream> mockResponse = mock(HttpResponse.class);
+    InputStream archive = inputStreamFromResources("egg_upload.tar.gz");
+    when(mockClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class)))
+        .thenReturn(mockResponse);
+    when(mockResponse.body()).thenReturn(archive);
+
+    EventConsumer.setHttpClient(mockClient);
+
+    String kafkaMessage = readFromResources("egg_is_runtimes.json");
+    inMemoryConnector.source(EGG_CHANNEL).send(kafkaMessage);
+    // inMemoryConnector.source(INGRESS_CHANNEL).send(kafkaMessage);
+
+    micrometerAssertionHelper.awaitAndAssertTimerIncrement(CONSUMED_TIMER_NAME, 1);
+    micrometerAssertionHelper.assertCounterIncrement(PROCESSING_EXCEPTION_COUNTER_NAME, 0);
+
+    TestUtils.await_entity_count(entityManager, "JvmInstance", 1L);
   }
 
   @Test

@@ -17,6 +17,11 @@
       <artifactId>runtimes-inventory-core</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-compress</artifactId>
+      <version>1.23.0</version>
+    </dependency>
 
     <!-- Quarkus -->
     <dependency>

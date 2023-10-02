@@ -19,15 +19,21 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Clock;
 import java.util.*;
 import java.util.concurrent.CompletionStage;
 import java.util.zip.GZIPInputStream;
+import org.apache.commons.compress.archivers.ArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Message;
 import org.hibernate.Session;
@@ -63,6 +69,8 @@ public class EventConsumer {
   private Counter duplicateCounter;
   private Counter processingExceptionCounter;
 
+  private static Clock clock = Clock.systemDefaultZone();
+
   @PostConstruct
   public void init() {
     rejectedCounter = registry.counter(REJECTED_COUNTER_NAME);
@@ -80,56 +88,26 @@ public class EventConsumer {
     Timer.Sample consumedTimer = Timer.start(registry);
     var payload = message.getPayload();
 
-    // Needs to be visible in the catch block
-    JvmInstance inst = null;
     try {
       Log.debugf("Processing received Kafka message %s", payload);
 
       // Parse JSON using Jackson
       var announce = jsonParser.fromJsonString(payload);
       if (announce.getContentType().equals(VALID_CONTENT_TYPE)) {
-        Log.debugf("Processing our Kafka message %s", payload);
 
         // Get data back from S3
         Log.infof("Processed message URL: %s", announce.getUrl());
         var archiveJson = getJsonFromS3(announce.getUrl());
         Log.debugf("Retrieved from S3: %s", archiveJson);
-
-        InsightsMessage msg = instanceOf(announce, archiveJson);
-        // This should be a true pattern match on type
-        if (msg instanceof JvmInstance) {
-          inst = (JvmInstance) msg;
-        } else if (msg instanceof EapInstance) {
-          inst = (EapInstance) msg;
-        } else if (msg instanceof UpdateInstance update) {
-          var linkingHash = update.getLinkingHash();
-          var maybeInst = getInstanceFromHash(linkingHash);
-          if (maybeInst.isPresent()) {
-            inst = maybeInst.get();
-            var newJars = update.getUpdates();
-            inst.getJarHashes().addAll(newJars);
-          } else {
-            throw new IllegalStateException(
-                "Update message seen for non-existent hash: " + linkingHash);
-          }
-        } else {
-          // Can't happen, but just in case
-          throw new IllegalStateException(
-              "Message seen that is neither a new instance or an update");
+        if (shouldProcessMessage(archiveJson, clock, false)) {
+          processMessage(announce, archiveJson);
         }
       }
 
-      if (inst != null) {
-        Log.debugf("About to persist: %s", inst);
-        entityManager.persist(inst);
-        entityManager.flush();
-        // inst should be saved, remove it from cache until we need it again.
-        session.evict(inst);
-      }
     } catch (Throwable t) {
       processingExceptionCounter.increment();
       Log.errorf(t, "Could not process the payload");
-      Log.debugf(t, "payload: %s", inst);
+      Log.debugf(t, "payload: %s", payload);
     } finally {
       // FIXME Might need tags
       consumedTimer.stop(registry.timer(CONSUMED_TIMER_NAME));
@@ -147,46 +125,75 @@ public class EventConsumer {
     Timer.Sample consumedTimer = Timer.start(registry);
     var payload = message.getPayload();
 
-    // Needs to be visible in the catch block
-    JvmInstance inst = null;
     try {
-      Log.debugf("Processing received Kafka message %s", payload);
+      Log.debugf("Processing received Kafka message from egg %s", payload);
 
       // Parse JSON using Jackson
       var announce = jsonParser.fromJsonString(payload);
       if (VALID_CONTENT_TYPE.equals(announce.getContentType()) || announce.isRuntimes()) {
-        Log.debugf("Processing our Kafka message from egg %s", payload);
-
         var url = announce.getUrl();
-        // FIXME I think that we'll need to do more JSON spelunking to get the S3 URL
         if (url != null) {
           // Get data back from S3
           Log.infof("Processed message URL: %s", url);
-          var archiveJson = getJsonFromS3(announce.getUrl());
-          Log.debugf("Retrieved from S3: %s", archiveJson);
-
-          var msg = instanceOf(announce, archiveJson);
-          // The egg topic does not deliver update events, so this
-          if (msg instanceof JvmInstance) {
-            inst = (JvmInstance) msg;
-            Log.debugf("About to persist (from egg): %s", inst);
-            entityManager.persist(inst);
-            entityManager.flush();
-            // inst should be saved, remove it from cache until we need it again.
-            session.evict(inst);
+          var jsonFiles = getJsonsFromArchiveStream(getInputStreamFromS3(announce.getUrl()));
+          Log.debugf("Found [%s] files in the S3 archive.", jsonFiles.size());
+          for (String json : jsonFiles) {
+            if (shouldProcessMessage(json, clock, true)) {
+              processMessage(announce, json);
+            }
           }
         }
       }
     } catch (Throwable t) {
       processingExceptionCounter.increment();
-      Log.errorf(t, "Could not process the payload.");
-      Log.debugf(t, "payload: %s", inst);
+      Log.errorf(t, "Could not process the egg payload.");
+      Log.debugf(t, "payload: %s", payload);
     } finally {
       // FIXME Might need tags
       consumedTimer.stop(registry.timer(CONSUMED_TIMER_NAME));
     }
 
     return message.ack();
+  }
+
+  @Transactional
+  public void processMessage(ArchiveAnnouncement announce, String json) {
+    // Needs to be visible in the catch block
+    JvmInstance inst = null;
+    try {
+      InsightsMessage msg = instanceOf(announce, json);
+
+      if (msg instanceof JvmInstance) {
+        inst = (JvmInstance) msg;
+      } else if (msg instanceof EapInstance) {
+        inst = (EapInstance) msg;
+      } else if (msg instanceof UpdateInstance update) {
+        var linkingHash = update.getLinkingHash();
+        var maybeInst = getInstanceFromHash(linkingHash);
+        if (maybeInst.isPresent()) {
+          inst = maybeInst.get();
+          var newJars = update.getUpdates();
+          inst.getJarHashes().addAll(newJars);
+        } else {
+          throw new IllegalStateException(
+              "Update message seen for non-existent hash: " + linkingHash);
+        }
+      } else {
+        // Can't happen, but just in case
+        throw new IllegalStateException("Message seen that is neither a new instance or an update");
+      }
+
+      if (inst != null) {
+        Log.infof("About to persist: %s", inst);
+        entityManager.persist(inst);
+        entityManager.flush();
+        session.evict(inst);
+      }
+    } catch (Throwable t) {
+      processingExceptionCounter.increment();
+      Log.errorf(t, "Could not process and/or persist the object.");
+      Log.debugf(t, "The object: %s", inst);
+    }
   }
 
   Optional<JvmInstance> getInstanceFromHash(String linkingHash) {
@@ -218,8 +225,52 @@ public class EventConsumer {
     }
   }
 
+  public static List<String> getJsonsFromArchiveStream(InputStream archiveStream) {
+    // The egg file comes in as a String, but it is actually a gzipped tarfile
+    // So we will turn it into a stream, 'uncompress' the stream, then walk
+    // the archive for files we car about.
+    String insightsDataPath = "/data/var/tmp/insights-runtimes/uploads/";
+    List<String> jsonFiles = new ArrayList<String>();
+
+    try {
+      GzipCompressorInputStream gzis = new GzipCompressorInputStream(archiveStream);
+      TarArchiveInputStream tarInput = new TarArchiveInputStream(gzis);
+
+      ArchiveEntry entry;
+      while ((entry = tarInput.getNextEntry()) != null) {
+        String entryName = entry.getName();
+
+        // Skip any file not in our relevant path
+        if (!entryName.contains(insightsDataPath)) {
+          continue;
+        }
+
+        // Read in the file stream and turn it into a string for processing
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        byte[] buffer = new byte[4096];
+        int bytesRead;
+        while ((bytesRead = tarInput.read(buffer)) != -1) {
+          baos.write(buffer, 0, bytesRead);
+        }
+        String json = new String(baos.toByteArray());
+        if (json == null || json.isEmpty()) {
+          continue;
+        }
+
+        jsonFiles.add(json);
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return jsonFiles;
+  }
+
   static void setHttpClient(HttpClient httpClient) {
     EventConsumer.httpClient = httpClient;
+  }
+
+  static void setClock(Clock clock) {
+    EventConsumer.clock = clock;
   }
 
   static String getJsonFromS3(String urlStr) {
@@ -236,6 +287,26 @@ public class EventConsumer {
       Log.debugf("S3 HTTP Client status: %s", response.statusCode());
 
       return unzipJson(response.body());
+    } catch (URISyntaxException | IOException | InterruptedException e) {
+      Log.error("Error in HTTP send: ", e);
+      throw new RuntimeException(e);
+    }
+  }
+
+  static InputStream getInputStreamFromS3(String urlStr) {
+    try {
+      var uri = new URL(urlStr).toURI();
+      var requestBuilder = HttpRequest.newBuilder().uri(uri);
+      var request = requestBuilder.GET().build();
+      Log.debugf("Issuing a HTTP POST request to %s", request);
+
+      if (httpClient == null) {
+        httpClient = HttpClient.newBuilder().build();
+      }
+      var response = httpClient.send(request, HttpResponse.BodyHandlers.ofInputStream());
+      Log.debugf("S3 HTTP Client status: %s", response.statusCode());
+
+      return response.body();
     } catch (URISyntaxException | IOException | InterruptedException e) {
       Log.error("Error in HTTP send: ", e);
       throw new RuntimeException(e);

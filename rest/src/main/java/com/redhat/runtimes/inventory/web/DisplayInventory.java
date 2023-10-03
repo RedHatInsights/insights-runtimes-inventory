@@ -315,7 +315,7 @@ public class DisplayInventory {
       @QueryParam("hostname") String hostname,
       @QueryParam("includeRaw") String includeRaw,
       @HeaderParam(X_RH_IDENTITY_HEADER) String rhIdentity) {
-    // X_RH header is just B64 encoded - decode for the org ID
+    // X_RH header is just Base64 encoded - decode for the org ID
     String rhIdJson = new String(Base64.getDecoder().decode(rhIdentity));
     Log.debugf("X_RH_IDENTITY_HEADER: %s", rhIdJson);
     String orgId = "";

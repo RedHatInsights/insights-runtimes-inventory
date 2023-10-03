@@ -41,7 +41,13 @@ objects:
               periodSeconds: 5
               successThreshold: 1
               timeoutSeconds: 120
-            resources: {}
+            resources:
+              limits:
+                cpu: 500m
+                memory: 2Gi
+              requests:
+                cpu: 150m
+                memory: 1Gi
             volumeMounts:
               - mountPath: /tmp
                 name: tmpdir

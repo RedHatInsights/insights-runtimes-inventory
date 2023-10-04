@@ -30,6 +30,7 @@ import java.util.concurrent.CompletionStage;
 import java.util.zip.GZIPInputStream;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Message;
+import org.hibernate.Session;
 
 @ApplicationScoped
 public class EventConsumer {
@@ -50,6 +51,8 @@ public class EventConsumer {
   @Inject MeterRegistry registry;
 
   @Inject EntityManager entityManager;
+
+  @Inject Session session;
 
   private static HttpClient httpClient;
 
@@ -120,10 +123,13 @@ public class EventConsumer {
         Log.debugf("About to persist: %s", inst);
         entityManager.persist(inst);
         entityManager.flush();
+        // inst should be saved, remove it from cache until we need it again.
+        session.evict(inst);
       }
     } catch (Throwable t) {
       processingExceptionCounter.increment();
-      Log.errorf(t, "Could not process the payload: %s", inst);
+      Log.errorf(t, "Could not process the payload");
+      Log.debugf(t, "payload: %s", inst);
     } finally {
       // FIXME Might need tags
       consumedTimer.stop(registry.timer(CONSUMED_TIMER_NAME));
@@ -163,15 +169,18 @@ public class EventConsumer {
           // The egg topic does not deliver update events, so this
           if (msg instanceof JvmInstance) {
             inst = (JvmInstance) msg;
-            Log.infof("About to persist (from egg): %s", inst);
+            Log.debugf("About to persist (from egg): %s", inst);
             entityManager.persist(inst);
             entityManager.flush();
+            // inst should be saved, remove it from cache until we need it again.
+            session.evict(inst);
           }
         }
       }
     } catch (Throwable t) {
       processingExceptionCounter.increment();
-      Log.errorf(t, "Could not process the payload: %s", inst);
+      Log.errorf(t, "Could not process the payload.");
+      Log.debugf(t, "payload: %s", inst);
     } finally {
       // FIXME Might need tags
       consumedTimer.stop(registry.timer(CONSUMED_TIMER_NAME));

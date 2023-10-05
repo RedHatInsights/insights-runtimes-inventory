@@ -16,7 +16,7 @@ objects:
         version: 15
       deployments:
         - metadata: {}
-          minReplicas: 1
+          minReplicas: ${{MIN_REPLICAS}}
           name: service
           podSpec:
             image: quay.io/${IMAGE_NAMESPACE}/insights-rbi-events:${IMAGE_TAG}
@@ -67,7 +67,7 @@ objects:
               apiPath: insights-rbi-events
               enabled: true
         - metadata: {}
-          minReplicas: 1
+          minReplicas: ${{MIN_REPLICAS}}
           name: rest
           podSpec:
             image: quay.io/${IMAGE_NAMESPACE}/insights-rbi-rest:${IMAGE_TAG}
@@ -135,3 +135,6 @@ parameters:
   - name: CLOUDWATCH_ENABLED
     value: "false"
     displayName: Enable Cloudwatch logging
+  - name: MIN_REPLICAS
+    value: "1"
+    displayName: Minimum number of replicas for deployments

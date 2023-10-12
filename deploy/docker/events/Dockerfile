@@ -10,31 +10,18 @@ WORKDIR /home/jboss
 RUN ./mvnw clean package -DskipTests --no-transfer-progress
 
 # Build the container
-FROM registry.access.redhat.com/ubi8/ubi-minimal:latest
+FROM registry.access.redhat.com/ubi8/openjdk-17-runtime:latest
 
-ARG JAVA_PACKAGE=java-17-openjdk-headless
 ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en'
 
-# Install java
-# Also set up permissions for user `1001`
-RUN microdnf install openssl curl ca-certificates ${JAVA_PACKAGE} \
-    && microdnf update \
-    && microdnf clean all \
-    && mkdir /deployments \
-    && chown 1001 /deployments \
-    && chmod "g+rwX" /deployments \
-    && chown 1001:root /deployments \
-    && echo "securerandom.source=file:/dev/urandom" >> /etc/alternatives/jre/lib/security/java.security
-
-ENV JAVA_OPTIONS="-Dquarkus.http.host=0.0.0.0 -Dquarkus.http.port=8000 -Djava.util.logging.manager=org.jboss.logmanager.LogManager -XX:-ExitOnOutOfMemoryError -XX:MaxRAMPercentage=80 -XX:+PrintFlagsFinal"
-
 # Use four distinct layers so if there are application changes the library layers can be re-used
-COPY --from=build --chown=1001 /home/jboss/events/target/quarkus-app/lib/ /deployments/lib/
-COPY --from=build --chown=1001 /home/jboss/events/target/quarkus-app/*.jar /deployments/
-COPY --from=build --chown=1001 /home/jboss/events/target/quarkus-app/app/ /deployments/app/
-COPY --from=build --chown=1001 /home/jboss/events/target/quarkus-app/quarkus/ /deployments/quarkus/
+COPY --from=build --chown=185 /home/jboss/events/target/quarkus-app/lib/ /deployments/lib/
+COPY --from=build --chown=185 /home/jboss/events/target/quarkus-app/*.jar /deployments/
+COPY --from=build --chown=185 /home/jboss/events/target/quarkus-app/app/ /deployments/app/
+COPY --from=build --chown=185 /home/jboss/events/target/quarkus-app/quarkus/ /deployments/quarkus/
 
-EXPOSE 8080
-USER 1001
+ENV JAVA_OPTS_APPEND="-XX:-ExitOnOutOfMemoryError -Dquarkus.http.host=0.0.0.0 -Dquarkus.http.port=8000 -Djava.util.logging.manager=org.jboss.logmanager.LogManager -XX:+PrintFlagsFinal"
+ENV JAVA_APP_JAR="/deployments/quarkus-run.jar"
 
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTIONS -jar /deployments/quarkus-run.jar"]
+EXPOSE 8000
+USER 185

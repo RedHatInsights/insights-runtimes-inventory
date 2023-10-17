@@ -3,7 +3,7 @@
 # https://github.com/RedHatInsights/cicd-tools/blob/main/examples/unit_test_example.sh
 
 # Run unit tests
-./mvnw clean package
+./mvnw clean test --no-transfer-progress
 result=$?
 
 # Evaluate the test result.

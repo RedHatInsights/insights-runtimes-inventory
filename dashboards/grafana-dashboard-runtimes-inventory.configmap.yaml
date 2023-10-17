@@ -64,7 +64,7 @@ data:
           {
             "datasource": {
               "type": "prometheus",
-              "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+              "uid": "${datasource}"
             },
             "enable": true,
             "expr": "resets(process_uptime_seconds{job=\"$job\", pod=\"$pod\"}[1m]) > 0",
@@ -91,7 +91,7 @@ data:
           "collapsed": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PD776AFABBE26000A"
+            "uid": "${datasource}"
           },
           "gridPos": {
             "h": 1,
@@ -105,7 +105,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PD776AFABBE26000A"
+                "uid": "${datasource}"
               },
               "refId": "A"
             }
@@ -116,7 +116,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "fieldConfig": {
             "defaults": {
@@ -180,7 +180,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "process_uptime_seconds{job=\"$job\", pod=\"$pod\"}",
               "format": "time_series",
@@ -197,7 +197,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "fieldConfig": {
             "defaults": {
@@ -260,7 +260,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "process_start_time_seconds{job=\"$job\", pod=\"$pod\"}*1000",
               "format": "time_series",
@@ -277,7 +277,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "fieldConfig": {
             "defaults": {
@@ -345,7 +345,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "sum(jvm_memory_used_bytes{job=\"$job\", pod=\"$pod\", area=\"heap\"})*100/sum(jvm_memory_max_bytes{job=\"$job\",pod=\"$pod\", area=\"heap\"})",
               "format": "time_series",
@@ -361,7 +361,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "fieldConfig": {
             "defaults": {
@@ -439,7 +439,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "sum(jvm_memory_used_bytes{job=\"$job\", pod=\"$pod\", area=\"nonheap\"})*100/sum(jvm_memory_max_bytes{job=\"$job\",pod=\"$pod\", area=\"nonheap\"})",
               "format": "time_series",
@@ -456,7 +456,7 @@ data:
           "collapsed": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PD776AFABBE26000A"
+            "uid": "${datasource}"
           },
           "gridPos": {
             "h": 1,
@@ -470,7 +470,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PD776AFABBE26000A"
+                "uid": "${datasource}"
               },
               "refId": "A"
             }
@@ -485,7 +485,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "fill": 1,
           "fillGradient": 0,
@@ -526,7 +526,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "sum(rate(http_server_requests_seconds_count{job=\"$job\", pod=\"$pod\"}[1m]))",
               "format": "time_series",
@@ -576,7 +576,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "fill": 1,
           "fillGradient": 0,
@@ -617,7 +617,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "sum(rate(http_server_requests_seconds_count{job=\"$job\", pod=\"$pod\", status=~\"5..\"}[1m]))",
               "format": "time_series",
@@ -664,7 +664,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "fill": 1,
           "fillGradient": 0,
@@ -705,7 +705,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "sum(rate(http_server_requests_seconds_sum{job=\"$job\", pod=\"$pod\", status!~\"5..\"}[1m]))/sum(rate(http_server_requests_seconds_count{job=\"$job\", pod=\"$pod\", status!~\"5..\"}[1m]))",
               "format": "time_series",
@@ -717,7 +717,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "max(http_server_requests_seconds_max{job=\"$job\", pod=\"$pod\", status!~\"5..\"})",
               "format": "time_series",
@@ -765,7 +765,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "description": "",
           "fill": 1,
@@ -808,7 +808,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "tomcat_threads_busy_threads{job=\"$job\", pod=\"$pod\"}",
               "format": "time_series",
@@ -820,7 +820,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "tomcat_threads_current_threads{job=\"$job\", pod=\"$pod\"}",
               "format": "time_series",
@@ -832,7 +832,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "tomcat_threads_config_max_threads{job=\"$job\", pod=\"$pod\"}",
               "format": "time_series",
@@ -844,7 +844,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "jetty_threads_busy{job=\"$job\", pod=\"$pod\"}",
               "format": "time_series",
@@ -856,7 +856,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "jetty_threads_current{job=\"$job\", pod=\"$pod\"}",
               "format": "time_series",
@@ -868,7 +868,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "jetty_threads_config_max{job=\"$job\", pod=\"$pod\"}",
               "format": "time_series",
@@ -913,7 +913,7 @@ data:
           "collapsed": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PD776AFABBE26000A"
+            "uid": "${datasource}"
           },
           "gridPos": {
             "h": 1,
@@ -927,7 +927,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PD776AFABBE26000A"
+                "uid": "${datasource}"
               },
               "refId": "A"
             }
@@ -942,7 +942,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "editable": true,
           "error": false,
@@ -989,7 +989,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "sum(jvm_memory_used_bytes{job=\"$job\", pod=\"$pod\", area=\"heap\"})",
               "format": "time_series",
@@ -1002,7 +1002,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "sum(jvm_memory_committed_bytes{job=\"$job\", pod=\"$pod\", area=\"heap\"})",
               "format": "time_series",
@@ -1014,7 +1014,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "sum(jvm_memory_max_bytes{job=\"$job\", pod=\"$pod\", area=\"heap\"})",
               "format": "time_series",
@@ -1069,7 +1069,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "editable": true,
           "error": false,
@@ -1116,7 +1116,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "sum(jvm_memory_used_bytes{job=\"$job\", pod=\"$pod\", area=\"nonheap\"})",
               "format": "time_series",
@@ -1130,7 +1130,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "sum(jvm_memory_committed_bytes{job=\"$job\", pod=\"$pod\", area=\"nonheap\"})",
               "format": "time_series",
@@ -1142,7 +1142,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "sum(jvm_memory_max_bytes{job=\"$job\", pod=\"$pod\", area=\"nonheap\"})",
               "format": "time_series",
@@ -1197,7 +1197,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "editable": true,
           "error": false,
@@ -1245,7 +1245,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "sum(jvm_memory_used_bytes{job=\"$job\", pod=\"$pod\"})",
               "format": "time_series",
@@ -1258,7 +1258,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "sum(jvm_memory_committed_bytes{job=\"$job\", pod=\"$pod\"})",
               "format": "time_series",
@@ -1270,7 +1270,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "sum(jvm_memory_max_bytes{job=\"$job\", pod=\"$pod\"})",
               "format": "time_series",
@@ -1326,7 +1326,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "editable": true,
           "error": false,
@@ -1373,7 +1373,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "process_memory_vss_bytes{job=\"$job\", pod=\"$pod\"}",
               "format": "time_series",
@@ -1387,7 +1387,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "process_memory_rss_bytes{job=\"$job\", pod=\"$pod\"}",
               "format": "time_series",
@@ -1398,7 +1398,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "process_memory_swap_bytes{job=\"$job\", pod=\"$pod\"}",
               "format": "time_series",
@@ -1409,7 +1409,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "process_memory_rss_bytes{job=\"$job\", pod=\"$pod\"} + process_memory_swap_bytes{job=\"$job\", pod=\"$pod\"}",
               "format": "time_series",
@@ -1461,7 +1461,7 @@ data:
           "collapsed": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PD776AFABBE26000A"
+            "uid": "${datasource}"
           },
           "gridPos": {
             "h": 1,
@@ -1475,7 +1475,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PD776AFABBE26000A"
+                "uid": "${datasource}"
               },
               "refId": "A"
             }
@@ -1490,7 +1490,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "editable": true,
           "error": false,
@@ -1537,7 +1537,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "system_cpu_usage{job=\"$job\", pod=\"$pod\"}",
               "format": "time_series",
@@ -1551,7 +1551,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "process_cpu_usage{job=\"$job\", pod=\"$pod\"}",
               "format": "time_series",
@@ -1563,7 +1563,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "avg_over_time(process_cpu_usage{job=\"$job\", pod=\"$pod\"}[15m])",
               "format": "time_series",
@@ -1621,7 +1621,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "editable": true,
           "error": false,
@@ -1668,7 +1668,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "system_load_average_1m{job=\"$job\", pod=\"$pod\"}",
               "format": "time_series",
@@ -1681,7 +1681,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "system_cpu_count{job=\"$job\", pod=\"$pod\"}",
               "format": "time_series",
@@ -1737,7 +1737,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "editable": true,
           "error": false,
@@ -1784,7 +1784,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "jvm_threads_live_threads{job=\"$job\", pod=\"$pod\"}",
               "format": "time_series",
@@ -1797,7 +1797,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "jvm_threads_daemon_threads{job=\"$job\", pod=\"$pod\"}",
               "format": "time_series",
@@ -1810,7 +1810,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "jvm_threads_peak_threads{job=\"$job\", pod=\"$pod\"}",
               "format": "time_series",
@@ -1822,7 +1822,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "process_threads{job=\"$job\", pod=\"$pod\"}",
               "format": "time_series",
@@ -1886,7 +1886,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "fill": 1,
           "fillGradient": 0,
@@ -1929,7 +1929,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "jvm_threads_states_threads{job=\"$job\", pod=\"$pod\"}",
               "format": "time_series",
@@ -1975,7 +1975,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "description": "The percent of time spent on Garbage Collection over all CPUs assigned to the JVM process.",
           "fill": 1,
@@ -2017,7 +2017,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "sum(rate(jvm_gc_pause_seconds_sum{job=\"$job\", pod=\"$pod\"}[1m])) by (job, pod) / on(job, pod) system_cpu_count",
               "format": "time_series",
@@ -2072,7 +2072,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "editable": true,
           "error": false,
@@ -2133,7 +2133,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "increase(logback_events_total{job=\"$job\", pod=\"$pod\"}[1m])",
               "format": "time_series",
@@ -2191,7 +2191,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "editable": true,
           "error": false,
@@ -2238,7 +2238,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "process_files_open_files{job=\"$job\", pod=\"$pod\"}",
               "format": "time_series",
@@ -2252,7 +2252,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "process_files_max_files{job=\"$job\", pod=\"$pod\"}",
               "format": "time_series",
@@ -2307,7 +2307,7 @@ data:
           "collapsed": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PD776AFABBE26000A"
+            "uid": "${datasource}"
           },
           "gridPos": {
             "h": 1,
@@ -2322,7 +2322,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PD776AFABBE26000A"
+                "uid": "${datasource}"
               },
               "refId": "A"
             }
@@ -2337,7 +2337,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "editable": true,
           "error": false,
@@ -2388,7 +2388,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "jvm_memory_used_bytes{job=\"$job\", pod=\"$pod\", id=~\"$jvm_memory_pool_heap\"}",
               "format": "time_series",
@@ -2403,7 +2403,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "jvm_memory_committed_bytes{job=\"$job\", pod=\"$pod\", id=~\"$jvm_memory_pool_heap\"}",
               "format": "time_series",
@@ -2418,7 +2418,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "jvm_memory_max_bytes{job=\"$job\", pod=\"$pod\", id=~\"$jvm_memory_pool_heap\"}",
               "format": "time_series",
@@ -2473,7 +2473,7 @@ data:
           "collapsed": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PD776AFABBE26000A"
+            "uid": "${datasource}"
           },
           "gridPos": {
             "h": 1,
@@ -2487,7 +2487,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PD776AFABBE26000A"
+                "uid": "${datasource}"
               },
               "refId": "A"
             }
@@ -2502,7 +2502,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "editable": true,
           "error": false,
@@ -2553,7 +2553,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "jvm_memory_used_bytes{job=\"$job\", pod=\"$pod\", id=~\"$jvm_memory_pool_nonheap\"}",
               "format": "time_series",
@@ -2568,7 +2568,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "jvm_memory_committed_bytes{job=\"$job\", pod=\"$pod\", id=~\"$jvm_memory_pool_nonheap\"}",
               "format": "time_series",
@@ -2583,7 +2583,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "jvm_memory_max_bytes{job=\"$job\", pod=\"$pod\", id=~\"$jvm_memory_pool_nonheap\"}",
               "format": "time_series",
@@ -2638,7 +2638,7 @@ data:
           "collapsed": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PD776AFABBE26000A"
+            "uid": "${datasource}"
           },
           "gridPos": {
             "h": 1,
@@ -2652,7 +2652,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PD776AFABBE26000A"
+                "uid": "${datasource}"
               },
               "refId": "A"
             }
@@ -2667,7 +2667,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "fill": 1,
           "fillGradient": 0,
@@ -2708,7 +2708,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "rate(jvm_gc_pause_seconds_count{job=\"$job\", pod=\"$pod\"}[1m])",
               "format": "time_series",
@@ -2757,7 +2757,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "fill": 1,
           "fillGradient": 0,
@@ -2798,7 +2798,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "rate(jvm_gc_pause_seconds_sum{job=\"$job\", pod=\"$pod\"}[1m])/rate(jvm_gc_pause_seconds_count{job=\"$job\", pod=\"$pod\"}[1m])",
               "format": "time_series",
@@ -2811,7 +2811,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "jvm_gc_pause_seconds_max{job=\"$job\", pod=\"$pod\"}",
               "format": "time_series",
@@ -2861,7 +2861,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "fill": 1,
           "fillGradient": 0,
@@ -2902,7 +2902,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "rate(jvm_gc_memory_allocated_bytes_total{job=\"$job\", pod=\"$pod\"}[1m])",
               "format": "time_series",
@@ -2914,7 +2914,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "rate(jvm_gc_memory_promoted_bytes_total{job=\"$job\", pod=\"$pod\"}[1m])",
               "format": "time_series",
@@ -2959,7 +2959,7 @@ data:
           "collapsed": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PD776AFABBE26000A"
+            "uid": "${datasource}"
           },
           "gridPos": {
             "h": 1,
@@ -2973,7 +2973,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PD776AFABBE26000A"
+                "uid": "${datasource}"
               },
               "refId": "A"
             }
@@ -2988,7 +2988,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "editable": true,
           "error": false,
@@ -3035,7 +3035,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "jvm_classes_loaded_classes{job=\"$job\", pod=\"$pod\"}",
               "format": "time_series",
@@ -3091,7 +3091,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "editable": true,
           "error": false,
@@ -3138,7 +3138,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "delta(jvm_classes_loaded_classes{job=\"$job\",pod=\"$pod\"}[1m])",
               "format": "time_series",
@@ -3193,7 +3193,7 @@ data:
           "collapsed": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PD776AFABBE26000A"
+            "uid": "${datasource}"
           },
           "gridPos": {
             "h": 1,
@@ -3207,7 +3207,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PD776AFABBE26000A"
+                "uid": "${datasource}"
               },
               "refId": "A"
             }
@@ -3222,7 +3222,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "fill": 1,
           "fillGradient": 0,
@@ -3274,7 +3274,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "jvm_buffer_memory_used_bytes{job=\"$job\", pod=\"$pod\", id=~\"$jvm_buffer_pool\"}",
               "format": "time_series",
@@ -3285,7 +3285,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "jvm_buffer_total_capacity_bytes{job=\"$job\", pod=\"$pod\", id=~\"$jvm_buffer_pool\"}",
               "format": "time_series",
@@ -3296,7 +3296,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+                "uid": "${datasource}"
               },
               "expr": "jvm_buffer_count_buffers{job=\"$job\", pod=\"$pod\", id=~\"$jvm_buffer_pool\"}",
               "format": "time_series",
@@ -3486,6 +3486,24 @@ data:
             "tagsQuery": "",
             "type": "query",
             "useTags": false
+          },
+          {
+            "current": {
+              "selected": true,
+              "text": "crcs02ue1-prometheus",
+              "value": "crcs02ue1-prometheus"
+            },
+            "hide": 0,
+            "includeAll": false,
+            "multi": false,
+            "name": "datasource",
+            "options": [],
+            "query": "prometheus",
+            "queryValue": "",
+            "refresh": 1,
+            "regex": "",
+            "skipUrlSync": false,
+            "type": "datasource"
           }
         ]
       },
@@ -3520,9 +3538,9 @@ data:
         ]
       },
       "timezone": "browser",
-      "title": "Runtimes Inventory",
+      "title": "Runtimes Inventory Services",
       "uid": "ZPWA6RnIk",
-      "version": 5,
+      "version": 3,
       "weekStart": ""
     }
 kind: ConfigMap
@@ -3532,4 +3550,3 @@ metadata:
   annotations:
     grafana-folder: /grafana-dashboard-definitions/runtimes-inventory
   name: grafana-dashboard-runtimes-inventory
-

@@ -1,4 +1,41 @@
 {
+  "__inputs": [
+    {
+      "name": "DS_CRCS02UE1-PROMETHEUS",
+      "label": "crcs02ue1-prometheus",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "prometheus",
+      "pluginName": "Prometheus"
+    }
+  ],
+  "__elements": {},
+  "__requires": [
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "9.3.8"
+    },
+    {
+      "type": "panel",
+      "id": "graph",
+      "name": "Graph (old)",
+      "version": ""
+    },
+    {
+      "type": "datasource",
+      "id": "prometheus",
+      "name": "Prometheus",
+      "version": "1.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "stat",
+      "name": "Stat",
+      "version": ""
+    }
+  ],
   "annotations": {
     "list": [
       {
@@ -24,7 +61,7 @@
       {
         "datasource": {
           "type": "prometheus",
-          "uid": "PDD8BE47D10408F45"
+          "uid": "${DS_CRCS02UE1-PROMETHEUS}"
         },
         "enable": true,
         "expr": "resets(process_uptime_seconds{job=\"$job\", pod=\"$pod\"}[1m]) > 0",
@@ -43,7 +80,7 @@
   "fiscalYearStartMonth": 0,
   "gnetId": 4701,
   "graphTooltip": 1,
-  "id": 658126,
+  "id": null,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -76,7 +113,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "PDD8BE47D10408F45"
+        "uid": "${DS_CRCS02UE1-PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -140,7 +177,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "process_uptime_seconds{job=\"$job\", pod=\"$pod\"}",
           "format": "time_series",
@@ -157,7 +194,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "PDD8BE47D10408F45"
+        "uid": "${DS_CRCS02UE1-PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -220,7 +257,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "process_start_time_seconds{job=\"$job\", pod=\"$pod\"}*1000",
           "format": "time_series",
@@ -237,7 +274,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "PDD8BE47D10408F45"
+        "uid": "${DS_CRCS02UE1-PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -305,7 +342,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "sum(jvm_memory_used_bytes{job=\"$job\", pod=\"$pod\", area=\"heap\"})*100/sum(jvm_memory_max_bytes{job=\"$job\",pod=\"$pod\", area=\"heap\"})",
           "format": "time_series",
@@ -321,7 +358,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "PDD8BE47D10408F45"
+        "uid": "${DS_CRCS02UE1-PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -399,7 +436,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "sum(jvm_memory_used_bytes{job=\"$job\", pod=\"$pod\", area=\"nonheap\"})*100/sum(jvm_memory_max_bytes{job=\"$job\",pod=\"$pod\", area=\"nonheap\"})",
           "format": "time_series",
@@ -445,7 +482,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid": "PDD8BE47D10408F45"
+        "uid": "${DS_CRCS02UE1-PROMETHEUS}"
       },
       "fill": 1,
       "fillGradient": 0,
@@ -486,7 +523,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "sum(rate(http_server_requests_seconds_count{job=\"$job\", pod=\"$pod\"}[1m]))",
           "format": "time_series",
@@ -536,7 +573,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid": "PDD8BE47D10408F45"
+        "uid": "${DS_CRCS02UE1-PROMETHEUS}"
       },
       "fill": 1,
       "fillGradient": 0,
@@ -577,7 +614,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "sum(rate(http_server_requests_seconds_count{job=\"$job\", pod=\"$pod\", status=~\"5..\"}[1m]))",
           "format": "time_series",
@@ -624,7 +661,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid": "PDD8BE47D10408F45"
+        "uid": "${DS_CRCS02UE1-PROMETHEUS}"
       },
       "fill": 1,
       "fillGradient": 0,
@@ -665,7 +702,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "sum(rate(http_server_requests_seconds_sum{job=\"$job\", pod=\"$pod\", status!~\"5..\"}[1m]))/sum(rate(http_server_requests_seconds_count{job=\"$job\", pod=\"$pod\", status!~\"5..\"}[1m]))",
           "format": "time_series",
@@ -677,7 +714,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "max(http_server_requests_seconds_max{job=\"$job\", pod=\"$pod\", status!~\"5..\"})",
           "format": "time_series",
@@ -725,7 +762,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid": "PDD8BE47D10408F45"
+        "uid": "${DS_CRCS02UE1-PROMETHEUS}"
       },
       "description": "",
       "fill": 1,
@@ -768,7 +805,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "tomcat_threads_busy_threads{job=\"$job\", pod=\"$pod\"}",
           "format": "time_series",
@@ -780,7 +817,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "tomcat_threads_current_threads{job=\"$job\", pod=\"$pod\"}",
           "format": "time_series",
@@ -792,7 +829,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "tomcat_threads_config_max_threads{job=\"$job\", pod=\"$pod\"}",
           "format": "time_series",
@@ -804,7 +841,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "jetty_threads_busy{job=\"$job\", pod=\"$pod\"}",
           "format": "time_series",
@@ -816,7 +853,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "jetty_threads_current{job=\"$job\", pod=\"$pod\"}",
           "format": "time_series",
@@ -828,7 +865,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "jetty_threads_config_max{job=\"$job\", pod=\"$pod\"}",
           "format": "time_series",
@@ -902,7 +939,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid": "PDD8BE47D10408F45"
+        "uid": "${DS_CRCS02UE1-PROMETHEUS}"
       },
       "editable": true,
       "error": false,
@@ -949,7 +986,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "sum(jvm_memory_used_bytes{job=\"$job\", pod=\"$pod\", area=\"heap\"})",
           "format": "time_series",
@@ -962,7 +999,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "sum(jvm_memory_committed_bytes{job=\"$job\", pod=\"$pod\", area=\"heap\"})",
           "format": "time_series",
@@ -974,7 +1011,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "sum(jvm_memory_max_bytes{job=\"$job\", pod=\"$pod\", area=\"heap\"})",
           "format": "time_series",
@@ -1029,7 +1066,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid": "PDD8BE47D10408F45"
+        "uid": "${DS_CRCS02UE1-PROMETHEUS}"
       },
       "editable": true,
       "error": false,
@@ -1076,7 +1113,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "sum(jvm_memory_used_bytes{job=\"$job\", pod=\"$pod\", area=\"nonheap\"})",
           "format": "time_series",
@@ -1090,7 +1127,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "sum(jvm_memory_committed_bytes{job=\"$job\", pod=\"$pod\", area=\"nonheap\"})",
           "format": "time_series",
@@ -1102,7 +1139,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "sum(jvm_memory_max_bytes{job=\"$job\", pod=\"$pod\", area=\"nonheap\"})",
           "format": "time_series",
@@ -1157,7 +1194,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid": "PDD8BE47D10408F45"
+        "uid": "${DS_CRCS02UE1-PROMETHEUS}"
       },
       "editable": true,
       "error": false,
@@ -1205,7 +1242,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "sum(jvm_memory_used_bytes{job=\"$job\", pod=\"$pod\"})",
           "format": "time_series",
@@ -1218,7 +1255,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "sum(jvm_memory_committed_bytes{job=\"$job\", pod=\"$pod\"})",
           "format": "time_series",
@@ -1230,7 +1267,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "sum(jvm_memory_max_bytes{job=\"$job\", pod=\"$pod\"})",
           "format": "time_series",
@@ -1286,7 +1323,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid": "PDD8BE47D10408F45"
+        "uid": "${DS_CRCS02UE1-PROMETHEUS}"
       },
       "editable": true,
       "error": false,
@@ -1333,7 +1370,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "process_memory_vss_bytes{job=\"$job\", pod=\"$pod\"}",
           "format": "time_series",
@@ -1347,7 +1384,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "process_memory_rss_bytes{job=\"$job\", pod=\"$pod\"}",
           "format": "time_series",
@@ -1358,7 +1395,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "process_memory_swap_bytes{job=\"$job\", pod=\"$pod\"}",
           "format": "time_series",
@@ -1369,7 +1406,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "process_memory_rss_bytes{job=\"$job\", pod=\"$pod\"} + process_memory_swap_bytes{job=\"$job\", pod=\"$pod\"}",
           "format": "time_series",
@@ -1450,7 +1487,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid": "PDD8BE47D10408F45"
+        "uid": "${DS_CRCS02UE1-PROMETHEUS}"
       },
       "editable": true,
       "error": false,
@@ -1497,7 +1534,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "system_cpu_usage{job=\"$job\", pod=\"$pod\"}",
           "format": "time_series",
@@ -1511,7 +1548,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "process_cpu_usage{job=\"$job\", pod=\"$pod\"}",
           "format": "time_series",
@@ -1523,7 +1560,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "avg_over_time(process_cpu_usage{job=\"$job\", pod=\"$pod\"}[15m])",
           "format": "time_series",
@@ -1581,7 +1618,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid": "PDD8BE47D10408F45"
+        "uid": "${DS_CRCS02UE1-PROMETHEUS}"
       },
       "editable": true,
       "error": false,
@@ -1628,7 +1665,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "system_load_average_1m{job=\"$job\", pod=\"$pod\"}",
           "format": "time_series",
@@ -1641,7 +1678,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "system_cpu_count{job=\"$job\", pod=\"$pod\"}",
           "format": "time_series",
@@ -1697,7 +1734,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid": "PDD8BE47D10408F45"
+        "uid": "${DS_CRCS02UE1-PROMETHEUS}"
       },
       "editable": true,
       "error": false,
@@ -1744,7 +1781,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "jvm_threads_live_threads{job=\"$job\", pod=\"$pod\"}",
           "format": "time_series",
@@ -1757,7 +1794,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "jvm_threads_daemon_threads{job=\"$job\", pod=\"$pod\"}",
           "format": "time_series",
@@ -1770,7 +1807,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "jvm_threads_peak_threads{job=\"$job\", pod=\"$pod\"}",
           "format": "time_series",
@@ -1782,7 +1819,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "process_threads{job=\"$job\", pod=\"$pod\"}",
           "format": "time_series",
@@ -1846,7 +1883,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid": "PDD8BE47D10408F45"
+        "uid": "${DS_CRCS02UE1-PROMETHEUS}"
       },
       "fill": 1,
       "fillGradient": 0,
@@ -1889,7 +1926,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "jvm_threads_states_threads{job=\"$job\", pod=\"$pod\"}",
           "format": "time_series",
@@ -1935,7 +1972,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid": "PDD8BE47D10408F45"
+        "uid": "${DS_CRCS02UE1-PROMETHEUS}"
       },
       "description": "The percent of time spent on Garbage Collection over all CPUs assigned to the JVM process.",
       "fill": 1,
@@ -1977,7 +2014,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "sum(rate(jvm_gc_pause_seconds_sum{job=\"$job\", pod=\"$pod\"}[1m])) by (job, pod) / on(job, pod) system_cpu_count",
           "format": "time_series",
@@ -2032,7 +2069,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid": "PDD8BE47D10408F45"
+        "uid": "${DS_CRCS02UE1-PROMETHEUS}"
       },
       "editable": true,
       "error": false,
@@ -2093,7 +2130,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "increase(logback_events_total{job=\"$job\", pod=\"$pod\"}[1m])",
           "format": "time_series",
@@ -2151,7 +2188,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid": "PDD8BE47D10408F45"
+        "uid": "${DS_CRCS02UE1-PROMETHEUS}"
       },
       "editable": true,
       "error": false,
@@ -2198,7 +2235,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "process_files_open_files{job=\"$job\", pod=\"$pod\"}",
           "format": "time_series",
@@ -2212,7 +2249,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "process_files_max_files{job=\"$job\", pod=\"$pod\"}",
           "format": "time_series",
@@ -2297,7 +2334,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid": "PDD8BE47D10408F45"
+        "uid": "${DS_CRCS02UE1-PROMETHEUS}"
       },
       "editable": true,
       "error": false,
@@ -2348,7 +2385,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "jvm_memory_used_bytes{job=\"$job\", pod=\"$pod\", id=~\"$jvm_memory_pool_heap\"}",
           "format": "time_series",
@@ -2363,7 +2400,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "jvm_memory_committed_bytes{job=\"$job\", pod=\"$pod\", id=~\"$jvm_memory_pool_heap\"}",
           "format": "time_series",
@@ -2378,7 +2415,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "jvm_memory_max_bytes{job=\"$job\", pod=\"$pod\", id=~\"$jvm_memory_pool_heap\"}",
           "format": "time_series",
@@ -2462,7 +2499,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid": "PDD8BE47D10408F45"
+        "uid": "${DS_CRCS02UE1-PROMETHEUS}"
       },
       "editable": true,
       "error": false,
@@ -2513,7 +2550,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "jvm_memory_used_bytes{job=\"$job\", pod=\"$pod\", id=~\"$jvm_memory_pool_nonheap\"}",
           "format": "time_series",
@@ -2528,7 +2565,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "jvm_memory_committed_bytes{job=\"$job\", pod=\"$pod\", id=~\"$jvm_memory_pool_nonheap\"}",
           "format": "time_series",
@@ -2543,7 +2580,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "jvm_memory_max_bytes{job=\"$job\", pod=\"$pod\", id=~\"$jvm_memory_pool_nonheap\"}",
           "format": "time_series",
@@ -2627,7 +2664,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid": "PDD8BE47D10408F45"
+        "uid": "${DS_CRCS02UE1-PROMETHEUS}"
       },
       "fill": 1,
       "fillGradient": 0,
@@ -2668,7 +2705,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "rate(jvm_gc_pause_seconds_count{job=\"$job\", pod=\"$pod\"}[1m])",
           "format": "time_series",
@@ -2717,7 +2754,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid": "PDD8BE47D10408F45"
+        "uid": "${DS_CRCS02UE1-PROMETHEUS}"
       },
       "fill": 1,
       "fillGradient": 0,
@@ -2758,7 +2795,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "rate(jvm_gc_pause_seconds_sum{job=\"$job\", pod=\"$pod\"}[1m])/rate(jvm_gc_pause_seconds_count{job=\"$job\", pod=\"$pod\"}[1m])",
           "format": "time_series",
@@ -2771,7 +2808,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "jvm_gc_pause_seconds_max{job=\"$job\", pod=\"$pod\"}",
           "format": "time_series",
@@ -2821,7 +2858,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid": "PDD8BE47D10408F45"
+        "uid": "${DS_CRCS02UE1-PROMETHEUS}"
       },
       "fill": 1,
       "fillGradient": 0,
@@ -2862,7 +2899,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "rate(jvm_gc_memory_allocated_bytes_total{job=\"$job\", pod=\"$pod\"}[1m])",
           "format": "time_series",
@@ -2874,7 +2911,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "rate(jvm_gc_memory_promoted_bytes_total{job=\"$job\", pod=\"$pod\"}[1m])",
           "format": "time_series",
@@ -2948,7 +2985,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid": "PDD8BE47D10408F45"
+        "uid": "${DS_CRCS02UE1-PROMETHEUS}"
       },
       "editable": true,
       "error": false,
@@ -2995,7 +3032,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "jvm_classes_loaded_classes{job=\"$job\", pod=\"$pod\"}",
           "format": "time_series",
@@ -3051,7 +3088,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid": "PDD8BE47D10408F45"
+        "uid": "${DS_CRCS02UE1-PROMETHEUS}"
       },
       "editable": true,
       "error": false,
@@ -3098,7 +3135,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "delta(jvm_classes_loaded_classes{job=\"$job\",pod=\"$pod\"}[1m])",
           "format": "time_series",
@@ -3182,7 +3219,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid": "PDD8BE47D10408F45"
+        "uid": "${DS_CRCS02UE1-PROMETHEUS}"
       },
       "fill": 1,
       "fillGradient": 0,
@@ -3234,7 +3271,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "jvm_buffer_memory_used_bytes{job=\"$job\", pod=\"$pod\", id=~\"$jvm_buffer_pool\"}",
           "format": "time_series",
@@ -3245,7 +3282,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "jvm_buffer_total_capacity_bytes{job=\"$job\", pod=\"$pod\", id=~\"$jvm_buffer_pool\"}",
           "format": "time_series",
@@ -3256,7 +3293,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PDD8BE47D10408F45"
+            "uid": "${DS_CRCS02UE1-PROMETHEUS}"
           },
           "expr": "jvm_buffer_count_buffers{job=\"$job\", pod=\"$pod\", id=~\"$jvm_buffer_pool\"}",
           "format": "time_series",
@@ -3337,14 +3374,10 @@
       },
       {
         "allFormat": "glob",
-        "current": {
-          "selected": false,
-          "text": "runtimes-inventory-rest-65d859dfdc-8kw5f",
-          "value": "runtimes-inventory-rest-65d859dfdc-8kw5f"
-        },
+        "current": {},
         "datasource": {
           "type": "prometheus",
-          "uid": "PDD8BE47D10408F45"
+          "uid": "${DS_CRCS02UE1-PROMETHEUS}"
         },
         "definition": "",
         "hide": 0,
@@ -3369,14 +3402,10 @@
       },
       {
         "allFormat": "glob",
-        "current": {
-          "selected": false,
-          "text": "All",
-          "value": "$__all"
-        },
+        "current": {},
         "datasource": {
           "type": "prometheus",
-          "uid": "PDD8BE47D10408F45"
+          "uid": "${DS_CRCS02UE1-PROMETHEUS}"
         },
         "definition": "",
         "hide": 2,
@@ -3401,14 +3430,10 @@
       },
       {
         "allFormat": "glob",
-        "current": {
-          "selected": false,
-          "text": "All",
-          "value": "$__all"
-        },
+        "current": {},
         "datasource": {
           "type": "prometheus",
-          "uid": "PDD8BE47D10408F45"
+          "uid": "${DS_CRCS02UE1-PROMETHEUS}"
         },
         "definition": "",
         "hide": 2,
@@ -3433,14 +3458,10 @@
       },
       {
         "allFormat": "glob",
-        "current": {
-          "selected": false,
-          "text": "All",
-          "value": "$__all"
-        },
+        "current": {},
         "datasource": {
           "type": "prometheus",
-          "uid": "PDD8BE47D10408F45"
+          "uid": "${DS_CRCS02UE1-PROMETHEUS}"
         },
         "definition": "",
         "hide": 2,
@@ -3496,7 +3517,7 @@
     ]
   },
   "timezone": "browser",
-  "title": "Runtimes Inventory ",
+  "title": "Runtimes Inventory",
   "uid": "ZPWA6RnIk",
   "version": 5,
   "weekStart": ""

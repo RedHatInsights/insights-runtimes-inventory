@@ -1,3 +1,5 @@
+-- noinspection SqlNoDataSourceInspectionForFile
+
 CREATE TABLE public.jvm_instance(
     id uuid NOT NULL,
     linking_hash character varying(255) NOT NULL,

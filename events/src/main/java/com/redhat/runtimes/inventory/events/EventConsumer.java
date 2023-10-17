@@ -91,7 +91,7 @@ public class EventConsumer {
         Log.debugf("Processing our Kafka message %s", payload);
 
         // Get data back from S3
-        Log.debugf("Processed message URL: %s", announce.getUrl());
+        Log.infof("Processed message URL: %s", announce.getUrl());
         var archiveJson = getJsonFromS3(announce.getUrl());
         Log.debugf("Retrieved from S3: %s", archiveJson);
 
@@ -161,7 +161,7 @@ public class EventConsumer {
         // FIXME I think that we'll need to do more JSON spelunking to get the S3 URL
         if (url != null) {
           // Get data back from S3
-          Log.debugf("Processed message URL: %s", url);
+          Log.infof("Processed message URL: %s", url);
           var archiveJson = getJsonFromS3(announce.getUrl());
           Log.debugf("Retrieved from S3: %s", archiveJson);
 

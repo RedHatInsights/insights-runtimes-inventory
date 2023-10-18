@@ -5,7 +5,7 @@ Runtimes Based Inventory Service
 
 There is a Maven profile ("`coverage`") that can be used to enable JaCoCo code coverage reports. This can be performed using both `mvn` and `mvnw`.
 
-The resulting reports can be found in the coverage module. e.g., `/coverage/target/site/index.html`
+The resulting reports can be found in the coverage module. e.g., `/coverage/target/site/jacoco-aggregate/index.html`
 
 ```shell
 mvn clean package // unit tests

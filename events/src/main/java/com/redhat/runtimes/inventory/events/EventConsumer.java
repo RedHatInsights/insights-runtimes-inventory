@@ -10,6 +10,8 @@ import com.redhat.runtimes.inventory.models.UpdateInstance;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
+import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics;
+import io.micrometer.core.instrument.binder.system.ProcessorMetrics;
 import io.quarkus.logging.Log;
 import io.smallrye.reactive.messaging.annotations.Blocking;
 import jakarta.annotation.PostConstruct;
@@ -69,6 +71,8 @@ public class EventConsumer {
     processingErrorCounter = registry.counter(PROCESSING_ERROR_COUNTER_NAME);
     processingExceptionCounter = registry.counter(PROCESSING_EXCEPTION_COUNTER_NAME);
     duplicateCounter = registry.counter(DUPLICATE_COUNTER_NAME);
+    new ProcessorMetrics().bindTo(registry);
+    new JvmMemoryMetrics().bindTo(registry);
   }
 
   @Incoming(INGRESS_CHANNEL)

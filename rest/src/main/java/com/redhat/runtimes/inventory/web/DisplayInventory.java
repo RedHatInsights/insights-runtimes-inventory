@@ -13,6 +13,8 @@ import com.redhat.runtimes.inventory.models.JarHash;
 import com.redhat.runtimes.inventory.models.JvmInstance;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics;
+import io.micrometer.core.instrument.binder.system.ProcessorMetrics;
 import io.quarkus.logging.Log;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.security.RolesAllowed;
@@ -42,6 +44,8 @@ public class DisplayInventory {
   @PostConstruct
   public void init() {
     processingErrorCounter = registry.counter(PROCESSING_ERROR_COUNTER_NAME);
+    new ProcessorMetrics().bindTo(registry);
+    new JvmMemoryMetrics().bindTo(registry);
   }
 
   /**

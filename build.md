@@ -1,13 +1,20 @@
 # insights-runtimes-inventory
 Runtimes Based Inventory Service
 
-```shell
-mvn clean package                // exclude integration tests
-./mvnw integration-test          // include all tests
-# ./mvnw coverage-test             // exclude integration tests + vanilla jacoco
-# ./mvnw integration-coverage-test // include all tests + quarkus-jacoco 
+## Test Coverage
 
-# mvn clean package -P coverage // exclude integration tests + vanilla jacoco
-# mvn clean package -P integration // include all tests
-# mvn clean package -P integration-coverage // include all tests + quarkus-jacoco
+There is a Maven profile ("`coverage`") that can be used to enable JaCoCo code coverage reports. This can be performed using both `mvn` and `mvnw`.
+
+The resulting reports can be found in the coverage module. e.g., `/coverage/target/site/jacoco-aggregate/index.html`
+
+```shell
+mvn clean package // unit tests
+mvn clean verify  // unit tests + integration (Quarkus) tests
+mvn clean package -P coverage // unit tests + coverage report
+mvn clean verify -P coverage // all tests + coverage report
+
+./mvnw clean package // unit tests
+./mvnw clean verify  // unit tests + integration (Quarkus) tests
+./mvnw clean package -P coverage // unit tests + coverage report
+./mvnw clean verify -P coverage // all tests + coverage report
 ```

@@ -3379,8 +3379,8 @@ data:
             "allFormat": "glob",
             "current": {},
             "datasource": {
-              "type": "prometheus",
-              "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+               "type": "prometheus",
+               "uid": "${datasource}"
             },
             "definition": "",
             "hide": 0,
@@ -3407,8 +3407,8 @@ data:
             "allFormat": "glob",
             "current": {},
             "datasource": {
-              "type": "prometheus",
-              "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+               "type": "prometheus",
+               "uid": "${datasource}"
             },
             "definition": "",
             "hide": 2,
@@ -3435,8 +3435,8 @@ data:
             "allFormat": "glob",
             "current": {},
             "datasource": {
-              "type": "prometheus",
-              "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+               "type": "prometheus",
+               "uid": "${datasource}"
             },
             "definition": "",
             "hide": 2,
@@ -3463,8 +3463,8 @@ data:
             "allFormat": "glob",
             "current": {},
             "datasource": {
-              "type": "prometheus",
-              "uid": "${DS_CRCS02UE1-PROMETHEUS}"
+               "type": "prometheus",
+               "uid": "${datasource}"
             },
             "definition": "",
             "hide": 2,

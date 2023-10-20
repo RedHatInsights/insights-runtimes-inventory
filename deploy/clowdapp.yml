@@ -31,6 +31,16 @@ objects:
               successThreshold: 1
               timeoutSeconds: 120
             metadata: {}
+            ports:
+              - containerPort: 8000
+                name: web
+                protocol: TCP
+              - containerPort: 9000
+                name: metrics
+                protocol: TCP
+              - containerPort: 9091
+                name: jmx
+                protocol: TCP
             readinessProbe:
               failureThreshold: 3
               httpGet:
@@ -82,6 +92,16 @@ objects:
               successThreshold: 1
               timeoutSeconds: 120
             metadata: {}
+            ports:
+              - containerPort: 8000
+                name: web
+                protocol: TCP
+              - containerPort: 9000
+                name: metrics
+                protocol: TCP
+              - containerPort: 9091
+                name: jmx
+                protocol: TCP
             readinessProbe:
               failureThreshold: 3
               httpGet:

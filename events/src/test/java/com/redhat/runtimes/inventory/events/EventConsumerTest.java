@@ -1,6 +1,7 @@
 /* Copyright (C) Red Hat 2023 */
 package com.redhat.runtimes.inventory.events;
 
+import static com.redhat.runtimes.inventory.events.TestUtils.inputStreamFromResources;
 import static com.redhat.runtimes.inventory.events.TestUtils.readBytesFromResources;
 import static com.redhat.runtimes.inventory.events.TestUtils.readFromResources;
 import static com.redhat.runtimes.inventory.events.Utils.instanceOf;
@@ -19,6 +20,12 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class EventConsumerTest {
+
+  @Test
+  public void testEggUnzip() throws IOException {
+    var archive = inputStreamFromResources("egg_upload.tar.gz");
+    var jsonFiles = EventConsumer.getJsonsFromArchiveStream(archive);
+  }
 
   @Test
   public void testSimpleUnzip() throws IOException {

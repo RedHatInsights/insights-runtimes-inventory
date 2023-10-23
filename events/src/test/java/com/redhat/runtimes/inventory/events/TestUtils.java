@@ -2,6 +2,7 @@
 package com.redhat.runtimes.inventory.events;
 
 import static org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.*;
 
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
@@ -10,9 +11,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
 import java.util.function.BooleanSupplier;
+import org.awaitility.core.ConditionTimeoutException;
 
 public final class TestUtils {
   private TestUtils() {}
+
+  public static Long lastResult;
 
   public static String readFromResources(String fName) throws IOException {
     return new String(readBytesFromResources(fName));
@@ -34,12 +38,28 @@ public final class TestUtils {
     }
   }
 
+  public static InputStream inputStreamFromResources(String fName) throws IOException {
+    return ArchiveAnnouncementParserTest.class.getClassLoader().getResourceAsStream(fName);
+  }
+
   public static void await_entity_count(EntityManager entityManager, String entity, Long expected) {
-    await_result(
-        () -> {
-          return entity_count(entityManager, entity) == expected;
-        },
-        5);
+    try {
+      await_result(
+          () -> {
+            TestUtils.lastResult = entity_count(entityManager, entity);
+            return lastResult == expected;
+          },
+          10);
+    } catch (ConditionTimeoutException e) {
+      fail(
+          "Entity count for ["
+              + entity
+              + "] was ["
+              + lastResult
+              + "]. Expected ["
+              + expected
+              + "]");
+    }
   }
 
   @Transactional

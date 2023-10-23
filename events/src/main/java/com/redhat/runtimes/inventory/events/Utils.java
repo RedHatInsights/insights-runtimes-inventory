@@ -14,10 +14,15 @@ import com.redhat.runtimes.inventory.models.JvmInstance;
 import com.redhat.runtimes.inventory.models.NameVersionPair;
 import com.redhat.runtimes.inventory.models.UpdateInstance;
 import io.quarkus.logging.Log;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.*;
 
 public final class Utils {
+
   private Utils() {}
 
   public static InsightsMessage instanceOf(ArchiveAnnouncement announce, String json) {
@@ -103,7 +108,6 @@ public final class Utils {
       }
       inst.setMajorVersion(Integer.parseInt(strVersion));
 
-      // Handle heap
       inst.setHeapMin((int) Double.parseDouble(String.valueOf(basic.get("jvm.heap.min"))));
       inst.setHeapMax((int) Double.parseDouble(String.valueOf(basic.get("jvm.heap.max"))));
       inst.setLaunchTime(Long.parseLong(String.valueOf(basic.get("jvm.report_time"))));
@@ -352,5 +356,44 @@ public final class Utils {
     }
 
     return config;
+  }
+
+  // Given a message, should we process it and persist it?
+  public static boolean shouldProcessMessage(String json, Clock clock, boolean isEgg) {
+    TypeReference<Map<String, Object>> typeRef = new TypeReference<>() {};
+
+    var mapper = new ObjectMapper();
+    try {
+      var o = mapper.readValue(json, typeRef);
+      var basic = (Map<String, Object>) o.get("basic");
+      // This might be an update. If so, things are fine
+      if (basic == null) {
+        var updatedJars = (Map<String, Object>) o.get("updated-jars");
+        // TODO We're ignoring updates from egg files
+        //      This is because of lack of date/time context in them
+        //      Maybe we shouldn't be? Maybe they shouldn't be sending them?
+        if (updatedJars == null || isEgg) {
+          return false;
+        }
+        return true;
+      }
+
+      // We should check the timestamp for statements from the last 24 hours.
+      LocalDate yesterday = LocalDate.now(clock).minusDays(1);
+      LocalDate messageTime =
+          Instant.ofEpochMilli(Long.valueOf(String.valueOf(basic.get("jvm.report_time"))))
+              .atZone(ZoneId.systemDefault())
+              .toLocalDate();
+      if (messageTime.isBefore(yesterday)) {
+        Log.infof(
+            "Ignoring message because its date [%s] is older than our cutoff [%s]",
+            messageTime, yesterday);
+        return false;
+      }
+    } catch (JsonProcessingException | ClassCastException | NumberFormatException e) {
+      Log.error("Error in unmarshalling JSON", e);
+      throw new RuntimeException("Error in unmarshalling JSON", e);
+    }
+    return true;
   }
 }

@@ -1,7 +1,5 @@
 #!/bin/bash
 
-USER=ameszaro-1
-
 REST_IMAGE_NAME="quay.io/$USER/insights-rbi-rest"
 EVENTS_IMAGE_NAME="quay.io/$USER/insights-rbi-events"
 IMAGE_TAG=$(git rev-parse --short=7 HEAD)

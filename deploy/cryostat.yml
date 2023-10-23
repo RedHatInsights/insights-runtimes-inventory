@@ -172,7 +172,7 @@ objects:
               - name: CRYOSTAT_EXT_WEB_PORT
                 value: "443"
               - name: CRYOSTAT_WEB_HOST
-                value: ""
+                value: ${ROUTE_HOST}
               - name: CRYOSTAT_PLATFORM
                 value: io.cryostat.platform.internal.KubeApiPlatformStrategy
               - name: CRYOSTAT_AUTH_MANAGER
@@ -180,7 +180,7 @@ objects:
               - name: GRAFANA_DATASOURCE_URL
                 value: http://127.0.0.1:8080
               - name: GRAFANA_DASHBOARD_URL
-                value: ""
+                value: ${GRAFANA_ROUTE_HOST}
               - name: CRYOSTAT_DISABLE_SSL
                 value: "true"
               - name: CRYOSTAT_DISABLE_JMX_AUTH

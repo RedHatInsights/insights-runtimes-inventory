@@ -39,7 +39,6 @@ import java.time.ZoneId;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 @QuarkusTest
@@ -72,7 +71,6 @@ public class EventConsumerIT {
   @SuppressWarnings("unchecked")
   // This complains about not being able to find the egg channel
   // Which is odd because it works in Prod
-  @Disabled
   void testValidEggPayload() throws IOException, InterruptedException {
     HttpClient mockClient = mock(HttpClient.class);
     HttpResponse<InputStream> mockResponse = mock(HttpResponse.class);
@@ -85,7 +83,6 @@ public class EventConsumerIT {
 
     String kafkaMessage = readFromResources("egg_is_runtimes.json");
     inMemoryConnector.source(EGG_CHANNEL).send(kafkaMessage);
-    // inMemoryConnector.source(INGRESS_CHANNEL).send(kafkaMessage);
 
     micrometerAssertionHelper.awaitAndAssertTimerIncrement(CONSUMED_TIMER_NAME, 1);
     micrometerAssertionHelper.assertCounterIncrement(PROCESSING_EXCEPTION_COUNTER_NAME, 0);

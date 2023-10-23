@@ -32,6 +32,9 @@ public class TestLifecycleManager implements QuarkusTestResourceLifecycleManager
     properties.putAll(
         InMemoryConnector.switchIncomingChannelsToInMemory(
             com.redhat.runtimes.inventory.events.EventConsumer.INGRESS_CHANNEL));
+    properties.putAll(
+        InMemoryConnector.switchIncomingChannelsToInMemory(
+            com.redhat.runtimes.inventory.events.EventConsumer.EGG_CHANNEL));
     return properties;
   }
 

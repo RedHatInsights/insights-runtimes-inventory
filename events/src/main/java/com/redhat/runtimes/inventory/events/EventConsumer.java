@@ -184,7 +184,7 @@ public class EventConsumer {
       }
 
       if (inst != null) {
-        Log.infof("About to persist: %s", inst);
+        Log.debugf("About to persist: %s", inst);
         entityManager.persist(inst);
         entityManager.flush();
         session.evict(inst);
@@ -228,7 +228,7 @@ public class EventConsumer {
   public static List<String> getJsonsFromArchiveStream(InputStream archiveStream) {
     // The egg file comes in as a String, but it is actually a gzipped tarfile
     // So we will turn it into a stream, 'uncompress' the stream, then walk
-    // the archive for files we car about.
+    // the archive for files we care about.
     String insightsDataPath = "/data/var/tmp/insights-runtimes/uploads/";
     List<String> jsonFiles = new ArrayList<String>();
 

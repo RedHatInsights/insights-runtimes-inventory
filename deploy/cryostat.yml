@@ -190,7 +190,9 @@ objects:
               - name: CRYOSTAT_ENABLE_JDP_BROADCAST
                 value: "false"
               - name: CRYOSTAT_K8S_NAMESPACES
-                value: ${NAMESPACE}
+                valueFrom:
+                  fieldRef:
+                    fieldPath: metadata.namespace
               - name: CRYOSTAT_SSL_PROXIED
                 value: "true"
               - name: CRYOSTAT_JMX_CREDENTIALS_DB_PASSWORD
@@ -329,6 +331,3 @@ parameters:
   - name: IMAGE_TAG
     value: 2.3.1
     displayName: The imageTag to deploy
-  - name: NAMESPACE
-    value: ""
-    displayName: Deployment namespace

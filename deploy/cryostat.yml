@@ -322,6 +322,10 @@ objects:
       termination: edge
       insecureEdgeTerminationPolicy: Redirect
 parameters:
+#   For ephemeral environment use the following commands to set the proper env vars after deployment is done
+#   export ROUTE_HOST=$(oc get route -n $NAMESPACE -o jsonpath="{.status.ingress[0].host}")
+#   export GRAFANA_ROUTE_HOST=$(oc get route -n $NAMESPACE cryostat-grafana -o jsonpath="{.status.ingress[0].host}")
+#   oc -n $NAMESPACE set env deploy --containers=cryostat cryostat CRYOSTAT_WEB_HOST=$ROUTE_HOST GRAFANA_DASHBOARD_URL=https://$GRAFANA_ROUTE_HOST
   - name: ROUTE_HOST
     value: ""
     displayName: Application Route Host

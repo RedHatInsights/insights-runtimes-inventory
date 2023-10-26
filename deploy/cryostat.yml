@@ -263,7 +263,7 @@ objects:
               capabilities:
                 drop:
                   - ALL
-            image: "registry.redhat.io/cryostat-tech-preview/jfr-datasource-rhel8:2.3.1"
+            image: registry.redhat.io/cryostat-tech-preview/jfr-datasource-rhel8:${IMAGE_TAG}
             imagePullPolicy: IfNotPresent
             env:
               - name: LISTEN_HOST

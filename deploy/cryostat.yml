@@ -327,7 +327,7 @@ parameters:
     displayName: Application Route Host
   - name: GRAFANA_ROUTE_HOST
     value: ""
-    displayName: IMAGE_TAG
+    displayName: Grafana Route Host
   - name: IMAGE_TAG
     value: 2.3.1
     displayName: The imageTag to deploy

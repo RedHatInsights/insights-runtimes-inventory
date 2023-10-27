@@ -8,28 +8,17 @@ objects:
   metadata:
     name: cryostat
     labels:
-      helm.sh/chart: cryostat-0.3.1
       app.kubernetes.io/name: cryostat
       app.kubernetes.io/instance: cryostat
-      app.kubernetes.io/version: "k.redhat"
-      app.kubernetes.io/managed-by: Helm
-- apiVersion: v1
-  kind: Secret
-  metadata:
-    name: cryostat-jmx-credentials-db
-  type: Opaque
-  data:
-    CRYOSTAT_JMX_CREDENTIALS_DB_PASSWORD: "a0JWQ2VqeEFuemI4MExCTmtldEJzY3pudHkyZVRzRTY="
+      app.kubernetes.io/version: "2.3.1.redhat"
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: Role
   metadata:
     name: cryostat
     labels:
-      helm.sh/chart: cryostat-0.3.1
       app.kubernetes.io/name: cryostat
       app.kubernetes.io/instance: cryostat
       app.kubernetes.io/version: "2.3.1.redhat"
-      app.kubernetes.io/managed-by: Helm
   rules:
     - apiGroups:
         - ""
@@ -66,11 +55,9 @@ objects:
   metadata:
     name: cryostat
     labels:
-      helm.sh/chart: cryostat-0.3.1
       app.kubernetes.io/name: cryostat
       app.kubernetes.io/instance: cryostat
       app.kubernetes.io/version: "2.3.1.redhat"
-      app.kubernetes.io/managed-by: Helm
   roleRef:
     apiGroup: rbac.authorization.k8s.io
     kind: Role
@@ -84,11 +71,9 @@ objects:
   metadata:
     name: cryostat
     labels:
-      helm.sh/chart: cryostat-0.3.1
       app.kubernetes.io/name: cryostat
       app.kubernetes.io/instance: cryostat
       app.kubernetes.io/version: "2.3.1.redhat"
-      app.kubernetes.io/managed-by: Helm
   spec:
     type: ClusterIP
     ports:
@@ -108,11 +93,9 @@ objects:
   metadata:
     name: cryostat-grafana
     labels:
-      helm.sh/chart: cryostat-0.3.1
       app.kubernetes.io/name: cryostat
       app.kubernetes.io/instance: cryostat
       app.kubernetes.io/version: "2.3.1.redhat"
-      app.kubernetes.io/managed-by: Helm
   spec:
     type: ClusterIP
     ports:
@@ -128,11 +111,9 @@ objects:
   metadata:
     name: cryostat
     labels:
-      helm.sh/chart: cryostat-0.3.1
       app.kubernetes.io/name: cryostat
       app.kubernetes.io/instance: cryostat
       app.kubernetes.io/version: "2.3.1.redhat"
-      app.kubernetes.io/managed-by: Helm
   spec:
     selector:
       matchLabels:
@@ -287,11 +268,9 @@ objects:
   metadata:
     name: cryostat
     labels:
-      helm.sh/chart: cryostat-0.3.1
       app.kubernetes.io/name: cryostat
       app.kubernetes.io/instance: cryostat
       app.kubernetes.io/version: "2.3.1.redhat"
-      app.kubernetes.io/managed-by: Helm
   spec:
     to:
       kind: Service
@@ -307,11 +286,9 @@ objects:
   metadata:
     name: cryostat-grafana
     labels:
-      helm.sh/chart: cryostat-0.3.1
       app.kubernetes.io/name: cryostat
       app.kubernetes.io/instance: cryostat
       app.kubernetes.io/version: "2.3.1.redhat"
-      app.kubernetes.io/managed-by: Helm
   spec:
     to:
       kind: Service

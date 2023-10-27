@@ -59,6 +59,8 @@ objects:
                 value: ${ENV_NAME}
               - name: QUARKUS_LOG_CLOUDWATCH_ENABLED
                 value: ${CLOUDWATCH_ENABLED}
+              - name: CRYOSTAT_JAVA_OPTS
+                value: "${CRYOSTAT_JAVA_OPTS}"
           webServices:
             metrics: {}
             private: {}
@@ -104,6 +106,8 @@ objects:
                 value: ${ENV_NAME}
               - name: QUARKUS_LOG_CLOUDWATCH_ENABLED
                 value: ${CLOUDWATCH_ENABLED}
+              - name: CRYOSTAT_JAVA_OPTS
+                value: "${CRYOSTAT_JAVA_OPTS}"
           webServices:
             metrics: {}
             private: {}
@@ -160,3 +164,6 @@ parameters:
   - name: MIN_REPLICAS
     value: "1"
     displayName: Minimum number of replicas for deployments
+  - name: CRYOSTAT_JAVA_OPTS
+    value: ""
+    displayName: Java system properties for Cryostat support

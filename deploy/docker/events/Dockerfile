@@ -27,6 +27,4 @@ ENV JAVA_OPTS_APPEND="-XX:-ExitOnOutOfMemoryError -Dquarkus.http.host=0.0.0.0 -D
 ENV JAVA_APP_JAR="/deployments/quarkus-run.jar"
 
 EXPOSE 8000
-EXPOSE 9091
-
 USER 185

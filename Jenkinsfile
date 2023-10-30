@@ -46,7 +46,7 @@ pipeline {
                 stage('Run unit tests') {
                     steps {
                         withVault([configuration: configuration, vaultSecrets: secrets]) {
-                            sh 'bash -x ./unit_test.sh'
+                            sh 'bash -x scripts/unit_test.sh'
                         }
                     }
                 }

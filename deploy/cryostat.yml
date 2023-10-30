@@ -1,0 +1,314 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: cryostat
+objects:
+- apiVersion: v1
+  kind: ServiceAccount
+  metadata:
+    name: cryostat
+    labels:
+      app.kubernetes.io/name: cryostat
+      app.kubernetes.io/instance: cryostat
+      app.kubernetes.io/version: "2.3.1.redhat"
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: Role
+  metadata:
+    name: cryostat
+    labels:
+      app.kubernetes.io/name: cryostat
+      app.kubernetes.io/instance: cryostat
+      app.kubernetes.io/version: "2.3.1.redhat"
+  rules:
+    - apiGroups:
+        - ""
+      resources:
+        - endpoints
+      verbs:
+        - get
+        - list
+        - watch
+    - apiGroups:
+        - ""
+      resources:
+        - pods
+        - replicationcontrollers
+      verbs:
+        - get
+    - apiGroups:
+        - apps
+      resources:
+        - replicasets
+        - deployments
+        - daemonsets
+        - statefulsets
+      verbs:
+        - get
+    - apiGroups:
+        - apps.openshift.io
+      resources:
+        - deploymentconfigs
+      verbs:
+        - get
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    name: cryostat
+    labels:
+      app.kubernetes.io/name: cryostat
+      app.kubernetes.io/instance: cryostat
+      app.kubernetes.io/version: "2.3.1.redhat"
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: cryostat
+  subjects:
+    - kind: ServiceAccount
+      name: cryostat
+      namespace: default
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: cryostat
+    labels:
+      app.kubernetes.io/name: cryostat
+      app.kubernetes.io/instance: cryostat
+      app.kubernetes.io/version: "2.3.1.redhat"
+  spec:
+    type: ClusterIP
+    ports:
+      - port: 8181
+        targetPort: 8181
+        protocol: TCP
+        name: cryostat-http
+      - port: 9091
+        targetPort: 9091
+        protocol: TCP
+        name: jfr-jmx
+    selector:
+      app.kubernetes.io/name: cryostat
+      app.kubernetes.io/instance: cryostat
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: cryostat-grafana
+    labels:
+      app.kubernetes.io/name: cryostat
+      app.kubernetes.io/instance: cryostat
+      app.kubernetes.io/version: "2.3.1.redhat"
+  spec:
+    type: ClusterIP
+    ports:
+      - port: 3000
+        targetPort: 3000
+        protocol: TCP
+        name: grafana-http
+    selector:
+      app.kubernetes.io/name: cryostat
+      app.kubernetes.io/instance: cryostat
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: cryostat
+    labels:
+      app.kubernetes.io/name: cryostat
+      app.kubernetes.io/instance: cryostat
+      app.kubernetes.io/version: "2.3.1.redhat"
+  spec:
+    selector:
+      matchLabels:
+        app.kubernetes.io/name: cryostat
+        app.kubernetes.io/instance: cryostat
+    template:
+      metadata:
+        labels:
+          app.kubernetes.io/name: cryostat
+          app.kubernetes.io/instance: cryostat
+      spec:
+        serviceAccountName: cryostat
+        securityContext:
+          runAsNonRoot: true
+        containers:
+          - name: cryostat
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - ALL
+            image: registry.redhat.io/cryostat-tech-preview/cryostat-rhel8:${IMAGE_TAG}
+            imagePullPolicy: IfNotPresent
+            env:
+              - name: CRYOSTAT_WEB_PORT
+                value: "8181"
+              - name: CRYOSTAT_CONFIG_PATH
+                value: /opt/cryostat.d/conf.d
+              - name: CRYOSTAT_ARCHIVE_PATH
+                value: /opt/cryostat.d/recordings.d
+              - name: CRYOSTAT_TEMPLATE_PATH
+                value: /opt/cryostat.d/templates.d
+              - name: CRYOSTAT_CLIENTLIB_PATH
+                value: /opt/cryostat.d/clientlib.d
+              - name: CRYOSTAT_PROBE_TEMPLATE_PATH
+                value: /opt/cryostat.d/probes.d
+              - name: CRYOSTAT_EXT_WEB_PORT
+                value: "443"
+              - name: CRYOSTAT_WEB_HOST
+                value: ${ROUTE_HOST}
+              - name: CRYOSTAT_PLATFORM
+                value: io.cryostat.platform.internal.KubeApiPlatformStrategy
+              - name: CRYOSTAT_AUTH_MANAGER
+                value: io.cryostat.net.NoopAuthManager
+              - name: GRAFANA_DATASOURCE_URL
+                value: http://127.0.0.1:8080
+              - name: GRAFANA_DASHBOARD_URL
+                value: ${GRAFANA_ROUTE_HOST}
+              - name: CRYOSTAT_DISABLE_SSL
+                value: "true"
+              - name: CRYOSTAT_DISABLE_JMX_AUTH
+                value: "true"
+              - name: CRYOSTAT_ALLOW_UNTRUSTED_SSL
+                value: "true"
+              - name: CRYOSTAT_ENABLE_JDP_BROADCAST
+                value: "false"
+              - name: CRYOSTAT_K8S_NAMESPACES
+                valueFrom:
+                  fieldRef:
+                    fieldPath: metadata.namespace
+              - name: CRYOSTAT_SSL_PROXIED
+                value: "true"
+              - name: CRYOSTAT_JMX_CREDENTIALS_DB_PASSWORD
+                valueFrom:
+                  secretKeyRef:
+                    name: cryostat-jmx-credentials-db
+                    key: CRYOSTAT_JMX_CREDENTIALS_DB_PASSWORD
+                    optional: false
+            ports:
+              - containerPort: 8181
+                protocol: TCP
+              - containerPort: 9090
+                protocol: TCP
+              - containerPort: 9091
+                protocol: TCP
+            livenessProbe:
+              httpGet:
+                path: "/health/liveness"
+                port: 8181
+            startupProbe:
+              httpGet:
+                path: "/health/liveness"
+                port: 8181
+              failureThreshold: 18
+            resources:
+              { }
+            volumeMounts:
+              - mountPath: /opt/cryostat.d/conf.d
+                name: cryostat
+                subPath: config
+              - mountPath: /opt/cryostat.d/recordings.d
+                name: cryostat
+                subPath: flightrecordings
+              - mountPath: /opt/cryostat.d/templates.d
+                name: cryostat
+                subPath: templates
+              - mountPath: /opt/cryostat.d/clientlib.d
+                name: cryostat
+                subPath: clientlib
+              - mountPath: /opt/cryostat.d/probes.d
+                name: cryostat
+                subPath: probes
+          - name: cryostat-grafana
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - ALL
+            image: registry.redhat.io/cryostat-tech-preview/cryostat-grafana-dashboard-rhel8:${IMAGE_TAG}
+            imagePullPolicy: IfNotPresent
+            env:
+              - name: JFR_DATASOURCE_URL
+                value: http://127.0.0.1:8080
+              - name: GF_AUTH_ANONYMOUS_ENABLED
+                value: "true"
+            ports:
+              - containerPort: 3000
+                protocol: TCP
+            livenessProbe:
+              httpGet:
+                path: /api/health
+                port: 3000
+            resources:
+              { }
+          - name: cryostat-jfr-datasource
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - ALL
+            image: registry.redhat.io/cryostat-tech-preview/jfr-datasource-rhel8:${IMAGE_TAG}
+            imagePullPolicy: IfNotPresent
+            env:
+              - name: LISTEN_HOST
+                value: 127.0.0.1
+            ports:
+              - containerPort: 8080
+                protocol: TCP
+            livenessProbe:
+              exec:
+                command:
+                  - curl
+                  - --fail
+                  - http://127.0.0.1:8080
+            resources:
+              { }
+        volumes:
+          - name: cryostat
+            emptyDir: { }
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    name: cryostat
+    labels:
+      app.kubernetes.io/name: cryostat
+      app.kubernetes.io/instance: cryostat
+      app.kubernetes.io/version: "2.3.1.redhat"
+  spec:
+    to:
+      kind: Service
+      name: cryostat
+    port:
+      targetPort: 8181
+    tls:
+      termination: edge
+      insecureEdgeTerminationPolicy: Redirect
+
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    name: cryostat-grafana
+    labels:
+      app.kubernetes.io/name: cryostat
+      app.kubernetes.io/instance: cryostat
+      app.kubernetes.io/version: "2.3.1.redhat"
+  spec:
+    to:
+      kind: Service
+      name: cryostat-grafana
+    port:
+      targetPort: 3000
+    tls:
+      termination: edge
+      insecureEdgeTerminationPolicy: Redirect
+parameters:
+#   For ephemeral environment use the following commands to set the proper env vars after deployment is done
+#   export ROUTE_HOST=$(oc get route -n $NAMESPACE -o jsonpath="{.status.ingress[0].host}")
+#   export GRAFANA_ROUTE_HOST=$(oc get route -n $NAMESPACE cryostat-grafana -o jsonpath="{.status.ingress[0].host}")
+#   oc -n $NAMESPACE set env deploy --containers=cryostat cryostat CRYOSTAT_WEB_HOST=$ROUTE_HOST GRAFANA_DASHBOARD_URL=https://$GRAFANA_ROUTE_HOST
+  - name: ROUTE_HOST
+    value: ""
+    displayName: Application Route Host
+  - name: GRAFANA_ROUTE_HOST
+    value: ""
+    displayName: Grafana Route Host
+  - name: IMAGE_TAG
+    value: 2.3.1
+    displayName: The imageTag to deploy

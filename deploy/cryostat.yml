@@ -309,6 +309,6 @@ parameters:
   - name: GRAFANA_ROUTE_HOST
     value: ""
     displayName: Grafana Route Host
-  - name: CRYOSTAT_CRYOSTAT_IMAGE_TAG
+  - name: CRYOSTAT_IMAGE_TAG
     value: 2.3.1
     displayName: The Cryostat image tag to deploy

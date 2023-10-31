@@ -135,7 +135,7 @@ objects:
               capabilities:
                 drop:
                   - ALL
-            image: registry.redhat.io/cryostat-tech-preview/cryostat-rhel8:${IMAGE_TAG}
+            image: registry.redhat.io/cryostat-tech-preview/cryostat-rhel8:${CRYOSTAT_IMAGE_TAG}
             imagePullPolicy: IfNotPresent
             env:
               - name: CRYOSTAT_WEB_PORT
@@ -222,7 +222,7 @@ objects:
               capabilities:
                 drop:
                   - ALL
-            image: registry.redhat.io/cryostat-tech-preview/cryostat-grafana-dashboard-rhel8:${IMAGE_TAG}
+            image: registry.redhat.io/cryostat-tech-preview/cryostat-grafana-dashboard-rhel8:${CRYOSTAT_IMAGE_TAG}
             imagePullPolicy: IfNotPresent
             env:
               - name: JFR_DATASOURCE_URL
@@ -244,7 +244,7 @@ objects:
               capabilities:
                 drop:
                   - ALL
-            image: registry.redhat.io/cryostat-tech-preview/jfr-datasource-rhel8:${IMAGE_TAG}
+            image: registry.redhat.io/cryostat-tech-preview/jfr-datasource-rhel8:${CRYOSTAT_IMAGE_TAG}
             imagePullPolicy: IfNotPresent
             env:
               - name: LISTEN_HOST
@@ -309,6 +309,6 @@ parameters:
   - name: GRAFANA_ROUTE_HOST
     value: ""
     displayName: Grafana Route Host
-  - name: IMAGE_TAG
+  - name: CRYOSTAT_CRYOSTAT_IMAGE_TAG
     value: 2.3.1
-    displayName: The imageTag to deploy
+    displayName: The Cryostat image tag to deploy

@@ -67,7 +67,6 @@ objects:
   subjects:
     - kind: ServiceAccount
       name: cryostat
-      namespace: default
 - apiVersion: v1
   kind: Service
   metadata:

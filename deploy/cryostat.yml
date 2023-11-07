@@ -162,7 +162,7 @@ objects:
               - name: GRAFANA_DATASOURCE_URL
                 value: http://127.0.0.1:8080
               - name: GRAFANA_DASHBOARD_URL
-                value: ${GRAFANA_ROUTE_HOST}
+                value: "https://${GRAFANA_ROUTE_HOST}"
               - name: CRYOSTAT_DISABLE_SSL
                 value: "true"
               - name: CRYOSTAT_DISABLE_JMX_AUTH

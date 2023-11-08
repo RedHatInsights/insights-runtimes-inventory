@@ -120,6 +120,10 @@ apps:
       parameters:
         IMAGE_NAMESPACE: <your quay.io username>
         IMAGE_TAG: latest
+    - name: cryostat
+      host: local
+      repo: ~/projects/insights-runtimes-inventory
+      path: deploy/cryostat.yml
 ```
 
 Note that the app and component name must be `runtimes-inventory`.

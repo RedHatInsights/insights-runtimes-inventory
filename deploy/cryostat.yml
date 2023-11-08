@@ -139,6 +139,10 @@ objects:
             image: registry.redhat.io/cryostat-tech-preview/cryostat-rhel8:${CRYOSTAT_IMAGE_TAG}
             imagePullPolicy: IfNotPresent
             env:
+              - name: NAMESPACE
+                valueFrom:
+                  fieldRef:
+                    fieldPath: metadata.namespace
               - name: CRYOSTAT_WEB_PORT
                 value: "8181"
               - name: CRYOSTAT_CONFIG_PATH
@@ -154,7 +158,7 @@ objects:
               - name: CRYOSTAT_EXT_WEB_PORT
                 value: "443"
               - name: CRYOSTAT_WEB_HOST
-                value: ${ROUTE_HOST}
+                value: "cryostat-$(NAMESPACE).${ROUTE_DOMAIN}"
               - name: CRYOSTAT_PLATFORM
                 value: io.cryostat.platform.internal.KubeApiPlatformStrategy
               - name: CRYOSTAT_AUTH_MANAGER
@@ -162,7 +166,7 @@ objects:
               - name: GRAFANA_DATASOURCE_URL
                 value: http://127.0.0.1:8080
               - name: GRAFANA_DASHBOARD_URL
-                value: "https://${GRAFANA_ROUTE_HOST}"
+                value: "https://cryostat-grafana-$(NAMESPACE).${ROUTE_DOMAIN}"
               - name: CRYOSTAT_DISABLE_SSL
                 value: "true"
               - name: CRYOSTAT_DISABLE_JMX_AUTH
@@ -313,16 +317,9 @@ objects:
     CRYOSTAT_JMX_CREDENTIALS_DB_PASSWORD: "${EPHEMERAL_DB_PASSWORD}"
 
 parameters:
-#   For ephemeral environment use the following commands to set the proper env vars after deployment is done
-#   export ROUTE_HOST=$(oc get route -n $NAMESPACE -o jsonpath="{.status.ingress[0].host}")
-#   export GRAFANA_ROUTE_HOST=$(oc get route -n $NAMESPACE cryostat-grafana -o jsonpath="{.status.ingress[0].host}")
-#   oc -n $NAMESPACE set env deploy --containers=cryostat cryostat CRYOSTAT_WEB_HOST=$ROUTE_HOST GRAFANA_DASHBOARD_URL=https://$GRAFANA_ROUTE_HOST
-  - name: ROUTE_HOST
-    value: ""
-    displayName: Application Route Host
-  - name: GRAFANA_ROUTE_HOST
-    value: ""
-    displayName: Grafana Route Host
+  - name: ROUTE_DOMAIN
+    displayName: Route Domain
+    description: Default domain for routes created in this cluster
   - name: CRYOSTAT_IMAGE_TAG
     value: 2.3.1-10
     displayName: Cryostat Image Tag
@@ -339,4 +336,4 @@ parameters:
     displayName: Credentials Database Password (Ephemeral Only)
     description: Password for Cryostat's credentials database for Ephemeral Environments
     generate: expression
-    from: '[\A]{10}'
+    from: '[\w\A]{10}'

@@ -299,6 +299,19 @@ objects:
     tls:
       termination: edge
       insecureEdgeTerminationPolicy: Redirect
+
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: cryostat-jmx-credentials-db
+    labels:
+      app.kubernetes.io/name: cryostat
+      app.kubernetes.io/instance: cryostat
+      app.kubernetes.io/version: "2.3.1.redhat"
+  type: Opaque
+  stringData:
+    CRYOSTAT_JMX_CREDENTIALS_DB_PASSWORD: "${EPHEMERAL_DB_PASSWORD}"
+
 parameters:
 #   For ephemeral environment use the following commands to set the proper env vars after deployment is done
 #   export ROUTE_HOST=$(oc get route -n $NAMESPACE -o jsonpath="{.status.ingress[0].host}")
@@ -312,10 +325,18 @@ parameters:
     displayName: Grafana Route Host
   - name: CRYOSTAT_IMAGE_TAG
     value: 2.3.1-10
-    displayName: The main Cryostat image tag to deploy
+    displayName: Cryostat Image Tag
+    description: The main Cryostat image tag to deploy
   - name: JFR_DATASOURCE_IMAGE_TAG
     value: 2.3.1-10
-    displayName: The JFR Data Source image tag to deploy
+    displayName: JFR Data Source Image Tag
+    description: The JFR Data Source image tag to deploy
   - name: CRYOSTAT_GRAFANA_IMAGE_TAG
     value: 2.3.1-10
-    displayName: The main Cryostat Grafana dashboard image tag to deploy
+    displayName: Grafana Dashboard Image Tag
+    description: The main Cryostat Grafana dashboard image tag to deploy
+  - name: EPHEMERAL_DB_PASSWORD
+    displayName: Credentials Database Password (Ephemeral Only)
+    description: Password for Cryostat's credentials database for Ephemeral Environments
+    generate: expression
+    from: '[\A]{10}'

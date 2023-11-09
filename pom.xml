@@ -30,6 +30,7 @@
     <spotless-maven-plugin.version>2.29.0</spotless-maven-plugin.version>
     <surefire-plugin.version>3.1.2</surefire-plugin.version>
     <failsafe-plugin.version>${surefire-plugin.version}</failsafe-plugin.version>
+    <surefire-tree-reporter.version>1.2.1</surefire-tree-reporter.version>
     <checkstyle-plugin.version>3.2.1</checkstyle-plugin.version>
     <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
     <jacoco-plugin.version>0.8.9</jacoco-plugin.version>
@@ -149,7 +150,29 @@
           <systemPropertyVariables>
             <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
           </systemPropertyVariables>
+          <!-- config for maven-surefire-junit5-tree-reporter -->
+          <reportFormat>plain</reportFormat>
+          <consoleOutputReporter>
+            <disable>true</disable>
+          </consoleOutputReporter>
+          <statelessTestsetInfoReporter implementation="org.apache.maven.plugin.surefire.extensions.junit5.JUnit5StatelessTestsetInfoTreeReporter">
+            <printStacktraceOnError>true</printStacktraceOnError>
+            <printStacktraceOnFailure>true</printStacktraceOnFailure>
+            <printStdoutOnError>true</printStdoutOnError>
+            <printStdoutOnFailure>true</printStdoutOnFailure>
+            <printStdoutOnSuccess>false</printStdoutOnSuccess>
+            <printStderrOnError>true</printStderrOnError>
+            <printStderrOnFailure>true</printStderrOnFailure>
+            <printStderrOnSuccess>false</printStderrOnSuccess>
+          </statelessTestsetInfoReporter>
         </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>me.fabriciorby</groupId>
+            <artifactId>maven-surefire-junit5-tree-reporter</artifactId>
+            <version>${surefire-tree-reporter.version}</version>
+          </dependency>
+        </dependencies>
         <executions>
           <execution>
             <id>default-test</id>
@@ -168,7 +191,17 @@
             <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
             <quarkus.jacoco.reuse-data-file>true</quarkus.jacoco.reuse-data-file>
           </systemPropertyVariables>
+          <!-- config for maven-surefire-junit5-tree-reporter -->
+          <reportFormat>plain</reportFormat>
+          <statelessTestsetInfoReporter implementation="org.apache.maven.plugin.surefire.extensions.junit5.JUnit5StatelessTestsetInfoTreeReporter"></statelessTestsetInfoReporter>
         </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>me.fabriciorby</groupId>
+            <artifactId>maven-surefire-junit5-tree-reporter</artifactId>
+            <version>${surefire-tree-reporter.version}</version>
+          </dependency>
+        </dependencies>
         <executions>
           <execution>
             <goals>

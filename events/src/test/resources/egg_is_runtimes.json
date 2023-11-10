@@ -57,7 +57,8 @@
   "timestamp": "2023-08-30T07:35:59.678761+00:00",
   "platform_metadata": {
     "request_id": "3f339044-4acb-4972-96e9-cb9c14ec4b45",
-    "is_runtimes": true
+    "is_runtimes": true,
+    "url": "http://env-ephemeral-tklsfv-minio.ephemeral-tklsfv.svc:9000/insights-upload-perma/ingress-service-7cd6ffb567-js5fn/1J6DOEu9ni-000029?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=jPyVrodwpcNG%2F20230201%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20230201T113343Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&X-Amz-Signature=b40f454a4854fe2e673f9a7fb5385949465efe73eb018fb33ecdc1024fb6c06f"
   },
   "metadata": {
     "request_id": "3f339044-4acb-4972-96e9-cb9c14ec4b45"

@@ -1,15 +1,63 @@
 {
   "type": "updated",
-  "org_id": "16790890",
-  "account": "11487129",
-  "content_type": "application/vnd.redhat.runtimes-java-general.analytics+tgz",
-  "request_id": "3f339044-4acb-4972-96e9-cb9c14ec4b45",
+  "host": {
+    "id": "aa6d366c-d2ca-472f-9710-cc7d9a757515",
+    "display_name": "physical_pzkxnvlg.example.info",
+    "ansible_host": null,
+    "account": "11487129",
+    "org_id": "16790890",
+    "insights_id": "0e5ede78-1d82-47c8-a0b2-34bbad6aa875",
+    "subscription_manager_id": "526a7a76-4621-473d-94f9-5d0bc5d4dd19",
+    "satellite_id": null,
+    "fqdn": "physical_pzkxnvlg.example.info",
+    "bios_uuid": "a76d4afe-77d1-4795-93d4-0568e8cf2dcd",
+    "ip_addresses": null,
+    "mac_addresses": null,
+    "facts": [
+      {
+        "namespace": "rhsm",
+        "facts": {
+          "orgId": "16790890",
+          "MEMORY": 1,
+          "RH_PROD": [
+            "69"
+          ],
+          "IS_VIRTUAL": false,
+          "ARCHITECTURE": "x86_64",
+          "SYNC_TIMESTAMP": "2023-08-30T07:35:59.62347389Z"
+        }
+      }
+    ],
+    "provider_id": null,
+    "provider_type": null,
+    "created": "2023-08-30T06:47:40.980983+00:00",
+    "updated": "2023-08-30T07:35:59.670568+00:00",
+    "stale_timestamp": "2023-09-01T07:35:59.623473+00:00",
+    "stale_warning_timestamp": "2023-09-08T07:35:59.623473+00:00",
+    "culled_timestamp": "2023-09-15T07:35:59.623473+00:00",
+    "reporter": "rhsm-conduit",
+    "tags": [],
+    "system_profile": {
+      "arch": "x86_64",
+      "owner_id": "526a7a76-4621-473d-94f9-5d0bc5d4dd19",
+      "cores_per_socket": 1,
+      "number_of_sockets": 1,
+      "infrastructure_type": "physical",
+      "system_memory_bytes": 14336
+    },
+    "per_reporter_staleness": {
+      "rhsm-conduit": {
+        "last_check_in": "2023-08-30T07:35:59.670324+00:00",
+        "stale_timestamp": "2023-09-01T07:35:59.623473+00:00",
+        "check_in_succeeded": true
+      }
+    },
+    "groups": []
+  },
   "timestamp": "2023-08-30T07:35:59.678761+00:00",
   "platform_metadata": {
-    "org_id": "1234567",
     "request_id": "3f339044-4acb-4972-96e9-cb9c14ec4b45",
-    "is_runtimes": true,
-    "url": "http://env-ephemeral-tklsfv-minio.ephemeral-tklsfv.svc:9000/insights-upload-perma/ingress-service-7cd6ffb567-js5fn/1J6DOEu9ni-000029?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=jPyVrodwpcNG%2F20230201%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20230201T113343Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&X-Amz-Signature=b40f454a4854fe2e673f9a7fb5385949465efe73eb018fb33ecdc1024fb6c06f"
+    "is_runtimes": true
   },
   "metadata": {
     "request_id": "3f339044-4acb-4972-96e9-cb9c14ec4b45"

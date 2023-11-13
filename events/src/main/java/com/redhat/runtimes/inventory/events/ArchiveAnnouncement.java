@@ -41,6 +41,9 @@ public class ArchiveAnnouncement {
   @JsonProperty("platform_metadata")
   private Map<String, Object> platformMetadata;
 
+  @JsonProperty("host")
+  private Map<String, Object> host;
+
   public ArchiveAnnouncement() {}
 
   // For egg uploads, we identify them via the is_runtimes field in the platform_metadata
@@ -63,6 +66,32 @@ public class ArchiveAnnouncement {
   @JsonProperty("url")
   public void setUrl(String url) {
     this.url = url;
+  }
+
+  @JsonProperty("org_id")
+  public String getOrgId() {
+    if (host == null) {
+      return this.orgId;
+    }
+    return String.valueOf(host.get("org_id"));
+  }
+
+  @JsonProperty("org_id")
+  public void setOrgId(String orgId) {
+    this.orgId = orgId;
+  }
+
+  @JsonProperty("account")
+  public String getAccountId() {
+    if (host == null) {
+      return this.accountId;
+    }
+    return String.valueOf(host.get("account"));
+  }
+
+  @JsonProperty("account")
+  public void setAccountId(String accountId) {
+    this.accountId = accountId;
   }
 
   ////////////////////////////////////////////////////////////////////////
@@ -97,26 +126,6 @@ public class ArchiveAnnouncement {
     this.timestamp = timestamp;
   }
 
-  @JsonProperty("account")
-  public String getAccountId() {
-    return this.accountId;
-  }
-
-  @JsonProperty("account")
-  public void setAccountId(String accountId) {
-    this.accountId = accountId;
-  }
-
-  @JsonProperty("org_id")
-  public String getOrgId() {
-    return this.orgId;
-  }
-
-  @JsonProperty("org_id")
-  public void setOrgId(String orgId) {
-    this.orgId = orgId;
-  }
-
   @JsonProperty("request_id")
   public String getRequestId() {
     return requestId;
@@ -145,5 +154,15 @@ public class ArchiveAnnouncement {
   @JsonProperty("platform_metadata")
   public void setPlatformMetadata(Map<String, Object> platformMetadata) {
     this.platformMetadata = platformMetadata;
+  }
+
+  @JsonProperty("host")
+  public Map<String, Object> getHost() {
+    return host;
+  }
+
+  @JsonProperty("host")
+  public void setHost(Map<String, Object> host) {
+    this.host = host;
   }
 }

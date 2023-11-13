@@ -12,11 +12,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.runtimes.inventory.models.EapInstance;
 import com.redhat.runtimes.inventory.models.JarHash;
 import com.redhat.runtimes.inventory.models.JvmInstance;
+import com.redhat.runtimes.inventory.models.UpdateInstance;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class EventConsumerTest {
@@ -64,7 +64,6 @@ public class EventConsumerTest {
   }
 
   @Test
-  @Disabled
   public void test_jvmInstance_MWTELE_67() throws IOException {
     var dummy = new ArchiveAnnouncement();
     dummy.setTimestamp(Instant.MIN);
@@ -72,11 +71,9 @@ public class EventConsumerTest {
     var buffy = readBytesFromResources("update1.json.gz");
     var json = EventConsumer.unzipJson(buffy);
     var msg = instanceOf(dummy, json);
-    assertTrue(msg instanceof JvmInstance);
-    var inst = (JvmInstance) msg;
-
-    var hostname = "fedora";
-    assertEquals(hostname, inst.getHostname());
+    assertTrue(msg instanceof UpdateInstance);
+    var inst = (UpdateInstance) msg;
+    assertEquals(1, inst.getUpdates().size());
   }
 
   @Test

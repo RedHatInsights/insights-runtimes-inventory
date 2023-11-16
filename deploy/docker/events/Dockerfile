@@ -23,6 +23,7 @@ COPY --from=build --chown=185 /home/jboss/events/target/quarkus-app/quarkus/ /de
 # Add a custom run-env.sh script to append any Cryostat system properties
 COPY --from=build --chown=185 /home/jboss/deploy/docker/common/cryostat-run-env.sh /deployments/run-env.sh
 
+ENV GC_CONTAINER_OPTIONS="-XX:+UseG1GC"
 ENV JAVA_OPTS_APPEND="-XX:-ExitOnOutOfMemoryError -Dquarkus.http.host=0.0.0.0 -Dquarkus.http.port=8000 -Djava.util.logging.manager=org.jboss.logmanager.LogManager -XX:+PrintFlagsFinal"
 ENV JAVA_APP_JAR="/deployments/quarkus-run.jar"
 

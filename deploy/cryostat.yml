@@ -120,6 +120,7 @@ objects:
       matchLabels:
         app.kubernetes.io/name: cryostat
         app.kubernetes.io/instance: cryostat
+    replicas: ${{CRYOSTAT_REPLICAS}}
     template:
       metadata:
         labels:
@@ -337,3 +338,7 @@ parameters:
     description: Password for Cryostat's credentials database for Ephemeral Environments
     generate: expression
     from: '[\w\A]{10}'
+  - name: CRYOSTAT_REPLICAS
+    displayName: Cryostat Replicas
+    description: Number of replicas for Cryostat deployment (should be 0 or 1)
+    value: "1"

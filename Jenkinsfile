@@ -41,12 +41,20 @@ pipeline {
             }
         }
 
-        stage('Run Tests') {
+        stage('Run unit tests') {
+            steps {
+                withVault([configuration: configuration, vaultSecrets: secrets]) {
+                    sh 'bash -x scripts/unit_test.sh'
+                }
+            }
+        }
+
+        stage('Run integration and smoke tests') {
             parallel {
-                stage('Run unit tests') {
+                stage('Run integration tests and upload to SonarQube') {
                     steps {
                         withVault([configuration: configuration, vaultSecrets: secrets]) {
-                            sh 'bash -x scripts/unit_test.sh'
+                            sh 'bash -x scripts/sonarqube.sh'
                         }
                     }
                 }
@@ -69,16 +77,10 @@ pipeline {
         }
     }
 
-    // post {
-    //     always{
-    //         withVault([configuration: configuration, vaultSecrets: secrets]) {
-    //             sh '''
-    //                 curl -s $CICD_URL/bootstrap.sh > .cicd_bootstrap.sh
-    //                 source ./.cicd_bootstrap.sh
-
-    //                 source "${CICD_ROOT}/post_test_results.sh"
-    //             '''
-    //         }
-    //     }
-    // }
+    post {
+        always{
+            archiveArtifacts artifacts: 'artifacts/**/*', fingerprint: true
+            junit skipPublishingChecks: true, testResults: 'artifacts/*.xml'
+        }
+    }
 }

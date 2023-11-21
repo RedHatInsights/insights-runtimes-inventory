@@ -50,3 +50,7 @@ tmp/
 # ///// Private config
 deploy/clowdapp_ee.yml
 beevans-secret.yml
+
+# Local runs of the PR check scripts
+.docker/
+artifacts

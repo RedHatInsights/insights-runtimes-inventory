@@ -1,8 +1,9 @@
 #!/bin/bash
 
-# Run unit tests
 DOCKER_CONF="$PWD/.docker"
-docker --config="$DOCKER_CONF" build -t insights-runtimes-inventory/unit-test:latest -f scripts/Dockerfile .
+
+# Run unit tests
+docker --config="$DOCKER_CONF" build -t insights-runtimes-inventory/unit-test -f scripts/Dockerfile --target unit-test .
 result=$?
 
 if [ $result -eq 0 ]; then
@@ -18,6 +19,13 @@ if [ $result -eq 0 ]; then
         fi
     done
 else
+    mkdir -p artifacts
+    cat << EOF > artifacts/junit-dummy.xml
+<testsuite tests="1">
+    <testcase classname="dummy" name="dummytest"/>
+</testsuite>
+EOF
+
     echo '====================================='
     echo '====  ✖ ERROR: UNIT TEST FAILED  ===='
     echo '====================================='

@@ -6,6 +6,8 @@ import io.smallrye.reactive.messaging.memory.InMemoryConnector;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import org.eclipse.microprofile.config.ConfigProvider;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 /**
@@ -14,28 +16,41 @@ import org.testcontainers.containers.PostgreSQLContainer;
  */
 public class TestLifecycleManager implements QuarkusTestResourceLifecycleManager {
 
+  Boolean quarkusDevServiceEnabled = true;
+
   PostgreSQLContainer<?> postgreSQLContainer;
 
   @Override
   public Map<String, String> start() {
+    Optional<Boolean> quarkusDevServiceEnabledFlag =
+        ConfigProvider.getConfig().getOptionalValue("quarkus.devservices.enabled", Boolean.class);
+    if (quarkusDevServiceEnabledFlag.isPresent()) {
+      quarkusDevServiceEnabled = quarkusDevServiceEnabledFlag.get();
+    }
+
     Map<String, String> properties = new HashMap<>();
     try {
-      setupPostgres(properties);
+      if (quarkusDevServiceEnabled) {
+        setupPostgres(properties);
+      }
+      setupInMemoryConnector(properties);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
+    return properties;
+  }
 
+  private void setupInMemoryConnector(Map<String, String> props) {
     /*
      * We'll use an in-memory Reactive Messaging connector to send payloads.
      * See https://smallrye.io/smallrye-reactive-messaging/smallrye-reactive-messaging/2/testing/testing.html
      */
-    properties.putAll(
+    props.putAll(
         InMemoryConnector.switchIncomingChannelsToInMemory(
             com.redhat.runtimes.inventory.events.EventConsumer.INGRESS_CHANNEL));
-    properties.putAll(
+    props.putAll(
         InMemoryConnector.switchIncomingChannelsToInMemory(
             com.redhat.runtimes.inventory.events.EventConsumer.EGG_CHANNEL));
-    return properties;
   }
 
   @Override
@@ -45,7 +60,7 @@ public class TestLifecycleManager implements QuarkusTestResourceLifecycleManager
   }
 
   void setupPostgres(Map<String, String> props) throws SQLException {
-    postgreSQLContainer = new PostgreSQLContainer<>("postgres:14");
+    postgreSQLContainer = new PostgreSQLContainer<>("postgres:15");
     postgreSQLContainer.start();
     String jdbcUrl = postgreSQLContainer.getJdbcUrl();
     props.put("quarkus.datasource.jdbc.url", jdbcUrl);

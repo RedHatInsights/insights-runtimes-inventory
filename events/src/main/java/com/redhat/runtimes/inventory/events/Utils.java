@@ -458,7 +458,7 @@ public final class Utils {
 
   // This tokenizes a string, but with some special rules
   // It tokenizes based on spaces, but it will interpret quotes
-  // that start in the middle of a string.
+  // that start in the middle of a string, after an '='
   // This is important because some of the data we want to preserve might
   // look like -Dxxxxx="this is all one token"
   // This is also aware of escape sequences
@@ -467,6 +467,8 @@ public final class Utils {
     StringBuilder word = new StringBuilder();
     Character currentQuote = null;
     boolean escaping = false;
+    boolean afterEquals = false;
+    // Order is important here. Rearrange at your own risk.
     for (char c : in.toCharArray()) {
       // If we're not escaping, start escaping and continue
       if (c == '\\' && !escaping) {
@@ -482,6 +484,13 @@ public final class Utils {
         continue;
       }
 
+      // If we see an '=', remember that and continue
+      if (c == '=') {
+        afterEquals = true;
+        word.append(c);
+        continue;
+      }
+
       // If we're not in a quote and we hit a space, save the word and continue
       if (currentQuote == null && c == ' ') {
         tokens.add(word.toString());
@@ -491,22 +500,23 @@ public final class Utils {
 
       // If we see a quote...
       if (c == '\'' || c == '"') {
-        // If we're not quoting, start quoting
-        if (currentQuote == null) {
-          currentQuote = c;
-          word.append(c);
-          continue;
+        // If we are quoting...
+        if (currentQuote != null) {
+          // stop quoting if we're at the matching quote
+          if (c == currentQuote) {
+            currentQuote = null;
+          }
+        } else {
+          // So we're not quoting...
+          // If we're at a new word or after an equals, start quoting
+          if (afterEquals || word.length() == 0) {
+            currentQuote = c;
+          }
         }
-
-        // If we are quoting, check if this is the ending quote
-        if (c == currentQuote) {
-          currentQuote = null;
-        }
-        word.append(c);
-        continue;
       }
 
       // Otherwise, just add the char
+      afterEquals = false;
       word.append(c);
     }
     // Add the last word for the end of string

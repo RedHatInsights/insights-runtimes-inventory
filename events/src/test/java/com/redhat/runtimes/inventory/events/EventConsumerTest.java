@@ -5,6 +5,7 @@ import static com.redhat.runtimes.inventory.events.TestUtils.inputStreamFromReso
 import static com.redhat.runtimes.inventory.events.TestUtils.readBytesFromResources;
 import static com.redhat.runtimes.inventory.events.TestUtils.readFromResources;
 import static com.redhat.runtimes.inventory.events.Utils.instanceOf;
+import static com.redhat.runtimes.inventory.events.Utils.sanitizeInstance;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -61,6 +62,9 @@ public class EventConsumerTest {
 
     hostname = "uriel.local";
     assertEquals(hostname, inst.getHostname());
+
+    // Check that sanitizing is happening
+    assertTrue(inst.getJvmArgs().contains("=*****"));
   }
 
   @Test
@@ -101,6 +105,9 @@ public class EventConsumerTest {
     assertNotNull(inst.getConfiguration().getInterfaces());
     assertNotNull(inst.getConfiguration().getPaths());
     assertNotNull(inst.getConfiguration().getSocketBindingGroups());
+
+    // Check that sanitizing is happening
+    assertTrue(inst.getJvmArgs().contains("=*****"));
   }
 
   @Test
@@ -122,5 +129,57 @@ public class EventConsumerTest {
     assertEquals(
         "4c85d6f74cb8a34dca6748873f9b38457c04f253c4b7d1e088010d13eec7021145b338979adf8991f54c2b6241da7d350c2cfac849e603c286aa5fb13edf560f",
         jar.getSha512Checksum());
+  }
+
+  @Test
+  public void testSanitizeInstance() throws IOException {
+    var dummy = new ArchiveAnnouncement();
+    dummy.setTimestamp(Instant.now());
+
+    var json = readFromResources("eap_example1.json");
+    var msg = instanceOf(dummy, json);
+    assertTrue(msg instanceof EapInstance);
+    var inst = (EapInstance) msg;
+
+    String unsanitizedJvmArgs =
+        "[-D[Standalone], -verbose:gc, -Xloggc:/opt/jboss-eap-7.4.0/standalone/log/gc.log,"
+            + " -XX:+PrintGCDetails, -XX:+PrintGCDateStamps, -XX:+UseGCLogFileRotation,"
+            + " -XX:NumberOfGCLogFiles=5, -XX:GCLogFileSize=3M, -XX:-TraceClassUnloading,"
+            + " -Djdk.serialFilter=maxbytes=10485760;maxdepth=128;maxarray=100000;maxrefs=300000,"
+            + " -Xms1303m, -Xmx2048m, -XX:MetaspaceSize=128M, -XX:MaxMetaspaceSize=512m,"
+            + " -Djava.net.preferIPv4Stack=true, -Djboss.modules.system.pkgs=org.jboss.byteman,"
+            + " -Djava.awt.headless=true,"
+            + " -Dorg.jboss.boot.log.file=/opt/jboss-eap-7.4.0/standalone/log/server.log,"
+            + " -Dsome.dumb.practice=\"Man I hope \\\" ' this = works\","
+            + " -Dlogging.configuration=file:/opt/jboss-eap-7.4.0/standalone/configuration/logging.properties]";
+    String sanitizedJvmArgs =
+        "[-D[Standalone], -verbose:gc, -Xloggc:/opt/jboss-eap-7.4.0/standalone/log/gc.log,"
+            + " -XX:+PrintGCDetails, -XX:+PrintGCDateStamps, -XX:+UseGCLogFileRotation,"
+            + " -XX:NumberOfGCLogFiles=5, -XX:GCLogFileSize=3M, -XX:-TraceClassUnloading,"
+            + " -Djdk.serialFilter=*****, -Xms1303m, -Xmx2048m, -XX:MetaspaceSize=128M,"
+            + " -XX:MaxMetaspaceSize=512m, -Djava.net.preferIPv4Stack=*****,"
+            + " -Djboss.modules.system.pkgs=*****, -Djava.awt.headless=*****,"
+            + " -Dorg.jboss.boot.log.file=*****, -Dsome.dumb.practice=*****,"
+            + " -Dlogging.configuration=*****]";
+
+    String unsanitizedJavaCommand =
+        "/opt/jboss/7/eap/jboss-modules.jar -mp"
+            + " /opt/jboss/7/eap/modules:/opt/jboss/7/eap/../modules org.jboss.as.standalone"
+            + " -Djboss.home.dir=/opt/jboss/7/eap"
+            + " -Djboss.server.base.dir=/opt/jboss/7/instances/jboss-bdi-dwhprosa -c standalone.xml"
+            + " -Djboss.server.base.dir=/opt/jboss/7/instances/jboss-bdi-dwhprosa";
+    String sanitizedJavaCommand =
+        "/opt/jboss/7/eap/jboss-modules.jar -mp"
+            + " /opt/jboss/7/eap/modules:/opt/jboss/7/eap/../modules org.jboss.as.standalone"
+            + " -Djboss.home.dir=***** -Djboss.server.base.dir=***** -c standalone.xml"
+            + " -Djboss.server.base.dir=*****";
+
+    inst.setJvmArgs(unsanitizedJvmArgs);
+    inst.setJavaCommand(unsanitizedJavaCommand);
+
+    sanitizeInstance(inst);
+
+    assertEquals(sanitizedJvmArgs, inst.getJvmArgs());
+    assertEquals(sanitizedJavaCommand, inst.getJavaCommand());
   }
 }

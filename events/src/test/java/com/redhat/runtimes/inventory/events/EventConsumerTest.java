@@ -65,6 +65,8 @@ public class EventConsumerTest {
 
     // Check that sanitizing is happening
     assertTrue(inst.getJvmArgs().contains("=*****"));
+    // This example file doesn't have anything to sanitize here
+    // assertTrue(inst.getJavaCommand().contains("=*****"));
   }
 
   @Test
@@ -108,6 +110,7 @@ public class EventConsumerTest {
 
     // Check that sanitizing is happening
     assertTrue(inst.getJvmArgs().contains("=*****"));
+    assertTrue(inst.getJavaCommand().contains("=*****"));
   }
 
   @Test

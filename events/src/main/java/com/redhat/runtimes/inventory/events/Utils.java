@@ -429,10 +429,8 @@ public final class Utils {
   public static String sanitizeJavaParameters(String in) {
     StringBuilder out = new StringBuilder();
     String redacted = "=*****"; // What to replace sanitized content with
-    Log.info(in);
 
     for (String token : tokenizeString(in)) {
-      Log.info(token);
       // We only care about -Dxxxxx=yyyyy params
       if (token.startsWith("-D") && token.contains("=")) {
         String[] parts = token.split("=", 2);

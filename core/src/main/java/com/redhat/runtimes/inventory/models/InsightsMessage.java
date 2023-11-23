@@ -9,13 +9,18 @@ public sealed interface InsightsMessage permits JvmInstance, UpdateInstance {
   // persist
   void sanitize();
 
-  // This will sanitize strings that contain java style parameters
-  // of the type -Dxxxxx=yyyyy by substituting the yyyyy part.
-  static String sanitizeJavaParameters(String parameters) {
-    StringBuilder out = new StringBuilder();
+  /**
+   * Sanitizes a string that contains java style parameters of the type -Dxxxxx=yyyyy by
+   * substituting the yyyyy value for an obfuscated string
+   *
+   * @param parameters
+   * @return a sanitized parameter string suitable for persisting
+   */
+  static String sanitizeJavaParameters(final String parameters) {
+    final StringBuilder out = new StringBuilder();
     String redacted = "=*****"; // What to replace sanitized content with
 
-    for (String token : tokenizeComplexJavaParameters(parameters)) {
+    for (final String token : tokenizeComplexJavaParameters(parameters)) {
       // We only care about -Dxxxxx=yyyyy params
       if (token.startsWith("-D") && token.contains("=")) {
         String[] parts = token.split("=", 2);
@@ -45,39 +50,39 @@ public sealed interface InsightsMessage permits JvmInstance, UpdateInstance {
   // This is important because some of the data we want to preserve might
   // look like -Dxxxxx="this is all one token"
   // This is also aware of escape sequences
-  static String[] tokenizeComplexJavaParameters(String parameters) {
-    ArrayList<String> tokens = new ArrayList<String>();
-    StringBuilder word = new StringBuilder();
+  static String[] tokenizeComplexJavaParameters(final String parameters) {
+    final ArrayList<String> tokens = new ArrayList<String>();
+    StringBuilder currentWord = new StringBuilder();
     Character currentQuote = null;
     boolean escaping = false;
     boolean afterEquals = false;
     // Order is important here. Rearrange at your own risk.
-    for (char c : parameters.toCharArray()) {
+    for (final char c : parameters.toCharArray()) {
       // If we're not escaping, start escaping and continue
       if (c == '\\' && !escaping) {
         escaping = true;
-        word.append(c);
+        currentWord.append(c);
         continue;
       }
 
       // If we're escaping, always just add to the word and continue
       if (escaping) {
         escaping = false;
-        word.append(c);
+        currentWord.append(c);
         continue;
       }
 
       // If we see an '=', remember that and continue
       if (c == '=') {
         afterEquals = true;
-        word.append(c);
+        currentWord.append(c);
         continue;
       }
 
       // If we're not in a quote and we hit a space, save the word and continue
       if (currentQuote == null && c == ' ') {
-        tokens.add(word.toString());
-        word = new StringBuilder();
+        tokens.add(currentWord.toString());
+        currentWord = new StringBuilder();
         continue;
       }
 
@@ -92,7 +97,7 @@ public sealed interface InsightsMessage permits JvmInstance, UpdateInstance {
         } else {
           // So we're not quoting...
           // If we're at a new word or after an equals, start quoting
-          if (afterEquals || word.isEmpty()) {
+          if (afterEquals || currentWord.isEmpty()) {
             currentQuote = c;
           }
         }
@@ -100,10 +105,10 @@ public sealed interface InsightsMessage permits JvmInstance, UpdateInstance {
 
       // Otherwise, just add the char
       afterEquals = false;
-      word.append(c);
+      currentWord.append(c);
     }
     // Add the last word for the end of string
-    tokens.add(word.toString());
+    tokens.add(currentWord.toString());
     return tokens.toArray(new String[0]);
   }
 }

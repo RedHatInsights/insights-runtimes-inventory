@@ -5,6 +5,7 @@ import static com.redhat.runtimes.inventory.events.TestUtils.inputStreamFromReso
 import static com.redhat.runtimes.inventory.events.TestUtils.readBytesFromResources;
 import static com.redhat.runtimes.inventory.events.TestUtils.readFromResources;
 import static com.redhat.runtimes.inventory.events.Utils.instanceOf;
+import static com.redhat.runtimes.inventory.models.InsightsMessage.REDACTED_VALUE;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -63,9 +64,9 @@ public class EventConsumerTest {
     assertEquals(hostname, inst.getHostname());
 
     // Check that sanitizing is happening
-    assertTrue(inst.getJvmArgs().contains("=*****"));
+    assertTrue(inst.getJvmArgs().contains(REDACTED_VALUE));
     // This example file doesn't have anything to sanitize here
-    // assertTrue(inst.getJavaCommand().contains("=*****"));
+    // assertTrue(inst.getJavaCommand().contains(REDACTED_VALUE));
   }
 
   @Test
@@ -108,8 +109,8 @@ public class EventConsumerTest {
     assertNotNull(inst.getConfiguration().getSocketBindingGroups());
 
     // Check that sanitizing is happening
-    assertTrue(inst.getJvmArgs().contains("=*****"));
-    assertTrue(inst.getJavaCommand().contains("=*****"));
+    assertTrue(inst.getJvmArgs().contains(REDACTED_VALUE));
+    assertTrue(inst.getJavaCommand().contains(REDACTED_VALUE));
   }
 
   @Test
@@ -158,11 +159,25 @@ public class EventConsumerTest {
         "[-D[Standalone], -verbose:gc, -Xloggc:/opt/jboss-eap-7.4.0/standalone/log/gc.log,"
             + " -XX:+PrintGCDetails, -XX:+PrintGCDateStamps, -XX:+UseGCLogFileRotation,"
             + " -XX:NumberOfGCLogFiles=5, -XX:GCLogFileSize=3M, -XX:-TraceClassUnloading,"
-            + " -Djdk.serialFilter=*****, -Xms1303m, -Xmx2048m, -XX:MetaspaceSize=128M,"
-            + " -XX:MaxMetaspaceSize=512m, -Djava.net.preferIPv4Stack=*****,"
-            + " -Djboss.modules.system.pkgs=*****, -Djava.awt.headless=*****,"
-            + " -Dorg.jboss.boot.log.file=*****, -Dsome.dumb.practice=*****,"
-            + " -Dlogging.configuration=*****]";
+            + " -Djdk.serialFilter"
+            + REDACTED_VALUE
+            + ", -Xms1303m, -Xmx2048m, -XX:MetaspaceSize=128M,"
+            + " -XX:MaxMetaspaceSize=512m, -Djava.net.preferIPv4Stack"
+            + REDACTED_VALUE
+            + ","
+            + " -Djboss.modules.system.pkgs"
+            + REDACTED_VALUE
+            + ", -Djava.awt.headless"
+            + REDACTED_VALUE
+            + ","
+            + " -Dorg.jboss.boot.log.file"
+            + REDACTED_VALUE
+            + ", -Dsome.dumb.practice"
+            + REDACTED_VALUE
+            + ","
+            + " -Dlogging.configuration"
+            + REDACTED_VALUE
+            + "]";
 
     String unsanitizedJavaCommand =
         "/opt/jboss/7/eap/jboss-modules.jar -mp"
@@ -173,8 +188,13 @@ public class EventConsumerTest {
     String sanitizedJavaCommand =
         "/opt/jboss/7/eap/jboss-modules.jar -mp"
             + " /opt/jboss/7/eap/modules:/opt/jboss/7/eap/../modules org.jboss.as.standalone"
-            + " -Djboss.home.dir=***** -Djboss.server.base.dir=***** -c standalone.xml"
-            + " -Djboss.server.base.dir=*****";
+            + " -Djboss.home.dir"
+            + REDACTED_VALUE
+            + " -Djboss.server.base.dir"
+            + REDACTED_VALUE
+            + " -c standalone.xml"
+            + " -Djboss.server.base.dir"
+            + REDACTED_VALUE;
 
     inst.setJvmArgs(unsanitizedJvmArgs);
     inst.setJavaCommand(unsanitizedJavaCommand);

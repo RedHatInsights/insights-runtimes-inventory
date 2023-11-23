@@ -1,6 +1,7 @@
 /* Copyright (C) Red Hat 2023 */
 package com.redhat.runtimes.inventory.models;
 
+import static com.redhat.runtimes.inventory.models.InsightsMessage.REDACTED_VALUE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
@@ -20,10 +21,26 @@ public class InsightsMessageTest {
             + " -Dsome.broken.json=\"{\"a\":\"b\"'{\",";
     String sanitizedJvmArgs =
         "[-D[Standalone], -verbose:gc, -Xloggc:/opt/jboss-eap-7.4.0/standalone/log/gc.log,"
-            + " -Djava.net.preferIPv4Stack=*****, -Djboss.modules.system.pkgs=*****,"
-            + " -Djava.awt.headless=*****, -Dorg.jboss.boot.log.file=*****,"
-            + " -Dsome.dumb.practice=*****, -Dsome.broken.practice=*****, -Dsome.nice.json=*****,"
-            + " -Dsome.broken.json=*****,";
+            + " -Djava.net.preferIPv4Stack"
+            + REDACTED_VALUE
+            + ", -Djboss.modules.system.pkgs"
+            + REDACTED_VALUE
+            + ","
+            + " -Djava.awt.headless"
+            + REDACTED_VALUE
+            + ", -Dorg.jboss.boot.log.file"
+            + REDACTED_VALUE
+            + ","
+            + " -Dsome.dumb.practice"
+            + REDACTED_VALUE
+            + ", -Dsome.broken.practice"
+            + REDACTED_VALUE
+            + ", -Dsome.nice.json"
+            + REDACTED_VALUE
+            + ","
+            + " -Dsome.broken.json"
+            + REDACTED_VALUE
+            + ",";
 
     assertEquals(sanitizedJvmArgs, InsightsMessage.sanitizeJavaParameters(unsanitizedJvmArgs));
   }

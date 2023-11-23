@@ -9,7 +9,7 @@ public sealed interface InsightsMessage permits JvmInstance, UpdateInstance {
   // persist
   void sanitize();
 
-  String REDACTED_VALUE = "ZZZZZZZZZ";
+  String REDACTED_VALUE = "=ZZZZZZZZZ";
 
   /**
    * Sanitizes a string that contains java style parameters of the type -Dxxxxx=yyyyy by
@@ -20,14 +20,13 @@ public sealed interface InsightsMessage permits JvmInstance, UpdateInstance {
    */
   static String sanitizeJavaParameters(final String parameters) {
     final StringBuilder out = new StringBuilder();
-    String redacted = "=*****"; // What to replace sanitized content with
 
     for (final String token : tokenizeComplexJavaParameters(parameters)) {
       // We only care about -Dxxxxx=yyyyy params
       if (token.startsWith("-D") && token.contains("=")) {
         String[] parts = token.split("=", 2);
         out.append(parts[0]);
-        out.append(redacted);
+        out.append(REDACTED_VALUE);
         // We might be parsing json
         // if so, preserve the list comma or list closing bracket
         if (token.endsWith(",")) {

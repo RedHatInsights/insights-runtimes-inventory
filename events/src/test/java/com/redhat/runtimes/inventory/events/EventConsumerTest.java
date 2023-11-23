@@ -5,7 +5,6 @@ import static com.redhat.runtimes.inventory.events.TestUtils.inputStreamFromReso
 import static com.redhat.runtimes.inventory.events.TestUtils.readBytesFromResources;
 import static com.redhat.runtimes.inventory.events.TestUtils.readFromResources;
 import static com.redhat.runtimes.inventory.events.Utils.instanceOf;
-import static com.redhat.runtimes.inventory.events.Utils.sanitizeInstance;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -180,7 +179,7 @@ public class EventConsumerTest {
     inst.setJvmArgs(unsanitizedJvmArgs);
     inst.setJavaCommand(unsanitizedJavaCommand);
 
-    sanitizeInstance(inst);
+    inst.sanitize();
 
     assertEquals(sanitizedJvmArgs, inst.getJvmArgs());
     assertEquals(sanitizedJavaCommand, inst.getJavaCommand());

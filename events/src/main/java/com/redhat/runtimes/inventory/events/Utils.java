@@ -25,6 +25,7 @@ public final class Utils {
 
   private Utils() {}
 
+  @SuppressWarnings("unchecked")
   public static InsightsMessage instanceOf(ArchiveAnnouncement announce, String json) {
     TypeReference<Map<String, Object>> typeRef = new TypeReference<>() {};
 
@@ -55,6 +56,7 @@ public final class Utils {
   /****************************************************************************
    *                             JVM Methods
    ***************************************************************************/
+  @SuppressWarnings("unchecked")
   public static JvmInstance jvmInstanceOf(ArchiveAnnouncement announce, String json) {
     var inst = new JvmInstance();
     // Announce fields first
@@ -80,7 +82,7 @@ public final class Utils {
       throw new RuntimeException("Error in unmarshalling JSON", e);
     }
 
-    sanitizeInstance(inst);
+    inst.sanitize();
     return inst;
   }
 
@@ -151,6 +153,7 @@ public final class Utils {
     return new UpdateInstance(linkingHash, jars);
   }
 
+  @SuppressWarnings("unchecked")
   static Set<JarHash> jarHashesOf(Map<String, Object> jarsRep) {
     if (jarsRep == null) {
       return Set.of();
@@ -165,6 +168,7 @@ public final class Utils {
     return out;
   }
 
+  @SuppressWarnings("unchecked")
   public static JarHash jarHashOf(Map<String, Object> jarJson) {
     var out = new JarHash();
     out.setName((String) jarJson.getOrDefault("name", ""));
@@ -183,6 +187,7 @@ public final class Utils {
   /****************************************************************************
    *                             EAP Methods
    ***************************************************************************/
+  @SuppressWarnings("unchecked")
   public static EapInstance eapInstanceOf(ArchiveAnnouncement announce, String json) {
     var inst = new EapInstance();
     inst.setRaw(json);
@@ -241,7 +246,7 @@ public final class Utils {
       throw new RuntimeException("Error in unmarshalling JSON", e);
     }
 
-    sanitizeInstance(inst);
+    inst.sanitize();
     return inst;
   }
 
@@ -268,6 +273,7 @@ public final class Utils {
     return out;
   }
 
+  @SuppressWarnings("unchecked")
   static EapConfiguration eapConfigurationOf(EapInstance inst, Map<String, Object> eapConfigRep) {
     if (eapConfigRep == null) {
       throw new RuntimeException(
@@ -364,6 +370,7 @@ public final class Utils {
    *                             Utility Methods
    ***************************************************************************/
   // Given a message, should we process it and persist it?
+  @SuppressWarnings("unchecked")
   public static boolean shouldProcessMessage(String json, Clock clock, boolean isEgg) {
     TypeReference<Map<String, Object>> typeRef = new TypeReference<>() {};
 
@@ -386,7 +393,7 @@ public final class Utils {
       // We should check the timestamp for statements from the last 24 hours.
       LocalDate yesterday = LocalDate.now(clock).minusDays(1);
       LocalDate messageTime =
-          Instant.ofEpochMilli(Long.valueOf(String.valueOf(basic.get("jvm.report_time"))))
+          Instant.ofEpochMilli(Long.parseLong(String.valueOf(basic.get("jvm.report_time"))))
               .atZone(ZoneId.systemDefault())
               .toLocalDate();
       if (messageTime.isBefore(yesterday)) {
@@ -400,125 +407,5 @@ public final class Utils {
       throw new RuntimeException("Error in unmarshalling JSON", e);
     }
     return true;
-  }
-
-  // Clean given fields of data we don't want to persist
-  public static void sanitizeInstance(InsightsMessage msg) {
-    JvmInstance inst = null;
-
-    if (msg instanceof JvmInstance) {
-      inst = (JvmInstance) msg;
-    } else if (msg instanceof EapInstance) {
-      inst = (EapInstance) msg;
-    } else {
-      // We don't care, ignore and move on.
-      return;
-    }
-
-    if (inst == null) {
-      Log.debugf("Not sanitizing a Null Instance...");
-      return;
-    }
-
-    inst.setJvmArgs(sanitizeJavaParameters(inst.getJvmArgs()));
-    inst.setJavaCommand(sanitizeJavaParameters(inst.getJavaCommand()));
-  }
-
-  // This will sanitize strings that contain java style parameters
-  // of the type -Dxxxxx=yyyyy by substituting the yyyyy part.
-  public static String sanitizeJavaParameters(String in) {
-    StringBuilder out = new StringBuilder();
-    String redacted = "=*****"; // What to replace sanitized content with
-
-    for (String token : tokenizeString(in)) {
-      // We only care about -Dxxxxx=yyyyy params
-      if (token.startsWith("-D") && token.contains("=")) {
-        String[] parts = token.split("=", 2);
-        out.append(parts[0]);
-        out.append(redacted);
-        // We might be parsing json
-        // if so, preserve the list comma or list closing bracket
-        if (token.endsWith(",")) {
-          out.append(',');
-        }
-        if (token.endsWith("]")) {
-          out.append(']');
-        }
-      } else {
-        out.append(token);
-      }
-      out.append(" ");
-    }
-    // Remove the last added space
-    out.deleteCharAt(out.length() - 1);
-    return out.toString();
-  }
-
-  // This tokenizes a string, but with some special rules
-  // It tokenizes based on spaces, but it will interpret quotes
-  // that start in the middle of a string, after an '='
-  // This is important because some of the data we want to preserve might
-  // look like -Dxxxxx="this is all one token"
-  // This is also aware of escape sequences
-  public static String[] tokenizeString(String in) {
-    ArrayList<String> tokens = new ArrayList<String>();
-    StringBuilder word = new StringBuilder();
-    Character currentQuote = null;
-    boolean escaping = false;
-    boolean afterEquals = false;
-    // Order is important here. Rearrange at your own risk.
-    for (char c : in.toCharArray()) {
-      // If we're not escaping, start escaping and continue
-      if (c == '\\' && !escaping) {
-        escaping = true;
-        word.append(c);
-        continue;
-      }
-
-      // If we're escaping, always just add to the word and continue
-      if (escaping) {
-        escaping = false;
-        word.append(c);
-        continue;
-      }
-
-      // If we see an '=', remember that and continue
-      if (c == '=') {
-        afterEquals = true;
-        word.append(c);
-        continue;
-      }
-
-      // If we're not in a quote and we hit a space, save the word and continue
-      if (currentQuote == null && c == ' ') {
-        tokens.add(word.toString());
-        word = new StringBuilder();
-        continue;
-      }
-
-      // If we see a quote...
-      if (c == '\'' || c == '"') {
-        // If we are quoting...
-        if (currentQuote != null) {
-          // stop quoting if we're at the matching quote
-          if (c == currentQuote) {
-            currentQuote = null;
-          }
-        } else {
-          // So we're not quoting...
-          // If we're at a new word or after an equals, start quoting
-          if (afterEquals || word.length() == 0) {
-            currentQuote = c;
-          }
-        }
-      }
-
-      // Otherwise, just add the char
-      afterEquals = false;
-      word.append(c);
-    }
-    // Add the last word for the end of string
-    tokens.add(word.toString());
-    return tokens.toArray(new String[0]);
   }
 }

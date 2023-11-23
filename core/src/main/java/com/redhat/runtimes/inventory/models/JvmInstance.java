@@ -597,4 +597,10 @@ public non-sealed class JvmInstance implements InsightsMessage {
     sb.append('}');
     return sb.toString();
   }
+
+  @Override
+  public void sanitize() {
+    setJvmArgs(InsightsMessage.sanitizeJavaParameters(getJvmArgs()));
+    setJavaCommand(InsightsMessage.sanitizeJavaParameters(getJavaCommand()));
+  }
 }

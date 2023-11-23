@@ -9,6 +9,8 @@ public sealed interface InsightsMessage permits JvmInstance, UpdateInstance {
   // persist
   void sanitize();
 
+  String REDACTED_VALUE = "ZZZZZZZZZ";
+
   /**
    * Sanitizes a string that contains java style parameters of the type -Dxxxxx=yyyyy by
    * substituting the yyyyy value for an obfuscated string

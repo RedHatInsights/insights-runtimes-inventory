@@ -51,34 +51,26 @@ pipeline {
                     }
                 }
 
-                // stage('Run smoke tests') {
-                //     steps {
-                //         withVault([configuration: configuration, vaultSecrets: secrets]) {
-                //             sh '''
-                //                 curl -s $CICD_URL/bootstrap.sh > .cicd_bootstrap.sh
-                                
-                //                 source ./.cicd_bootstrap.sh
-                //                 source "${CICD_ROOT}/deploy_ephemeral_env.sh"
-                //                 source "${CICD_ROOT}/cji_smoke_test.sh"
-                //             '''
-                //         }
-
-                //     }
-                // }
+                stage('Run smoke tests') {
+                    steps {
+                        withVault([configuration: configuration, vaultSecrets: secrets]) {
+                            sh '''
+                                curl -s $CICD_URL/bootstrap.sh > .cicd_bootstrap.sh
+                                source ./.cicd_bootstrap.sh
+                                source "${CICD_ROOT}/deploy_ephemeral_env.sh"
+                                source "${CICD_ROOT}/cji_smoke_test.sh"
+                            '''
+                        }
+                    }
+                }
             }
         }
     }
 
-    // post {
-    //     always{
-    //         withVault([configuration: configuration, vaultSecrets: secrets]) {
-    //             sh '''
-    //                 curl -s $CICD_URL/bootstrap.sh > .cicd_bootstrap.sh
-    //                 source ./.cicd_bootstrap.sh
-
-    //                 source "${CICD_ROOT}/post_test_results.sh"
-    //             '''
-    //         }
-    //     }
-    // }
+    post {
+        always{
+            archiveArtifacts artifacts: 'artifacts/**/*', fingerprint: true
+            junit skipPublishingChecks: true, testResults: 'artifacts/*.xml'
+        }
+    }
 }

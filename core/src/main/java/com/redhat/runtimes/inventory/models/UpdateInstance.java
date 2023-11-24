@@ -19,4 +19,9 @@ public final class UpdateInstance implements InsightsMessage {
   public List<JarHash> getUpdates() {
     return updates;
   }
+
+  @Override
+  public void sanitize() {
+    // No-op
+  }
 }

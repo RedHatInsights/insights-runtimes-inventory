@@ -25,6 +25,7 @@ public final class Utils {
 
   private Utils() {}
 
+  @SuppressWarnings("unchecked")
   public static InsightsMessage instanceOf(ArchiveAnnouncement announce, String json) {
     TypeReference<Map<String, Object>> typeRef = new TypeReference<>() {};
 
@@ -55,6 +56,7 @@ public final class Utils {
   /****************************************************************************
    *                             JVM Methods
    ***************************************************************************/
+  @SuppressWarnings("unchecked")
   public static JvmInstance jvmInstanceOf(ArchiveAnnouncement announce, String json) {
     var inst = new JvmInstance();
     // Announce fields first
@@ -80,6 +82,7 @@ public final class Utils {
       throw new RuntimeException("Error in unmarshalling JSON", e);
     }
 
+    inst.sanitize();
     return inst;
   }
 
@@ -150,6 +153,7 @@ public final class Utils {
     return new UpdateInstance(linkingHash, jars);
   }
 
+  @SuppressWarnings("unchecked")
   static Set<JarHash> jarHashesOf(Map<String, Object> jarsRep) {
     if (jarsRep == null) {
       return Set.of();
@@ -164,6 +168,7 @@ public final class Utils {
     return out;
   }
 
+  @SuppressWarnings("unchecked")
   public static JarHash jarHashOf(Map<String, Object> jarJson) {
     var out = new JarHash();
     out.setName((String) jarJson.getOrDefault("name", ""));
@@ -182,6 +187,7 @@ public final class Utils {
   /****************************************************************************
    *                             EAP Methods
    ***************************************************************************/
+  @SuppressWarnings("unchecked")
   public static EapInstance eapInstanceOf(ArchiveAnnouncement announce, String json) {
     var inst = new EapInstance();
     inst.setRaw(json);
@@ -240,6 +246,7 @@ public final class Utils {
       throw new RuntimeException("Error in unmarshalling JSON", e);
     }
 
+    inst.sanitize();
     return inst;
   }
 
@@ -266,6 +273,7 @@ public final class Utils {
     return out;
   }
 
+  @SuppressWarnings("unchecked")
   static EapConfiguration eapConfigurationOf(EapInstance inst, Map<String, Object> eapConfigRep) {
     if (eapConfigRep == null) {
       throw new RuntimeException(
@@ -358,7 +366,11 @@ public final class Utils {
     return config;
   }
 
+  /****************************************************************************
+   *                             Utility Methods
+   ***************************************************************************/
   // Given a message, should we process it and persist it?
+  @SuppressWarnings("unchecked")
   public static boolean shouldProcessMessage(String json, Clock clock, boolean isEgg) {
     TypeReference<Map<String, Object>> typeRef = new TypeReference<>() {};
 
@@ -381,7 +393,7 @@ public final class Utils {
       // We should check the timestamp for statements from the last 24 hours.
       LocalDate yesterday = LocalDate.now(clock).minusDays(1);
       LocalDate messageTime =
-          Instant.ofEpochMilli(Long.valueOf(String.valueOf(basic.get("jvm.report_time"))))
+          Instant.ofEpochMilli(Long.parseLong(String.valueOf(basic.get("jvm.report_time"))))
               .atZone(ZoneId.systemDefault())
               .toLocalDate();
       if (messageTime.isBefore(yesterday)) {

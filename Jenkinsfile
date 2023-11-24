@@ -23,7 +23,6 @@ pipeline {
         // --------------------------------------------
         APP_NAME="runtimes-inventory"  // name of app-sre "application" folder this component lives in
         COMPONENT_NAME="runtimes-inventory"  // name of app-sre "resourceTemplate" in deploy.yaml for this component
-        IMAGE="quay.io/cloudservices/runtimes-inventory"  // image location on quay
 
         IQE_PLUGINS="runtimes-inventory"  // name of the IQE plugin for this app.
         IQE_MARKER_EXPRESSION="smoke"  // This is the value passed to pytest -m
@@ -57,7 +56,7 @@ pipeline {
                             sh '''
                                 curl -s $CICD_URL/bootstrap.sh > .cicd_bootstrap.sh
                                 source ./.cicd_bootstrap.sh
-                                source "${CICD_ROOT}/deploy_ephemeral_env.sh"
+                                source "scripts/deploy_ephemeral_env.sh"
                                 source "${CICD_ROOT}/cji_smoke_test.sh"
                             '''
                         }

@@ -44,4 +44,34 @@ public class InsightsMessageTest {
 
     assertEquals(sanitizedJvmArgs, InsightsMessage.sanitizeJavaParameters(unsanitizedJvmArgs));
   }
+
+  // This test is to ensure that we don't have any impact when we sanitize the JVM args on both
+  // client and server side
+  @Test
+  public void testDoubleSanitizeJavaParametersIsANoop() {
+    String sanitizedJvmArgs =
+        "[-D[Standalone], -verbose:gc, -Xloggc:/opt/jboss-eap-7.4.0/standalone/log/gc.log,"
+            + " -Djava.net.preferIPv4Stack"
+            + REDACTED_VALUE
+            + ", -Djboss.modules.system.pkgs"
+            + REDACTED_VALUE
+            + ","
+            + " -Djava.awt.headless"
+            + REDACTED_VALUE
+            + ", -Dorg.jboss.boot.log.file"
+            + REDACTED_VALUE
+            + ","
+            + " -Dsome.dumb.practice"
+            + REDACTED_VALUE
+            + ", -Dsome.broken.practice"
+            + REDACTED_VALUE
+            + ", -Dsome.nice.json"
+            + REDACTED_VALUE
+            + ","
+            + " -Dsome.broken.json"
+            + REDACTED_VALUE
+            + ",";
+
+    assertEquals(sanitizedJvmArgs, InsightsMessage.sanitizeJavaParameters(sanitizedJvmArgs));
+  }
 }

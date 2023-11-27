@@ -61,7 +61,7 @@ pipeline {
                                 curl -s $CICD_URL/bootstrap.sh > .cicd_bootstrap.sh
                                 source ./.cicd_bootstrap.sh
                                 source "scripts/deploy_ephemeral_env.sh"
-                                source "${CICD_ROOT}/cji_smoke_test.sh"
+                                source "scripts/cji_smoke_test.sh"
                             '''
                         }
                     }

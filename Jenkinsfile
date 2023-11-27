@@ -42,18 +42,17 @@ pipeline {
 
         stage('Run Tests') {
             parallel {
-                // stage('Run unit tests') {
-                //     steps {
-                //         withVault([configuration: configuration, vaultSecrets: secrets]) {
-                //             sh 'bash -x scripts/unit_test.sh'
-                //         }
-                //     }
-                // }
+                stage('Run unit tests') {
+                    steps {
+                        withVault([configuration: configuration, vaultSecrets: secrets]) {
+                            sh 'bash -x scripts/unit_test.sh'
+                        }
+                    }
+                }
 
                 stage('Run smoke tests') {
                     environment {
                         DEPLOY_TIMEOUT="900"  // 15min
-                        CJI_NAME="runtimes-inventory-smokes"
                     }
                     steps {
                         withVault([configuration: configuration, vaultSecrets: secrets]) {

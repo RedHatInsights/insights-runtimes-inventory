@@ -55,10 +55,6 @@ fi
 echo "Running: docker pull ${MC_IMAGE}"
 docker pull ${MC_IMAGE}
 
-# CJI_NAME="$COMPONENT_NAME"
-CJI_NAME="runtimes-inventory-smokes"
-IQE_IMAGE_TAG="runtimes-inventory"
-
 if [[ -z $IQE_CJI_TIMEOUT ]]; then
     echo "Error: no timeout set; export IQE_CJI_TIMEOUT before invoking cji_smoke_test.sh"
     exit 1
@@ -96,6 +92,10 @@ if [ ! -z "$IQE_IMAGE_TAG_TMP" ]; then
     fi
     set -e
 fi
+
+# Set variables that didn't resolve properly
+CJI_NAME="runtimes-inventory-smokes"
+IQE_IMAGE_TAG="runtimes-inventory"
 
 # Invoke the CJI using the options set via env vars
 set -x

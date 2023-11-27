@@ -51,6 +51,9 @@ pipeline {
                 // }
 
                 stage('Run smoke tests') {
+                    environment {
+                        DEPLOY_TIMEOUT="900"  // 15min
+                    }
                     steps {
                         withVault([configuration: configuration, vaultSecrets: secrets]) {
                             sh '''

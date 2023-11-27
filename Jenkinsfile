@@ -53,6 +53,7 @@ pipeline {
                 stage('Run smoke tests') {
                     environment {
                         DEPLOY_TIMEOUT="900"  // 15min
+                        CJI_NAME="runtimes-inventory-smokes"
                     }
                     steps {
                         withVault([configuration: configuration, vaultSecrets: secrets]) {

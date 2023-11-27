@@ -22,7 +22,7 @@ set -x
 export NAMESPACE=$(bonfire namespace reserve --pool ${NAMESPACE_POOL} --duration ${RESERVE_DURATION})
 SMOKE_NAMESPACE=$NAMESPACE  # track which namespace was used here for 'teardown' in common_deploy_logic
 
-export DEPLOY_TIMEOUT="1200" # try increasing from 900s -> 1200s
+IMAGE_TAG=$(git rev-parse --short=7 HEAD)
 
 bonfire deploy \
     ${APP_NAME} \

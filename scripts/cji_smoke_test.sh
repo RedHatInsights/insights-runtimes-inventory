@@ -57,6 +57,7 @@ docker pull ${MC_IMAGE}
 
 # CJI_NAME="$COMPONENT_NAME"
 CJI_NAME="runtimes-inventory-smokes"
+IQE_IMAGE_TAG="runtimes-inventory"
 
 if [[ -z $IQE_CJI_TIMEOUT ]]; then
     echo "Error: no timeout set; export IQE_CJI_TIMEOUT before invoking cji_smoke_test.sh"

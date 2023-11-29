@@ -12,10 +12,10 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 public class MetricsConfiguration {
 
   @ConfigProperty(name = "request.processing.duration.minimumExpectedValue", defaultValue = "1")
-  private Integer minimumExpectedValue;
+  Integer minimumExpectedValue;
 
   @ConfigProperty(name = "request.processing.duration.maximumExpectedValue", defaultValue = "700")
-  private Integer maximumExpectedValue;
+  Integer maximumExpectedValue;
 
   @Produces
   @Singleton

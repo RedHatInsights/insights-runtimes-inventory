@@ -16,12 +16,12 @@ public class MetricsConfiguration {
   @ConfigProperty(
       name = "metrics.event.processing.duration.minimumExpectedValue",
       defaultValue = "1")
-  private Integer minimumExpectedValue;
+  Integer minimumExpectedValue;
 
   @ConfigProperty(
       name = "metrics.event.processing.duration.maximumExpectedValue",
       defaultValue = "150")
-  private Integer maximumExpectedValue;
+  Integer maximumExpectedValue;
 
   @Produces
   @Singleton

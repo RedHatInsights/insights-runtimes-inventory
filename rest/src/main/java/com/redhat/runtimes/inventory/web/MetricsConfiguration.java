@@ -6,14 +6,16 @@ import io.micrometer.core.instrument.config.MeterFilter;
 import io.micrometer.core.instrument.distribution.DistributionStatisticConfig;
 import jakarta.enterprise.inject.Produces;
 import jakarta.inject.Singleton;
-import java.util.List;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 @Singleton
 public class MetricsConfiguration {
 
-  @ConfigProperty(name = "metrics.https.request.slo", defaultValue = "150,500,1000,5000")
-  List<Integer> slo;
+  @ConfigProperty(name = "request.processing.duration.minimumExpectedValue", defaultValue = "1")
+  private Integer minimumExpectedValue;
+
+  @ConfigProperty(name = "request.processing.duration.maximumExpectedValue", defaultValue = "700")
+  private Integer maximumExpectedValue;
 
   @Produces
   @Singleton
@@ -23,10 +25,11 @@ public class MetricsConfiguration {
       public DistributionStatisticConfig configure(
           Meter.Id id, DistributionStatisticConfig config) {
         if (id.getName().startsWith("http.server.requests")) {
-          // convert to nanoseconds
-          double[] values = slo.stream().map(i -> i * 1_000_000d).mapToDouble(d -> d).toArray();
+
           return DistributionStatisticConfig.builder()
-              .serviceLevelObjectives(values)
+              .percentilesHistogram(true)
+              .minimumExpectedValue(minimumExpectedValue * 1_000_000d)
+              .maximumExpectedValue(maximumExpectedValue * 1_000_000d)
               .build()
               .merge(config);
         }

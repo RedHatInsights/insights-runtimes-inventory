@@ -163,7 +163,7 @@ objects:
               - name: CRYOSTAT_PLATFORM
                 value: io.cryostat.platform.internal.KubeApiPlatformStrategy
               - name: CRYOSTAT_AUTH_MANAGER
-                value: io.cryostat.net.NoopAuthManager
+                value: ${CRYOSTAT_AUTH_MANAGER}
               - name: GRAFANA_DATASOURCE_URL
                 value: http://127.0.0.1:8080
               - name: GRAFANA_DASHBOARD_URL
@@ -222,6 +222,10 @@ objects:
               - mountPath: /opt/cryostat.d/probes.d
                 name: cryostat
                 subPath: probes
+              - mountPath: /opt/cryostat.d/conf.d/cryostat-users.properties
+                name: basic-auth-properties
+                subPath: cryostat-users.properties
+                readOnly: true
           - name: cryostat-grafana
             securityContext:
               allowPrivilegeEscalation: false
@@ -233,8 +237,9 @@ objects:
             env:
               - name: JFR_DATASOURCE_URL
                 value: http://127.0.0.1:8080
-              - name: GF_AUTH_ANONYMOUS_ENABLED
-                value: "true"
+            envFrom:
+            - secretRef:
+                name: cryostat-grafana-basic
             ports:
               - containerPort: 3000
                 protocol: TCP
@@ -269,6 +274,13 @@ objects:
         volumes:
           - name: cryostat
             emptyDir: { }
+          - name: basic-auth-properties
+            secret:
+              secretName: cryostat-users
+              items:
+                - key: properties
+                  path: cryostat-users.properties
+
 - apiVersion: route.openshift.io/v1
   kind: Route
   metadata:
@@ -317,6 +329,31 @@ objects:
   stringData:
     CRYOSTAT_JMX_CREDENTIALS_DB_PASSWORD: "${EPHEMERAL_DB_PASSWORD}"
 
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: cryostat-users
+    labels:
+      app.kubernetes.io/name: cryostat
+      app.kubernetes.io/instance: cryostat
+      app.kubernetes.io/version: "2.3.1.redhat"
+  type: Opaque
+  stringData:
+    properties: "${EPHEMERAL_CRYOSTAT_USER_PROPERTIES}"
+
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: cryostat-grafana-basic
+    labels:
+      app.kubernetes.io/name: cryostat
+      app.kubernetes.io/instance: cryostat
+      app.kubernetes.io/version: "2.3.1.redhat"
+  type: Opaque
+  stringData:
+    GF_SECURITY_ADMIN_USER:     "admin"
+    GF_SECURITY_ADMIN_PASSWORD: "${EPHEMERAL_GRAFANA_PASSWORD}"
+
 parameters:
   - name: ROUTE_DOMAIN
     displayName: Route Domain
@@ -338,7 +375,19 @@ parameters:
     description: Password for Cryostat's credentials database for Ephemeral Environments
     generate: expression
     from: '[\w\A]{10}'
+  - name: EPHEMERAL_CRYOSTAT_USER_PROPERTIES
+    displayName: Cryostat credentials property file (Ephemeral Only)
+    description: Java properties file containing user indentities of the form `<username>=<sha256 password>` for Ephemeral Environments
+    # user=pass
+    value: 'user=d74ff0ee8da3b9806b18c877dbf29bbde50b5bd8e4dad7a3a725000feb82e8f1'
+  - name: EPHEMERAL_GRAFANA_PASSWORD
+    displayName: Cryostat Grafana Password (Ephemeral Only)
+    description: Password for Cryostat's credentials database for Ephemeral Environments
+    value: pass
   - name: CRYOSTAT_REPLICAS
     displayName: Cryostat Replicas
     description: Number of replicas for Cryostat deployment (should be 0 or 1)
     value: "1"
+  - name: CRYOSTAT_AUTH_MANAGER
+    value: io.cryostat.net.BasicAuthManager
+    displayName: Authentication/authorization manager used for validating user access

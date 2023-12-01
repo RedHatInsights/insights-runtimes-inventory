@@ -9,8 +9,9 @@ readonly COMMIT_SHORT=$(git rev-parse --short=7 HEAD)
 
 # Build the docker image
 docker --config="$DOCKER_CONF" build \
+  --build-arg rh_it_root_ca_cert_url="${ROOT_CA_CERT_URL}" \
   --file scripts/Dockerfile \
-  --target integration-test-setup \
+  --target sonarqube-setup \
   --tag runtimes-inventory-sonarqube:latest \
   .
 

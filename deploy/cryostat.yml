@@ -121,6 +121,8 @@ objects:
         app.kubernetes.io/name: cryostat
         app.kubernetes.io/instance: cryostat
     replicas: ${{CRYOSTAT_REPLICAS}}
+    strategy:
+      type: Recreate
     template:
       metadata:
         labels:
@@ -188,6 +190,19 @@ objects:
                     name: cryostat-jmx-credentials-db
                     key: CRYOSTAT_JMX_CREDENTIALS_DB_PASSWORD
                     optional: false
+              - name: CRYOSTAT_JDBC_URL
+                value: jdbc:h2:file:/opt/cryostat.d/conf.d/h2;INIT=create domain if not exists jsonb as varchar
+              - name: CRYOSTAT_HBM2DDL
+                value: update
+              - name: CRYOSTAT_JDBC_DRIVER
+                value: org.h2.Driver
+              - name: CRYOSTAT_HIBERNATE_DIALECT
+                value: org.hibernate.dialect.H2Dialect
+              - name: CRYOSTAT_JDBC_USERNAME
+                value: cryostat
+              # Unused with H2 Database
+              - name: CRYOSTAT_JDBC_PASSWORD
+                value: cryostat
             ports:
               - containerPort: 8181
                 protocol: TCP
@@ -273,7 +288,8 @@ objects:
               { }
         volumes:
           - name: cryostat
-            emptyDir: { }
+            persistentVolumeClaim:
+              claimName: cryostat
           - name: basic-auth-properties
             secret:
               secretName: cryostat-users
@@ -316,6 +332,21 @@ objects:
     tls:
       termination: edge
       insecureEdgeTerminationPolicy: Redirect
+
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: cryostat
+    labels:
+      app.kubernetes.io/name: cryostat
+      app.kubernetes.io/instance: cryostat
+      app.kubernetes.io/version: "2.3.1.redhat"
+  spec:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: "${CRYOSTAT_STORAGE_SIZE}"
 
 - apiVersion: v1
   kind: Secret
@@ -391,3 +422,7 @@ parameters:
   - name: CRYOSTAT_AUTH_MANAGER
     value: io.cryostat.net.BasicAuthManager
     displayName: Authentication/authorization manager used for validating user access
+  - name: CRYOSTAT_STORAGE_SIZE
+    value: 500Mi
+    displayName: Cryostat PVC Size
+    description: Size in bytes of the Cryostat Persistent Volume Claim. Expressed as a Kubernetes Quantity.

@@ -167,10 +167,10 @@ public class EventConsumer {
     try {
       InsightsMessage msg = instanceOf(announce, json);
 
-      if (msg instanceof JvmInstance) {
-        inst = (JvmInstance) msg;
-      } else if (msg instanceof EapInstance) {
+      if (msg instanceof EapInstance) {
         inst = (EapInstance) msg;
+      } else if (msg instanceof JvmInstance) {
+        inst = (JvmInstance) msg;
       } else if (msg instanceof UpdateInstance update) {
         var linkingHash = update.getLinkingHash();
         var maybeInst = getInstanceFromHash(linkingHash);

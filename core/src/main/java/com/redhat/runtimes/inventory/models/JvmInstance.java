@@ -35,12 +35,10 @@ public non-sealed class JvmInstance implements InsightsMessage {
   // Process launched at
   @NotNull protected long launchTime;
 
-  //   "java.vm.specification.vendor" : "Oracle Corporation",
   @NotNull
   @Size(max = 255)
   protected String vendor;
 
-  //      "java.runtime.version" : "17.0.1+12",
   @NotNull
   @Size(max = 255)
   protected String versionString;
@@ -50,21 +48,16 @@ public non-sealed class JvmInstance implements InsightsMessage {
   @Size(max = 255)
   protected String version;
 
-  //    "java.vm.specification.version" : "17",
   @NotNull protected int majorVersion;
 
-  //  "system.arch" : "x86_64",
   @NotNull
   @Size(max = 50)
   protected String osArch;
 
-  //      "Logical Processors" : 12,
   @NotNull protected int processors;
 
-  //  "jvm.heap.min" : 1304,
   @NotNull protected int heapMin;
 
-  //  "Heap max (MB)" : 8192.0,
   @NotNull protected int heapMax;
 
   @NotNull
@@ -138,10 +131,13 @@ public non-sealed class JvmInstance implements InsightsMessage {
 
   @NotNull protected String jvmArgs;
 
+  @NotNull protected String workload;
+
   //////////////////////////////////////////////////////
 
   public JvmInstance() {}
 
+  @SuppressWarnings("unchecked")
   public JvmInstance(
       UUID id,
       String accountId,
@@ -207,6 +203,7 @@ public non-sealed class JvmInstance implements InsightsMessage {
     this.javaCommand = javaCommand;
     this.jvmPackages = jvmPackages;
     this.jvmArgs = jvmArgs;
+    this.workload = workload;
   }
 
   //////////////////////////////////////////////////////
@@ -483,49 +480,71 @@ public non-sealed class JvmInstance implements InsightsMessage {
     this.jvmArgs = jvmArgs;
   }
 
+  public String getWorkload() {
+    return workload;
+  }
+
+  public void setWorkload(String workload) {
+    this.workload = workload;
+  }
+
+  //////////////////////////////////////////////////////
+
+  @Override
+  public void sanitize() {
+    setJvmArgs(InsightsMessage.sanitizeJavaParameters(getJvmArgs()));
+    setJavaCommand(InsightsMessage.sanitizeJavaParameters(getJavaCommand()));
+  }
+
+  //////////////////////////////////////////////////////
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     JvmInstance that = (JvmInstance) o;
-    return majorVersion == that.majorVersion
+    return launchTime == that.launchTime
+        && majorVersion == that.majorVersion
         && processors == that.processors
         && heapMin == that.heapMin
         && heapMax == that.heapMax
         && Objects.equals(id, that.id)
+        && Objects.equals(linkingHash, that.linkingHash)
         && Objects.equals(accountId, that.accountId)
         && Objects.equals(orgId, that.orgId)
         && Objects.equals(hostname, that.hostname)
-        && Objects.equals(launchTime, that.launchTime)
         && Objects.equals(vendor, that.vendor)
         && Objects.equals(versionString, that.versionString)
         && Objects.equals(version, that.version)
         && Objects.equals(osArch, that.osArch)
         && Objects.equals(details, that.details)
         && Objects.equals(created, that.created)
-        && Objects.equals(javaClassPath, that.javaClassPath)
+        && Objects.equals(jarHashes, that.jarHashes)
         && Objects.equals(javaClassVersion, that.javaClassVersion)
-        && Objects.equals(javaCommand, that.javaCommand)
-        && Objects.equals(javaHome, that.javaHome)
-        && Objects.equals(javaLibraryPath, that.javaLibraryPath)
         && Objects.equals(javaSpecificationVendor, that.javaSpecificationVendor)
         && Objects.equals(javaVendor, that.javaVendor)
         && Objects.equals(javaVendorVersion, that.javaVendorVersion)
         && Objects.equals(javaVmName, that.javaVmName)
         && Objects.equals(javaVmVendor, that.javaVmVendor)
-        && Objects.equals(jvmArgs, that.jvmArgs)
         && Objects.equals(jvmHeapGcDetails, that.jvmHeapGcDetails)
-        && Objects.equals(jvmPackages, that.jvmPackages)
         && Objects.equals(jvmPid, that.jvmPid)
         && Objects.equals(jvmReportTime, that.jvmReportTime)
         && Objects.equals(systemOsName, that.systemOsName)
-        && Objects.equals(systemOsVersion, that.systemOsVersion);
+        && Objects.equals(systemOsVersion, that.systemOsVersion)
+        && Objects.equals(javaHome, that.javaHome)
+        && Objects.equals(javaLibraryPath, that.javaLibraryPath)
+        && Objects.equals(javaCommand, that.javaCommand)
+        && Objects.equals(javaClassPath, that.javaClassPath)
+        && Objects.equals(jvmPackages, that.jvmPackages)
+        && Objects.equals(jvmArgs, that.jvmArgs)
+        && Objects.equals(workload, that.workload);
   }
 
   @Override
   public int hashCode() {
     return Objects.hash(
         id,
+        linkingHash,
         accountId,
         orgId,
         hostname,
@@ -540,67 +559,126 @@ public non-sealed class JvmInstance implements InsightsMessage {
         heapMax,
         details,
         created,
-        javaClassPath,
+        jarHashes,
         javaClassVersion,
-        javaCommand,
-        javaHome,
-        javaLibraryPath,
         javaSpecificationVendor,
         javaVendor,
         javaVendorVersion,
         javaVmName,
         javaVmVendor,
-        jvmArgs,
         jvmHeapGcDetails,
-        jvmPackages,
         jvmPid,
         jvmReportTime,
         systemOsName,
-        systemOsVersion);
+        systemOsVersion,
+        javaHome,
+        javaLibraryPath,
+        javaCommand,
+        javaClassPath,
+        jvmPackages,
+        jvmArgs,
+        workload);
   }
 
   @Override
   public String toString() {
-    final StringBuffer sb = new StringBuffer("JvmInstance{");
-    sb.append("id=").append(id);
-    sb.append(", accountId='").append(accountId).append('\'');
-    sb.append(", orgId='").append(orgId).append('\'');
-    sb.append(", hostname='").append(hostname).append('\'');
-    sb.append(", launchTime=").append(launchTime);
-    sb.append(", vendor='").append(vendor).append('\'');
-    sb.append(", versionString='").append(versionString).append('\'');
-    sb.append(", version='").append(version).append('\'');
-    sb.append(", majorVersion=").append(majorVersion);
-    sb.append(", osArch='").append(osArch).append('\'');
-    sb.append(", processors=").append(processors);
-    sb.append(", heapMin=").append(heapMin);
-    sb.append(", heapMax=").append(heapMax);
-    sb.append(", details=").append(details);
-    sb.append(", created=").append(created);
-    sb.append(", javaClassPath=").append(javaClassPath);
-    sb.append(", javaClassVersion=").append(javaClassVersion);
-    sb.append(", javaHome=").append(javaHome);
-    sb.append(", javaLibraryPath=").append(javaLibraryPath);
-    sb.append(", javaSpecificationVendor=").append(javaSpecificationVendor);
-    sb.append(", javaVendor=").append(javaVendor);
-    sb.append(", javaVendorVersion=").append(javaVendorVersion);
-    sb.append(", javaVmName=").append(javaVmName);
-    sb.append(", javaVmVendor=").append(javaVmVendor);
-    sb.append(", jvmHeapGcDetails=").append(jvmHeapGcDetails);
-    sb.append(", jvmPid=").append(jvmPid);
-    sb.append(", jvmReportTime=").append(jvmReportTime);
-    sb.append(", systemOsName=").append(systemOsName);
-    sb.append(", systemOsVersion=").append(systemOsVersion);
-    sb.append(", javaCommand=").append(javaCommand);
-    sb.append(", jvmPackages=").append(jvmPackages);
-    sb.append(", jvmArgs=").append(jvmArgs);
-    sb.append('}');
-    return sb.toString();
-  }
-
-  @Override
-  public void sanitize() {
-    setJvmArgs(InsightsMessage.sanitizeJavaParameters(getJvmArgs()));
-    setJavaCommand(InsightsMessage.sanitizeJavaParameters(getJavaCommand()));
+    return "JvmInstance{"
+        + "id="
+        + id
+        + ", linkingHash='"
+        + linkingHash
+        + '\''
+        + ", accountId='"
+        + accountId
+        + '\''
+        + ", orgId='"
+        + orgId
+        + '\''
+        + ", hostname='"
+        + hostname
+        + '\''
+        + ", launchTime="
+        + launchTime
+        + ", vendor='"
+        + vendor
+        + '\''
+        + ", versionString='"
+        + versionString
+        + '\''
+        + ", version='"
+        + version
+        + '\''
+        + ", majorVersion="
+        + majorVersion
+        + ", osArch='"
+        + osArch
+        + '\''
+        + ", processors="
+        + processors
+        + ", heapMin="
+        + heapMin
+        + ", heapMax="
+        + heapMax
+        + ", details="
+        + details
+        + ", created="
+        + created
+        + ", jarHashes="
+        + jarHashes
+        + ", javaClassVersion='"
+        + javaClassVersion
+        + '\''
+        + ", javaSpecificationVendor='"
+        + javaSpecificationVendor
+        + '\''
+        + ", javaVendor='"
+        + javaVendor
+        + '\''
+        + ", javaVendorVersion='"
+        + javaVendorVersion
+        + '\''
+        + ", javaVmName='"
+        + javaVmName
+        + '\''
+        + ", javaVmVendor='"
+        + javaVmVendor
+        + '\''
+        + ", jvmHeapGcDetails='"
+        + jvmHeapGcDetails
+        + '\''
+        + ", jvmPid='"
+        + jvmPid
+        + '\''
+        + ", jvmReportTime='"
+        + jvmReportTime
+        + '\''
+        + ", systemOsName='"
+        + systemOsName
+        + '\''
+        + ", systemOsVersion='"
+        + systemOsVersion
+        + '\''
+        + ", javaHome='"
+        + javaHome
+        + '\''
+        + ", javaLibraryPath='"
+        + javaLibraryPath
+        + '\''
+        + ", javaCommand='"
+        + javaCommand
+        + '\''
+        + ", javaClassPath='"
+        + javaClassPath
+        + '\''
+        + ", jvmPackages='"
+        + jvmPackages
+        + '\''
+        + ", jvmArgs='"
+        + jvmArgs
+        + '\''
+        + ", workload='"
+        + workload
+        + '\''
+        + '}';
   }
 }

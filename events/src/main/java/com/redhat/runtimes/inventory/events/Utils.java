@@ -77,6 +77,10 @@ public final class Utils {
 
       mapJvmInstanceValues(inst, o, basic);
       inst.setJarHashes(jarHashesOf((Map<String, Object>) o.get("jars")));
+      // Set workload
+      var details = (Map<String, Object>) o.get("details");
+      inst.setWorkload((String) details.get("workloadType"));
+
     } catch (JsonProcessingException | ClassCastException | NumberFormatException e) {
       Log.error("Error in unmarshalling JSON", e);
       throw new RuntimeException("Error in unmarshalling JSON", e);
@@ -90,14 +94,6 @@ public final class Utils {
       JvmInstance inst, Map<String, Object> o, Map<String, Object> basic) {
 
     try {
-      // if (basic == null) {
-      //   var updatedJars = (Map<String, Object>) o.get("updated-jars");
-      //   if (updatedJars != null) {
-      //     return updatedInstanceOf(updatedJars);
-      //   }
-      //   throw new RuntimeException(
-      //       "Error in unmarshalling JSON - does not contain a basic or updated-jars tag");
-      // }
       inst.setLinkingHash((String) o.get("idHash"));
 
       inst.setVersionString(String.valueOf(basic.get("java.runtime.version")));
@@ -144,6 +140,7 @@ public final class Utils {
     }
   }
 
+  @SuppressWarnings("unchecked")
   static UpdateInstance updatedInstanceOf(Map<String, Object> updatedJars) {
     var linkingHash = (String) updatedJars.get("idHash");
     var jarsJson = (List<Map<String, Object>>) updatedJars.get("jars");
@@ -212,6 +209,7 @@ public final class Utils {
       inst.setAppTransportTypeHttps(String.valueOf(basic.get("app.transport.type.https")));
       inst.setAppUserDir(String.valueOf(basic.get("app.user.dir")));
       inst.setAppUserName(String.valueOf(basic.get("app.user.name")));
+      inst.setWorkload("EAP");
 
       // Jar hashes...
       inst.setJarHashes(jarHashesOf((Map<String, Object>) o.get("jars")));
@@ -250,6 +248,7 @@ public final class Utils {
     return inst;
   }
 
+  @SuppressWarnings("unchecked")
   static Set<EapDeployment> eapDeploymentsOf(EapInstance inst, List<Map<String, Object>> depRep) {
     if (depRep == null) {
       return Set.of();
@@ -262,11 +261,11 @@ public final class Utils {
       var arcRep = (List<Object>) deployment.get("archives");
       if (arcRep == null) {
         dep.setArchives(Set.of());
+      } else {
+        var archives = new HashSet<JarHash>();
+        arcRep.forEach(j -> archives.add(jarHashOf((Map<String, Object>) j)));
+        dep.setArchives(archives);
       }
-      var archives = new HashSet<JarHash>();
-      // arcRep.forEach(j -> archives.add(jarHashOf(inst, (Map<String, Object>) j)));
-      arcRep.forEach(j -> archives.add(jarHashOf((Map<String, Object>) j)));
-      dep.setArchives(archives);
       out.add(dep);
     }
 
@@ -341,7 +340,7 @@ public final class Utils {
       config.setCoreServices(mapper.writeValueAsString(configRep.get("core-service")));
 
       // Subsystem parsing
-      Map<String, String> subsystems = new HashMap<String, String>();
+      Map<String, String> subsystems = new HashMap<>();
       Map<String, Object> subsystemRep = (Map<String, Object>) configRep.get("subsystem");
       for (Map.Entry<String, Object> entry : subsystemRep.entrySet()) {
         subsystems.put(entry.getKey(), mapper.writeValueAsString(entry.getValue()));
@@ -349,7 +348,7 @@ public final class Utils {
       config.setSubsystems(subsystems);
 
       // Config Deployments parsing
-      Map<String, String> deployments = new HashMap<String, String>();
+      Map<String, String> deployments = new HashMap<>();
       Map<String, Object> deploymentRep = (Map<String, Object>) configRep.get("deployment");
       if (deploymentRep != null) {
         for (Map.Entry<String, Object> entry : deploymentRep.entrySet()) {

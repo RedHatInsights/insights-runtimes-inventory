@@ -79,7 +79,20 @@ public final class Utils {
       inst.setJarHashes(jarHashesOf((Map<String, Object>) o.get("jars")));
       // Set workload
       var details = (Map<String, Object>) o.get("details");
-      inst.setWorkload((String) details.get("workloadType"));
+      if (details != null) {
+        if (details.containsKey("workloadType")) {
+          inst.setWorkload((String) details.get("workloadType"));
+        }
+        if (details.containsKey("is_ocp")) {
+          inst.setOcp(Boolean.parseBoolean((String)details.get("is_ocp")));
+        } else {
+          // FIXME This is a workaround - for the first release of the agent in Cryostat
+          // we didn't have the is_ocp field. So we'll have to assume that if this payload
+          // came from an agent and the field's not there, it's from OCP.
+          // This should be fixed in the next release of the agent in Cryostat.
+          inst.setOcp(true);
+        }
+      }
 
     } catch (JsonProcessingException | ClassCastException | NumberFormatException e) {
       Log.error("Error in unmarshalling JSON", e);
@@ -210,6 +223,12 @@ public final class Utils {
       inst.setAppUserDir(String.valueOf(basic.get("app.user.dir")));
       inst.setAppUserName(String.valueOf(basic.get("app.user.name")));
       inst.setWorkload("EAP");
+      if (basic.containsKey("is_ocp")) {
+        inst.setOcp(Boolean.parseBoolean((String)basic.get("is_ocp")));
+      } else {
+        inst.setOcp(false);
+      }
+
 
       // Jar hashes...
       inst.setJarHashes(jarHashesOf((Map<String, Object>) o.get("jars")));

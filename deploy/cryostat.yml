@@ -220,7 +220,12 @@ objects:
                 port: 8181
               failureThreshold: 18
             resources:
-              { }
+              requests:
+                cpu: "500m"
+                memory: "256Mi"
+              limits:
+                cpu: "1"
+                memory: "1Gi"
             volumeMounts:
               - mountPath: /opt/cryostat.d/conf.d
                 name: cryostat
@@ -263,7 +268,12 @@ objects:
                 path: /api/health
                 port: 3000
             resources:
-              { }
+              requests:
+                cpu: "100m"
+                memory: "120Mi"
+              limits:
+                cpu: "200m"
+                memory: "256Mi"
           - name: cryostat-jfr-datasource
             securityContext:
               allowPrivilegeEscalation: false
@@ -285,7 +295,12 @@ objects:
                   - --fail
                   - http://127.0.0.1:8080
             resources:
-              { }
+              requests:
+                cpu: "200m"
+                memory: "384Mi"
+              limits:
+                cpu: "600m"
+                memory: "1Gi"
         volumes:
           - name: cryostat
             persistentVolumeClaim:

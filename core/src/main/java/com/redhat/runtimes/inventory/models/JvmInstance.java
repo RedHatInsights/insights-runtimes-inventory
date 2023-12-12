@@ -133,6 +133,8 @@ public non-sealed class JvmInstance implements InsightsMessage {
 
   @NotNull protected String workload = "Unidentified";
 
+  @NotNull protected boolean isOcp = false;
+
   //////////////////////////////////////////////////////
 
   public JvmInstance() {}
@@ -170,7 +172,9 @@ public non-sealed class JvmInstance implements InsightsMessage {
       String systemOsVersion,
       String javaCommand,
       String jvmPackages,
-      String jvmArgs) {
+      String jvmArgs,
+      String workload,
+      boolean isOcp) {
     this.id = id;
     this.accountId = accountId;
     this.orgId = orgId;
@@ -204,6 +208,7 @@ public non-sealed class JvmInstance implements InsightsMessage {
     this.jvmPackages = jvmPackages;
     this.jvmArgs = jvmArgs;
     this.workload = workload;
+    this.isOcp = isOcp;
   }
 
   //////////////////////////////////////////////////////
@@ -488,6 +493,14 @@ public non-sealed class JvmInstance implements InsightsMessage {
     this.workload = workload;
   }
 
+  public boolean isOcp() {
+    return isOcp;
+  }
+
+  public void setOcp(boolean ocp) {
+    isOcp = ocp;
+  }
+
   //////////////////////////////////////////////////////
 
   @Override
@@ -508,6 +521,7 @@ public non-sealed class JvmInstance implements InsightsMessage {
         && processors == that.processors
         && heapMin == that.heapMin
         && heapMax == that.heapMax
+        && isOcp == that.isOcp
         && Objects.equals(id, that.id)
         && Objects.equals(linkingHash, that.linkingHash)
         && Objects.equals(accountId, that.accountId)
@@ -577,7 +591,8 @@ public non-sealed class JvmInstance implements InsightsMessage {
         javaClassPath,
         jvmPackages,
         jvmArgs,
-        workload);
+        workload,
+        isOcp);
   }
 
   @Override
@@ -679,6 +694,8 @@ public non-sealed class JvmInstance implements InsightsMessage {
         + ", workload='"
         + workload
         + '\''
+        + ", isOcp="
+        + isOcp
         + '}';
   }
 }

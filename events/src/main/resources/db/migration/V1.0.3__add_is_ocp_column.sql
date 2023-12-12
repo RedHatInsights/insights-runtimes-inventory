@@ -9,5 +9,18 @@ ALTER TABLE IF EXISTS jvm_instance
 
 UPDATE jvm_instance SET is_ocp = FALSE;
 
+-- Cleanup from small amount of Cryostat data that was inserted before the column was added.
+UPDATE jvm_instance SET workload = 'Quarkus'
+                    FROM jvm_instance jvm, jar_hash hash, jvm_instance_jar_hash link
+                    WHERE jvm.id = link.jvm_instance_id
+                      AND link.jar_hash_id = hash.id
+                      AND hash.name = 'quarkus-run.jar';
+
+UPDATE jvm_instance SET is_ocp = TRUE
+           FROM jvm_instance jvm, jar_hash hash, jvm_instance_jar_hash link
+           WHERE jvm.id = link.jvm_instance_id
+             AND link.jar_hash_id = hash.id
+             AND hash.name = 'quarkus-run.jar';
+
 ALTER TABLE jvm_instance
   ALTER COLUMN is_ocp SET NOT NULL;

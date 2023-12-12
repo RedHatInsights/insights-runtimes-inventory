@@ -79,7 +79,10 @@ public final class Utils {
       inst.setJarHashes(jarHashesOf((Map<String, Object>) o.get("jars")));
       // Set workload
       var details = (Map<String, Object>) o.get("details");
-      inst.setWorkload((String) details.get("workloadType"));
+      var workload = details.get("workloadType");
+      if (workload != null) {
+        inst.setWorkload(String.valueOf(workload));
+      }
 
     } catch (JsonProcessingException | ClassCastException | NumberFormatException e) {
       Log.error("Error in unmarshalling JSON", e);

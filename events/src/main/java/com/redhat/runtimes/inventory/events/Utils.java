@@ -80,8 +80,9 @@ public final class Utils {
       // Set workload
       var details = (Map<String, Object>) o.get("details");
       if (details != null) {
-        if (details.containsKey("workloadType")) {
-          inst.setWorkload(details.get("workloadType").toString());
+        var workload = details.get("workloadType");
+        if (workload != null) {
+          inst.setWorkload(String.valueOf(workload));
         }
         if (details.containsKey("is_ocp")) {
           inst.setOcp(Boolean.parseBoolean(details.get("is_ocp").toString()));
@@ -93,7 +94,6 @@ public final class Utils {
           inst.setOcp(true);
         }
       }
-
     } catch (JsonProcessingException | ClassCastException | NumberFormatException e) {
       Log.error("Error in unmarshalling JSON", e);
       throw new RuntimeException("Error in unmarshalling JSON", e);
@@ -224,11 +224,10 @@ public final class Utils {
       inst.setAppUserName(String.valueOf(basic.get("app.user.name")));
       inst.setWorkload("EAP");
       if (basic.containsKey("is_ocp")) {
-        inst.setOcp(Boolean.parseBoolean((String)basic.get("is_ocp")));
+        inst.setOcp(Boolean.parseBoolean((String) basic.get("is_ocp")));
       } else {
         inst.setOcp(false);
       }
-
 
       // Jar hashes...
       inst.setJarHashes(jarHashesOf((Map<String, Object>) o.get("jars")));

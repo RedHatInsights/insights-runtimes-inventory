@@ -131,7 +131,7 @@ public non-sealed class JvmInstance implements InsightsMessage {
 
   @NotNull protected String jvmArgs;
 
-  @NotNull protected String workload;
+  @NotNull protected String workload = "Unidentified";
 
   @NotNull protected boolean isOcp;
 

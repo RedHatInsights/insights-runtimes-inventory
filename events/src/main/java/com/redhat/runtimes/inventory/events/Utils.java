@@ -224,7 +224,7 @@ public final class Utils {
       inst.setAppUserName(String.valueOf(basic.get("app.user.name")));
       inst.setWorkload("EAP");
       if (basic.containsKey("is_ocp")) {
-        inst.setOcp(Boolean.parseBoolean((String) basic.get("is_ocp")));
+        inst.setOcp(Boolean.parseBoolean(String.valueOf(basic.get("is_ocp"))));
       } else {
         inst.setOcp(false);
       }

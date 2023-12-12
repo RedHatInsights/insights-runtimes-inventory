@@ -81,10 +81,10 @@ public final class Utils {
       var details = (Map<String, Object>) o.get("details");
       if (details != null) {
         if (details.containsKey("workloadType")) {
-          inst.setWorkload((String) details.get("workloadType"));
+          inst.setWorkload(details.get("workloadType").toString());
         }
         if (details.containsKey("is_ocp")) {
-          inst.setOcp(Boolean.parseBoolean((String)details.get("is_ocp")));
+          inst.setOcp(Boolean.parseBoolean(details.get("is_ocp").toString()));
         } else {
           // FIXME This is a workaround - for the first release of the agent in Cryostat
           // we didn't have the is_ocp field. So we'll have to assume that if this payload

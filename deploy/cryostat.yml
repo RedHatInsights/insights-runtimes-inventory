@@ -222,7 +222,7 @@ objects:
             resources:
               requests:
                 cpu: "500m"
-                memory: "256Mi"
+                memory: "512Mi"
               limits:
                 cpu: "1"
                 memory: "1Gi"
@@ -270,7 +270,7 @@ objects:
             resources:
               requests:
                 cpu: "100m"
-                memory: "120Mi"
+                memory: "128Mi"
               limits:
                 cpu: "200m"
                 memory: "256Mi"
@@ -296,8 +296,8 @@ objects:
                   - http://127.0.0.1:8080
             resources:
               requests:
-                cpu: "200m"
-                memory: "384Mi"
+                cpu: "300m"
+                memory: "512Mi"
               limits:
                 cpu: "600m"
                 memory: "1Gi"

@@ -44,7 +44,7 @@ pipeline {
             }
         }
 
-        stage('Run Tests') {
+        // stage('Run Tests') {
             // parallel {
             //     stage('Run unit tests') {
             //         steps {
@@ -70,7 +70,7 @@ pipeline {
                     }
                 }
             // }
-        }
+        // }
     }
 
     post {

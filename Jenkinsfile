@@ -25,9 +25,12 @@ pipeline {
         COMPONENT_NAME="runtimes-inventory"  // name of app-sre "resourceTemplate" in deploy.yaml for this component
 
         IQE_PLUGINS="runtimes-inventory"  // name of the IQE plugin for this app.
-        IQE_MARKER_EXPRESSION="smoke"  // This is the value passed to pytest -m
+        IQE_MARKER_EXPRESSION="not full_stack"  // This is the value passed to pytest -m
         IQE_FILTER_EXPRESSION=""  // This is the value passed to pytest -k
         IQE_CJI_TIMEOUT="30m"  // This is the time to wait for smoke test to complete or fail
+
+        IMAGE="quay.io/cloudservices/insights-rbi-events" // set the name of the first image
+        EXTRA_DEPLOY_ARGS="--set-image-tag quay.io/cloudservices/insights-rbi-rest=${IMAGE_TAG}" // pass the second image as an extra arg
 
         CICD_URL="https://raw.githubusercontent.com/RedHatInsights/cicd-tools/main"
     }
@@ -59,8 +62,8 @@ pipeline {
                             sh '''
                                 curl -s $CICD_URL/bootstrap.sh > .cicd_bootstrap.sh
                                 source ./.cicd_bootstrap.sh
-                                source "scripts/deploy_ephemeral_env.sh"
-                                source "scripts/cji_smoke_test.sh"
+                                source "${CICD_ROOT}/deploy_ephemeral_env.sh"
+                                source "${CICD_ROOT}/cji_smoke_test.sh"
                             '''
                         }
                     }

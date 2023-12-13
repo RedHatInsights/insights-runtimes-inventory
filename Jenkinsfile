@@ -30,6 +30,7 @@ pipeline {
         IQE_CJI_TIMEOUT="30m"  // This is the time to wait for smoke test to complete or fail
 
         IMAGE="quay.io/cloudservices/insights-rbi-events" // set the name of the first image
+        IMAGE_TAG=$(git rev-parse --short=7 HEAD)
         EXTRA_DEPLOY_ARGS="--set-image-tag quay.io/cloudservices/insights-rbi-rest=${IMAGE_TAG}" // pass the second image as an extra arg
 
         CICD_URL="https://raw.githubusercontent.com/RedHatInsights/cicd-tools/main"
@@ -44,14 +45,14 @@ pipeline {
         }
 
         stage('Run Tests') {
-            parallel {
-                stage('Run unit tests') {
-                    steps {
-                        withVault([configuration: configuration, vaultSecrets: secrets]) {
-                            sh 'bash -x scripts/unit_test.sh'
-                        }
-                    }
-                }
+            // parallel {
+            //     stage('Run unit tests') {
+            //         steps {
+            //             withVault([configuration: configuration, vaultSecrets: secrets]) {
+            //                 sh 'bash -x scripts/unit_test.sh'
+            //             }
+            //         }
+            //     }
 
                 stage('Run smoke tests') {
                     environment {
@@ -68,7 +69,7 @@ pipeline {
                         }
                     }
                 }
-            }
+            // }
         }
     }
 

@@ -30,7 +30,8 @@ pipeline {
         IQE_CJI_TIMEOUT="30m"  // This is the time to wait for smoke test to complete or fail
 
         IMAGE="quay.io/cloudservices/insights-rbi-events" // set the name of the first image
-        IMAGE_TAG=sh(script: "git rev-parse --short=7 HEAD", returnStdout: true).trim()
+        IMAGE_TAG_TMP=sh(script: "git rev-parse --short=7 HEAD", returnStdout: true).trim() // get the base image tag using the commit id
+        IMAGE_TAG=sh(script: "if [ ! -z "$ghprbPullId" ]; then echo "pr-${ghprbPullId}-${IMAGE_TAG_TMP}"; else echo ${IMAGE_TAG_TMP}; fi", returnStdout: true).trim() // if this is a PR, use a different tag
         EXTRA_DEPLOY_ARGS="--set-image-tag quay.io/cloudservices/insights-rbi-rest=${IMAGE_TAG}" // pass the second image as an extra arg
 
         CICD_URL="https://raw.githubusercontent.com/RedHatInsights/cicd-tools/main"

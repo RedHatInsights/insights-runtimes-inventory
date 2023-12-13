@@ -11,6 +11,11 @@ if [[ -z "$QUAY_USER" || -z "$QUAY_TOKEN" ]]; then
     exit 1
 fi
 
+# if this is a PR, use a different tag, since PR tags expire
+if [ ! -z "$ghprbPullId" ]; then
+  IMAGE_TAG="pr-${ghprbPullId}-${IMAGE_TAG}"  
+fi
+
 DOCKER_CONF="$PWD/.docker"
 mkdir -p "$DOCKER_CONF"
 docker --config="$DOCKER_CONF" login -u="$QUAY_USER" -p="$QUAY_TOKEN" quay.io

@@ -121,6 +121,8 @@ objects:
         app.kubernetes.io/name: cryostat
         app.kubernetes.io/instance: cryostat
     replicas: ${{CRYOSTAT_REPLICAS}}
+    strategy:
+      type: Recreate
     template:
       metadata:
         labels:
@@ -163,7 +165,7 @@ objects:
               - name: CRYOSTAT_PLATFORM
                 value: io.cryostat.platform.internal.KubeApiPlatformStrategy
               - name: CRYOSTAT_AUTH_MANAGER
-                value: io.cryostat.net.NoopAuthManager
+                value: ${CRYOSTAT_AUTH_MANAGER}
               - name: GRAFANA_DATASOURCE_URL
                 value: http://127.0.0.1:8080
               - name: GRAFANA_DASHBOARD_URL
@@ -188,6 +190,19 @@ objects:
                     name: cryostat-jmx-credentials-db
                     key: CRYOSTAT_JMX_CREDENTIALS_DB_PASSWORD
                     optional: false
+              - name: CRYOSTAT_JDBC_URL
+                value: jdbc:h2:file:/opt/cryostat.d/conf.d/h2;INIT=create domain if not exists jsonb as varchar
+              - name: CRYOSTAT_HBM2DDL
+                value: update
+              - name: CRYOSTAT_JDBC_DRIVER
+                value: org.h2.Driver
+              - name: CRYOSTAT_HIBERNATE_DIALECT
+                value: org.hibernate.dialect.H2Dialect
+              - name: CRYOSTAT_JDBC_USERNAME
+                value: cryostat
+              # Unused with H2 Database
+              - name: CRYOSTAT_JDBC_PASSWORD
+                value: cryostat
             ports:
               - containerPort: 8181
                 protocol: TCP
@@ -205,7 +220,12 @@ objects:
                 port: 8181
               failureThreshold: 18
             resources:
-              { }
+              requests:
+                cpu: "500m"
+                memory: "256Mi"
+              limits:
+                cpu: "1"
+                memory: "1Gi"
             volumeMounts:
               - mountPath: /opt/cryostat.d/conf.d
                 name: cryostat
@@ -222,6 +242,10 @@ objects:
               - mountPath: /opt/cryostat.d/probes.d
                 name: cryostat
                 subPath: probes
+              - mountPath: /opt/cryostat.d/conf.d/cryostat-users.properties
+                name: basic-auth-properties
+                subPath: cryostat-users.properties
+                readOnly: true
           - name: cryostat-grafana
             securityContext:
               allowPrivilegeEscalation: false
@@ -233,8 +257,9 @@ objects:
             env:
               - name: JFR_DATASOURCE_URL
                 value: http://127.0.0.1:8080
-              - name: GF_AUTH_ANONYMOUS_ENABLED
-                value: "true"
+            envFrom:
+            - secretRef:
+                name: cryostat-grafana-basic
             ports:
               - containerPort: 3000
                 protocol: TCP
@@ -243,7 +268,12 @@ objects:
                 path: /api/health
                 port: 3000
             resources:
-              { }
+              requests:
+                cpu: "100m"
+                memory: "120Mi"
+              limits:
+                cpu: "200m"
+                memory: "256Mi"
           - name: cryostat-jfr-datasource
             securityContext:
               allowPrivilegeEscalation: false
@@ -265,10 +295,23 @@ objects:
                   - --fail
                   - http://127.0.0.1:8080
             resources:
-              { }
+              requests:
+                cpu: "200m"
+                memory: "384Mi"
+              limits:
+                cpu: "600m"
+                memory: "1Gi"
         volumes:
           - name: cryostat
-            emptyDir: { }
+            persistentVolumeClaim:
+              claimName: cryostat
+          - name: basic-auth-properties
+            secret:
+              secretName: cryostat-users
+              items:
+                - key: properties
+                  path: cryostat-users.properties
+
 - apiVersion: route.openshift.io/v1
   kind: Route
   metadata:
@@ -306,6 +349,21 @@ objects:
       insecureEdgeTerminationPolicy: Redirect
 
 - apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: cryostat
+    labels:
+      app.kubernetes.io/name: cryostat
+      app.kubernetes.io/instance: cryostat
+      app.kubernetes.io/version: "2.3.1.redhat"
+  spec:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: "${CRYOSTAT_STORAGE_SIZE}"
+
+- apiVersion: v1
   kind: Secret
   metadata:
     name: cryostat-jmx-credentials-db
@@ -316,6 +374,31 @@ objects:
   type: Opaque
   stringData:
     CRYOSTAT_JMX_CREDENTIALS_DB_PASSWORD: "${EPHEMERAL_DB_PASSWORD}"
+
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: cryostat-users
+    labels:
+      app.kubernetes.io/name: cryostat
+      app.kubernetes.io/instance: cryostat
+      app.kubernetes.io/version: "2.3.1.redhat"
+  type: Opaque
+  stringData:
+    properties: "${EPHEMERAL_CRYOSTAT_USER_PROPERTIES}"
+
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: cryostat-grafana-basic
+    labels:
+      app.kubernetes.io/name: cryostat
+      app.kubernetes.io/instance: cryostat
+      app.kubernetes.io/version: "2.3.1.redhat"
+  type: Opaque
+  stringData:
+    GF_SECURITY_ADMIN_USER:     "admin"
+    GF_SECURITY_ADMIN_PASSWORD: "${EPHEMERAL_GRAFANA_PASSWORD}"
 
 parameters:
   - name: ROUTE_DOMAIN
@@ -338,7 +421,23 @@ parameters:
     description: Password for Cryostat's credentials database for Ephemeral Environments
     generate: expression
     from: '[\w\A]{10}'
+  - name: EPHEMERAL_CRYOSTAT_USER_PROPERTIES
+    displayName: Cryostat credentials property file (Ephemeral Only)
+    description: Java properties file containing user indentities of the form `<username>=<sha256 password>` for Ephemeral Environments
+    # user=pass
+    value: 'user=d74ff0ee8da3b9806b18c877dbf29bbde50b5bd8e4dad7a3a725000feb82e8f1'
+  - name: EPHEMERAL_GRAFANA_PASSWORD
+    displayName: Cryostat Grafana Password (Ephemeral Only)
+    description: Password for Cryostat's credentials database for Ephemeral Environments
+    value: pass
   - name: CRYOSTAT_REPLICAS
     displayName: Cryostat Replicas
     description: Number of replicas for Cryostat deployment (should be 0 or 1)
     value: "1"
+  - name: CRYOSTAT_AUTH_MANAGER
+    value: io.cryostat.net.BasicAuthManager
+    displayName: Authentication/authorization manager used for validating user access
+  - name: CRYOSTAT_STORAGE_SIZE
+    value: 500Mi
+    displayName: Cryostat PVC Size
+    description: Size in bytes of the Cryostat Persistent Volume Claim. Expressed as a Kubernetes Quantity.

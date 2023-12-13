@@ -30,7 +30,7 @@ pipeline {
         IQE_CJI_TIMEOUT="30m"  // This is the time to wait for smoke test to complete or fail
 
         IMAGE="quay.io/cloudservices/insights-rbi-events" // set the name of the first image
-        IMAGE_TAG=$(git rev-parse --short=7 HEAD)
+        IMAGE_TAG=sh(script: "git rev-parse --short=7 HEAD", returnStdout: true).trim()
         EXTRA_DEPLOY_ARGS="--set-image-tag quay.io/cloudservices/insights-rbi-rest=${IMAGE_TAG}" // pass the second image as an extra arg
 
         CICD_URL="https://raw.githubusercontent.com/RedHatInsights/cicd-tools/main"

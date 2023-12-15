@@ -131,7 +131,7 @@ objects:
         - host-inventory
         - rbac
       testing:
-        iqePlugin: ''
+        iqePlugin: 'runtimes-inventory'
   - apiVersion: v1
     kind: Service
     metadata:

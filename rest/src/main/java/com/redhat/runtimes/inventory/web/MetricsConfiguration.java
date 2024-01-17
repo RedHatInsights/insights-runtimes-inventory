@@ -1,4 +1,4 @@
-/* Copyright (C) Red Hat 2023 */
+/* Copyright (C) Red Hat 2023-2024 */
 package com.redhat.runtimes.inventory.web;
 
 import io.micrometer.core.instrument.Meter;
@@ -11,6 +11,8 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 @Singleton
 public class MetricsConfiguration {
 
+  // in case you change these values make sure that it is aligned with the monitoring.
+  // ATM we expect that a bucket with "le=0.5*" exists
   @ConfigProperty(name = "request.processing.duration.minimumExpectedValue", defaultValue = "1")
   Integer minimumExpectedValue;
 

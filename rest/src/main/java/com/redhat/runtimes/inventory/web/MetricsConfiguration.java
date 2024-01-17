@@ -13,6 +13,7 @@ public class MetricsConfiguration {
 
   // in case you change these values make sure that it is aligned with the monitoring.
   // ATM we expect that a bucket with "le=0.5*" exists
+
   @ConfigProperty(name = "request.processing.duration.minimumExpectedValue", defaultValue = "1")
   Integer minimumExpectedValue;
 

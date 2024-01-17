@@ -54,6 +54,11 @@ objects:
               - mountPath: /var/run/secrets/com.redhat.insights/jmx-auth
                 name: jmx-auth
                 readOnly: true
+              - mountPath: /var/run/secrets/com.redhat.insights/jmx-tls
+                name: jmx-tls
+                readOnly: true
+              - name: keystore-volume
+                mountPath: /var/run/secrets/com.redhat.insights/jmx-keystore
             volumes:
               - emptyDir: {}
                 name: tmpdir
@@ -66,17 +71,50 @@ objects:
                     - key: password
                       path: jmxremote.password
                   optional: true
+              - name: jmx-tls
+                secret:
+                  secretName: runtimes-inventory-service-cryostat-tls
+                  optional: true
+              - name: keystore-volume
+                emptyDir: {}
             env:
               - name: QUARKUS_PROFILE
                 value: ${ENV_NAME}
               - name: QUARKUS_LOG_CLOUDWATCH_ENABLED
                 value: ${CLOUDWATCH_ENABLED}
-              - name: CRYOSTAT_JAVA_OPTS
-                value: "${CRYOSTAT_JAVA_OPTS}"
               - name: CRYOSTAT_JMX_ACCESS_FILE
                 value: /var/run/secrets/com.redhat.insights/jmx-auth/jmxremote.access
               - name: CRYOSTAT_JMX_PASSWORD_FILE
                 value: /var/run/secrets/com.redhat.insights/jmx-auth/jmxremote.password
+              - name: CRYOSTAT_KEYSTORE_FILE
+                value: /var/run/secrets/com.redhat.insights/jmx-keystore/keystore.p12
+              - name: CRYOSTAT_KEYSTORE_PASS
+                valueFrom:
+                  secretKeyRef:
+                    name: runtimes-inventory-keystore-pass
+                    key: KEYSTORE_PASS
+              - name: CRYOSTAT_JAVA_OPTS
+                value: "${CRYOSTAT_JAVA_OPTS}"
+            initContainers:
+              - name: pem-to-keystore
+                image: registry.access.redhat.com/ubi8/openssl:${OPENSSL_IMAGE_TAG}
+                env:
+                  - name: KEY_FILE
+                    value: /var/run/secrets/com.redhat.insights/jmx-tls/tls.key
+                  - name: CERT_FILE
+                    value: /var/run/secrets/com.redhat.insights/jmx-tls/tls.crt
+                  - name: KEYSTORE_FILE
+                    value: /var/run/secrets/com.redhat.insights/jmx-keystore/keystore.p12
+                  - name: KEYSTORE_PASS
+                    valueFrom:
+                      secretKeyRef:
+                        name: runtimes-inventory-keystore-pass
+                        key: KEYSTORE_PASS
+                command:
+                  - /bin/bash
+                args:
+                  - -c
+                  - openssl pkcs12 -export -inkey "${KEY_FILE}" -in "${CERT_FILE}" -out "${KEYSTORE_FILE}" -password "pass:${KEYSTORE_PASS}"
           webServices:
             metrics: {}
             private: {}
@@ -123,6 +161,11 @@ objects:
               - mountPath: /var/run/secrets/com.redhat.insights/jmx-auth
                 name: jmx-auth
                 readOnly: true
+              - mountPath: /var/run/secrets/com.redhat.insights/jmx-tls
+                name: jmx-tls
+                readOnly: true
+              - name: keystore-volume
+                mountPath: /var/run/secrets/com.redhat.insights/jmx-keystore
             volumes:
               - emptyDir: {}
                 name: tmpdir
@@ -135,6 +178,12 @@ objects:
                     - key: password
                       path: jmxremote.password
                   optional: true
+              - name: jmx-tls
+                secret:
+                  secretName: runtimes-inventory-rest-cryostat-tls
+                  optional: true
+              - name: keystore-volume
+                emptyDir: {}
             env:
               - name: QUARKUS_PROFILE
                 value: ${ENV_NAME}
@@ -146,6 +195,35 @@ objects:
                 value: /var/run/secrets/com.redhat.insights/jmx-auth/jmxremote.access
               - name: CRYOSTAT_JMX_PASSWORD_FILE
                 value: /var/run/secrets/com.redhat.insights/jmx-auth/jmxremote.password
+              - name: CRYOSTAT_KEYSTORE_FILE
+                value: /var/run/secrets/com.redhat.insights/jmx-keystore/keystore.p12
+              - name: CRYOSTAT_KEYSTORE_PASS
+                valueFrom:
+                  secretKeyRef:
+                    name: runtimes-inventory-keystore-pass
+                    key: KEYSTORE_PASS
+              - name: CRYOSTAT_JAVA_OPTS
+                value: "${CRYOSTAT_JAVA_OPTS}"
+            initContainers:
+              - name: pem-to-keystore
+                image: registry.access.redhat.com/ubi8/openssl:${OPENSSL_IMAGE_TAG}
+                env:
+                  - name: KEY_FILE
+                    value: /var/run/secrets/com.redhat.insights/jmx-tls/tls.key
+                  - name: CERT_FILE
+                    value: /var/run/secrets/com.redhat.insights/jmx-tls/tls.crt
+                  - name: KEYSTORE_FILE
+                    value: /var/run/secrets/com.redhat.insights/jmx-keystore/keystore.p12
+                  - name: KEYSTORE_PASS
+                    valueFrom:
+                      secretKeyRef:
+                        name: runtimes-inventory-keystore-pass
+                        key: KEYSTORE_PASS
+                command:
+                  - /bin/bash
+                args:
+                  - -c
+                  - openssl pkcs12 -export -inkey "${KEY_FILE}" -in "${CERT_FILE}" -out "${KEYSTORE_FILE}" -password "pass:${KEYSTORE_PASS}"
           webServices:
             metrics: {}
             private: {}
@@ -168,6 +246,8 @@ objects:
     kind: Service
     metadata:
       name: runtimes-inventory-service-cryostat
+      annotations:
+        service.beta.openshift.io/serving-cert-secret-name: runtimes-inventory-service-cryostat-tls
     spec:
       selector:
         pod: runtimes-inventory-service
@@ -179,6 +259,8 @@ objects:
     kind: Service
     metadata:
       name: runtimes-inventory-rest-cryostat
+      annotations:
+        service.beta.openshift.io/serving-cert-secret-name: runtimes-inventory-rest-cryostat-tls
     spec:
       selector:
         pod: runtimes-inventory-rest
@@ -195,6 +277,13 @@ objects:
     stringData:
       access: "admin readwrite"
       password: "admin ${EPHEMERAL_JMX_PASSWORD}"
+  - apiVersion: v1
+    kind: Secret
+    metadata:
+      name: runtimes-inventory-keystore-pass
+    type: Opaque
+    stringData:
+      KEYSTORE_PASS: "${EPHEMERAL_KEYSTORE_PASSWORD}"
 
 parameters:
   - name: IMAGE_TAG
@@ -213,10 +302,25 @@ parameters:
     value: "1"
     displayName: Minimum number of replicas for deployments
   - name: CRYOSTAT_JAVA_OPTS
-    value: ""
+    value: >-
+      -Dcom.sun.management.jmxremote.port=9091
+      -Dcom.sun.management.jmxremote.ssl=true
+      -Dcom.sun.management.jmxremote.registry.ssl=true
+      -Dcom.sun.management.jmxremote.authenticate=true
+      -Djavax.net.ssl.keyStore=$(CRYOSTAT_KEYSTORE_FILE)
+      -Djavax.net.ssl.keyStorePassword=$(CRYOSTAT_KEYSTORE_PASS)
     displayName: Java system properties for Cryostat support
+  - name: OPENSSL_IMAGE_TAG
+    displayName: OpenSSL UBI8 image tag
+    description: Image tag for the OpenSSL init container
+    value: "8.9-8"
   - name: EPHEMERAL_JMX_PASSWORD
     displayName: Remote JMX Password (Ephemeral Only)
     description: Password to connect over remote JMX on Ephemeral Environments
+    generate: expression
+    from: '[\w]{10}'
+  - name: EPHEMERAL_KEYSTORE_PASSWORD
+    displayName: Keystore Password (Ephemeral Only)
+    description: Password for the Keystore used by the remote JMX server on Ephemeral Environments
     generate: expression
     from: '[\w]{10}'

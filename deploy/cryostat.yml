@@ -246,6 +246,9 @@ objects:
                 name: basic-auth-properties
                 subPath: cryostat-users.properties
                 readOnly: true
+              - mountPath: /truststore/openshift
+                name: trusted-certs
+                readOnly: true
           - name: cryostat-grafana
             securityContext:
               allowPrivilegeEscalation: false
@@ -311,6 +314,15 @@ objects:
               items:
                 - key: properties
                   path: cryostat-users.properties
+          - name: trusted-certs
+            projected:
+              sources:
+                - configMap:
+                    name: cryostat-ca-bundle
+                    items:
+                      - key: service-ca.crt
+                        path: openshift-ca-bundle.crt
+                        mode: 0440
 
 - apiVersion: route.openshift.io/v1
   kind: Route
@@ -362,6 +374,17 @@ objects:
     resources:
       requests:
         storage: "${CRYOSTAT_STORAGE_SIZE}"
+
+- apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: cryostat-ca-bundle
+    labels:
+      app.kubernetes.io/name: cryostat
+      app.kubernetes.io/instance: cryostat
+      app.kubernetes.io/version: "2.3.1.redhat"
+    annotations:
+      service.beta.openshift.io/inject-cabundle: "true"
 
 - apiVersion: v1
   kind: Secret

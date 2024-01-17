@@ -1,4 +1,4 @@
-/* Copyright (C) Red Hat 2023 */
+/* Copyright (C) Red Hat 2023-2024 */
 package com.redhat.runtimes.inventory.events;
 
 import static com.redhat.runtimes.inventory.events.EventConsumer.CONSUMED_TIMER_NAME;
@@ -12,6 +12,9 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 @Singleton
 public class MetricsConfiguration {
+
+  // in case you change these values make sure that it is aligned with the monitoring.
+  // ATM we expect that a bucket with "le=0.15*" exists
 
   @ConfigProperty(
       name = "metrics.event.processing.duration.minimumExpectedValue",

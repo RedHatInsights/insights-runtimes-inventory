@@ -6,7 +6,7 @@ if [ -n "${CRYOSTAT_JAVA_OPTS}" ]; then
   # JVM process owner. Because OpenShift uses arbitrary UIDs when running
   # containers, we need to copy the file to change ownership and then
   # reduce its permissions.
-  if [ -n "${CRYOSTAT_JMX_PASSWORD_FILE}" ] && [ -n "${CRYOSTAT_JMX_ACCESS_FILE}" ]; then
+  if [ -f "${CRYOSTAT_JMX_PASSWORD_FILE}" ] && [ -f "${CRYOSTAT_JMX_ACCESS_FILE}" ]; then
       tmpdir="$(mktemp -d)"
       passwordFile="${tmpdir}/jmxremote.password"
       cp "${CRYOSTAT_JMX_PASSWORD_FILE}" "${passwordFile}"

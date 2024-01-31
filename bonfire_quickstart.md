@@ -17,7 +17,7 @@ Activate the environment:
 
 You may need to log in to the ephemeral cluster, by using this page (uses Github to authenticate):
 
-https://oauth-openshift.apps.crc-eph.r9lp.p1.openshiftapps.com/oauth/token/display
+https://oauth-openshift.apps.crc-eph.r9lp.p1.openshiftapps.com/oauth/token/request
 
 This will give you an `oc login` command. Run it in your venv.
 

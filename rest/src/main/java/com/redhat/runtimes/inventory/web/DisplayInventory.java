@@ -1,4 +1,4 @@
-/* Copyright (C) Red Hat 2023 */
+/* Copyright (C) Red Hat 2023-2024 */
 package com.redhat.runtimes.inventory.web;
 
 import static com.redhat.runtimes.inventory.models.Constants.X_RH_IDENTITY_HEADER;
@@ -20,7 +20,6 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.NoResultException;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import jakarta.ws.rs.*;
@@ -58,33 +57,33 @@ public class DisplayInventory {
   @GET
   @Path("/instance-ids/") // trailing slash is required by api
   @Produces(MediaType.APPLICATION_JSON)
-  public String getJvmInstanceIdRecords(
+  public ResponseWrapper<List<UUID>> getJvmInstanceIdRecords(
       @QueryParam("hostname") String hostname,
       @HeaderParam(X_RH_IDENTITY_HEADER) String rhIdentity) {
-    // X_RH header is just B64 encoded - decode for the org ID
-    String rhIdJson = new String(Base64.getDecoder().decode(rhIdentity));
-    Log.debugf("X_RH_IDENTITY_HEADER: %s", rhIdJson);
-    String orgId = "";
     try {
-      orgId = extractOrgId(rhIdJson);
-    } catch (Exception e) {
-      processingErrorCounter.increment();
-      return "{\"response\": \"[error]\"}";
-    }
-    // Retrieve from DB
-    TypedQuery<UUID> query =
-        entityManager.createQuery(
-            """
+      // X_RH header is just B64 encoded - decode for the org ID
+      String rhIdJson = new String(Base64.getDecoder().decode(rhIdentity));
+      Log.debugf("X_RH_IDENTITY_HEADER: %s", rhIdJson);
+      String orgId = extractOrgId(rhIdJson);
+
+      TypedQuery<UUID> query =
+          entityManager.createQuery(
+              """
               SELECT i.id
               FROM JvmInstance i
               WHERE i.orgId = :orgId and i.hostname = :hostname
               ORDER BY i.created desc
             """,
-            UUID.class);
-    query.setParameter("orgId", orgId);
-    query.setParameter("hostname", hostname);
-    List<UUID> results = query.getResultList();
-    return mapResultListToJson(results);
+              UUID.class);
+      query.setParameter("orgId", orgId);
+      query.setParameter("hostname", hostname);
+      return new ResponseWrapper<>(query.getResultList());
+    } catch (Exception e) {
+      processingErrorCounter.increment();
+      throw e;
+      //      todo
+      //      return "{\"response\": \"[error]\"}";
+    }
   }
 
   /**
@@ -97,47 +96,33 @@ public class DisplayInventory {
   @GET
   @Path("/instance/") // trailing slash is required by api
   @Produces(MediaType.APPLICATION_JSON)
-  public String getJvmInstanceRecord(
+  public ResponseWrapper<JvmInstance> getJvmInstanceRecord(
       @QueryParam("jvmInstanceId") String jvmInstanceId,
       @HeaderParam(X_RH_IDENTITY_HEADER) String rhIdentity) {
-    // X_RH header is just B64 encoded - decode for the org ID
-    String rhIdJson = new String(Base64.getDecoder().decode(rhIdentity));
-    Log.debugf("X_RH_IDENTITY_HEADER: %s", rhIdJson);
-    String orgId = "";
     try {
+      // X_RH header is just B64 encoded - decode for the org ID
+      String rhIdJson = new String(Base64.getDecoder().decode(rhIdentity));
+      Log.debugf("X_RH_IDENTITY_HEADER: %s", rhIdJson);
+      String orgId = "";
+
       orgId = extractOrgId(rhIdJson);
-    } catch (Exception e) {
-      processingErrorCounter.increment();
-      return """
-      {"response": "[error]"}""";
-    }
-    // Retrieve from DB
-    TypedQuery<JvmInstance> query =
-        entityManager.createQuery(
-            """
+
+      // Retrieve from DB
+      TypedQuery<JvmInstance> query =
+          entityManager.createQuery(
+              """
               SELECT i
               FROM JvmInstance i
               WHERE i.orgId = :orgId AND i.id = :id
               ORDER BY i.created desc
             """,
-            JvmInstance.class);
-    query.setParameter("id", UUID.fromString(jvmInstanceId));
-    query.setParameter("orgId", orgId);
-    JvmInstance result;
-    try {
-      result = query.getSingleResult();
-    } catch (NoResultException e) {
-      return "{\"response\": \"[]\"}";
-    }
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.registerModule(new JavaTimeModule());
-    try {
-      Map<String, JvmInstance> map = Map.of("response", result);
-      return mapper.writeValueAsString(map);
-    } catch (JsonProcessingException e) {
-      Log.error("JSON Exception", e);
+              JvmInstance.class);
+      query.setParameter("id", UUID.fromString(jvmInstanceId));
+      query.setParameter("orgId", orgId);
+      return new ResponseWrapper<>(query.getSingleResult());
+    } catch (Exception e) {
       processingErrorCounter.increment();
-      return "{\"response\": \"[error]\"}";
+      throw e;
     }
   }
 
@@ -151,33 +136,32 @@ public class DisplayInventory {
   @GET
   @Path("/instances/")
   @Produces(MediaType.APPLICATION_JSON)
-  public String getAllJvmInstanceRecords(
+  public ResponseWrapper<List<JvmInstance>> getAllJvmInstanceRecords(
       @QueryParam("hostname") String hostname,
       @HeaderParam(X_RH_IDENTITY_HEADER) String rhIdentity) {
-    // X_RH header is just B64 encoded - decode for the org ID
-    String rhIdJson = new String(Base64.getDecoder().decode(rhIdentity));
-    Log.debugf("X_RH_IDENTITY_HEADER: %s", rhIdJson);
-    String orgId = "";
     try {
-      orgId = extractOrgId(rhIdJson);
-    } catch (Exception e) {
-      processingErrorCounter.increment();
-      return "{\"response\": \"[error]\"}";
-    }
-    // Retrieve from DB
-    TypedQuery<JvmInstance> query =
-        entityManager.createQuery(
-            """
+      // X_RH header is just B64 encoded - decode for the org ID
+      String rhIdJson = new String(Base64.getDecoder().decode(rhIdentity));
+      Log.debugf("X_RH_IDENTITY_HEADER: %s", rhIdJson);
+      String orgId = extractOrgId(rhIdJson);
+      // Retrieve from DB
+      TypedQuery<JvmInstance> query =
+          entityManager.createQuery(
+              """
               SELECT i
               FROM JvmInstance i
               WHERE i.orgId = :orgId AND i.hostname = :hostname
               ORDER BY i.created desc
             """,
-            JvmInstance.class);
-    query.setParameter("orgId", orgId);
-    query.setParameter("hostname", hostname);
-    List<JvmInstance> results = query.getResultList();
-    return mapResultListToJson(results);
+              JvmInstance.class);
+      query.setParameter("orgId", orgId);
+      query.setParameter("hostname", hostname);
+      List<JvmInstance> results = query.getResultList();
+      return new ResponseWrapper<>(results);
+    } catch (Exception e) {
+      processingErrorCounter.increment();
+      throw e;
+    }
   }
 
   /**
@@ -189,7 +173,8 @@ public class DisplayInventory {
   @GET
   @Path("/jarhashes/")
   @Produces(MediaType.APPLICATION_JSON)
-  public String getAllJarHashRecords(@QueryParam("jvmInstanceId") String jvmInstanceId) {
+  public ResponseWrapper<List<?>> getAllJarHashRecords(
+      @QueryParam("jvmInstanceId") String jvmInstanceId) {
     Query query =
         entityManager.createNativeQuery(
             """
@@ -203,8 +188,7 @@ public class DisplayInventory {
             """,
             JarHash.class);
     query.setParameter("instanceId", UUID.fromString(jvmInstanceId));
-    var results = query.getResultList();
-    return mapResultListToJson(results);
+    return new ResponseWrapper<List<?>>(query.getResultList());
   }
 
   /**
@@ -217,33 +201,31 @@ public class DisplayInventory {
   @GET
   @Path("/eap-instance-ids/") // trailing slash is required by api
   @Produces(MediaType.APPLICATION_JSON)
-  public String getEapInstanceIdRecords(
+  public ResponseWrapper<List<UUID>> getEapInstanceIdRecords(
       @QueryParam("hostname") String hostname,
       @HeaderParam(X_RH_IDENTITY_HEADER) String rhIdentity) {
-    // X_RH header is just B64 encoded - decode for the org ID
-    String rhIdJson = new String(Base64.getDecoder().decode(rhIdentity));
-    Log.debugf("X_RH_IDENTITY_HEADER: %s", rhIdJson);
-    String orgId = "";
     try {
-      orgId = extractOrgId(rhIdJson);
-    } catch (Exception e) {
-      processingErrorCounter.increment();
-      return "{\"response\": \"[error]\"}";
-    }
-    // Retrieve from DB
-    TypedQuery<UUID> query =
-        entityManager.createQuery(
-            """
+      // X_RH header is just B64 encoded - decode for the org ID
+      String rhIdJson = new String(Base64.getDecoder().decode(rhIdentity));
+      Log.debugf("X_RH_IDENTITY_HEADER: %s", rhIdJson);
+      String orgId = extractOrgId(rhIdJson);
+
+      TypedQuery<UUID> query =
+          entityManager.createQuery(
+              """
               SELECT i.id
               FROM EapInstance i
               WHERE i.orgId = :orgId and i.hostname = :hostname
               ORDER BY i.created desc
             """,
-            UUID.class);
-    query.setParameter("orgId", orgId);
-    query.setParameter("hostname", hostname);
-    List<UUID> results = query.getResultList();
-    return mapResultListToJson(results);
+              UUID.class);
+      query.setParameter("orgId", orgId);
+      query.setParameter("hostname", hostname);
+      return new ResponseWrapper<>(query.getResultList());
+    } catch (Exception e) {
+      processingErrorCounter.increment();
+      throw e;
+    }
   }
 
   /**
@@ -257,50 +239,35 @@ public class DisplayInventory {
   @GET
   @Path("/eap-instance/") // trailing slash is required by api
   @Produces(MediaType.APPLICATION_JSON)
-  public String getEapInstanceRecord(
+  public ResponseWrapper<EapInstance> getEapInstanceRecord(
       @QueryParam("eapInstanceId") String eapInstanceId,
       @QueryParam("includeRaw") String includeRaw,
       @HeaderParam(X_RH_IDENTITY_HEADER) String rhIdentity) {
-    // X_RH header is just B64 encoded - decode for the org ID
-    String rhIdJson = new String(Base64.getDecoder().decode(rhIdentity));
-    Log.debugf("X_RH_IDENTITY_HEADER: %s", rhIdJson);
-    String orgId = "";
     try {
-      orgId = extractOrgId(rhIdJson);
-    } catch (Exception e) {
-      processingErrorCounter.increment();
-      return """
-      {"response": "[error]"}""";
-    }
-    // Retrieve from DB
-    TypedQuery<EapInstance> query =
-        entityManager.createQuery(
-            """
+      // X_RH header is just B64 encoded - decode for the org ID
+      String rhIdJson = new String(Base64.getDecoder().decode(rhIdentity));
+      Log.debugf("X_RH_IDENTITY_HEADER: %s", rhIdJson);
+      String orgId = extractOrgId(rhIdJson);
+
+      // Retrieve from DB
+      TypedQuery<EapInstance> query =
+          entityManager.createQuery(
+              """
               SELECT i
               FROM EapInstance i
               WHERE i.orgId = :orgId AND i.id = :id
             """,
-            EapInstance.class);
-    query.setParameter("id", UUID.fromString(eapInstanceId));
-    query.setParameter("orgId", orgId);
-    EapInstance result;
-    try {
-      result = query.getSingleResult();
+              EapInstance.class);
+      query.setParameter("id", UUID.fromString(eapInstanceId));
+      query.setParameter("orgId", orgId);
+      EapInstance result = query.getSingleResult();
       if (!Boolean.parseBoolean(includeRaw)) {
         result.setRaw("");
       }
-    } catch (NoResultException e) {
-      return "{\"response\": \"[]\"}";
-    }
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.registerModule(new JavaTimeModule());
-    try {
-      Map<String, EapInstance> map = Map.of("response", result);
-      return mapper.writeValueAsString(map);
-    } catch (JsonProcessingException e) {
-      Log.error("JSON Exception", e);
+      return new ResponseWrapper<>(result);
+    } catch (Exception e) {
       processingErrorCounter.increment();
-      return "{\"response\": \"[error]\"}";
+      throw e;
     }
   }
 
@@ -315,7 +282,7 @@ public class DisplayInventory {
   @GET
   @Path("/eap-instances/")
   @Produces(MediaType.APPLICATION_JSON)
-  public String getAllEapInstanceRecords(
+  public ResponseWrapper<List<EapInstance>> getAllEapInstanceRecords(
       @QueryParam("hostname") String hostname,
       @QueryParam("includeRaw") String includeRaw,
       @HeaderParam(X_RH_IDENTITY_HEADER) String rhIdentity) {
@@ -327,7 +294,7 @@ public class DisplayInventory {
       orgId = extractOrgId(rhIdJson);
     } catch (Exception e) {
       processingErrorCounter.increment();
-      return "{\"response\": \"[error]\"}";
+      throw e;
     }
     // Retrieve from DB
     TypedQuery<EapInstance> query =
@@ -347,23 +314,7 @@ public class DisplayInventory {
         result.setRaw("");
       }
     }
-    return mapResultListToJson(results);
-  }
-
-  private String mapResultListToJson(List<?> resultList) {
-    if (resultList.size() == 0) {
-      return "{\"response\": \"[]\"}";
-    }
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.registerModule(new JavaTimeModule());
-    try {
-      Map<String, List<?>> map = Map.of("response", resultList);
-      return mapper.writeValueAsString(map);
-    } catch (JsonProcessingException e) {
-      Log.error("JSON Exception", e);
-      processingErrorCounter.increment();
-      return "{\"response\": \"[error]\"}";
-    }
+    return new ResponseWrapper<>(results);
   }
 
   @SuppressWarnings("unchecked")

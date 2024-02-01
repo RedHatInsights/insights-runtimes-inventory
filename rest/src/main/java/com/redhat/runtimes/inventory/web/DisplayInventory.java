@@ -20,14 +20,18 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.jboss.resteasy.reactive.RestResponse;
+import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
 
 @Path("/api/runtimes-inventory-service/v1")
 @RolesAllowed(ConsoleIdentityProvider.RBAC_READ_HOSTS)
@@ -45,6 +49,16 @@ public class DisplayInventory {
     processingErrorCounter = registry.counter(PROCESSING_ERROR_COUNTER_NAME);
     new ProcessorMetrics().bindTo(registry);
     new JvmMemoryMetrics().bindTo(registry);
+  }
+
+  @ServerExceptionMapper
+  public RestResponse<String> genericError(RuntimeException e) {
+    return RestResponse.status(Response.Status.OK, "{\"response\": \"[error]\"}");
+  }
+
+  @ServerExceptionMapper
+  public RestResponse<String> noResultsError(NoResultException e) {
+    return RestResponse.status(Response.Status.OK, "{\"response\": \"[]\"}");
   }
 
   /**
@@ -77,12 +91,12 @@ public class DisplayInventory {
               UUID.class);
       query.setParameter("orgId", orgId);
       query.setParameter("hostname", hostname);
-      return new ResponseWrapper<>(query.getResultList());
+      var result = query.getResultList();
+      throwIfEmptyResult(result);
+      return new ResponseWrapper<>(result);
     } catch (Exception e) {
       processingErrorCounter.increment();
       throw e;
-      //      todo
-      //      return "{\"response\": \"[error]\"}";
     }
   }
 
@@ -156,8 +170,9 @@ public class DisplayInventory {
               JvmInstance.class);
       query.setParameter("orgId", orgId);
       query.setParameter("hostname", hostname);
-      List<JvmInstance> results = query.getResultList();
-      return new ResponseWrapper<>(results);
+      List<JvmInstance> result = query.getResultList();
+      throwIfEmptyResult(result);
+      return new ResponseWrapper<>(result);
     } catch (Exception e) {
       processingErrorCounter.increment();
       throw e;
@@ -188,7 +203,10 @@ public class DisplayInventory {
             """,
             JarHash.class);
     query.setParameter("instanceId", UUID.fromString(jvmInstanceId));
-    return new ResponseWrapper<List<?>>(query.getResultList());
+
+    var result = query.getResultList();
+    throwIfEmptyResult(result);
+    return new ResponseWrapper<List<?>>(result);
   }
 
   /**
@@ -221,7 +239,9 @@ public class DisplayInventory {
               UUID.class);
       query.setParameter("orgId", orgId);
       query.setParameter("hostname", hostname);
-      return new ResponseWrapper<>(query.getResultList());
+      var result = query.getResultList();
+      throwIfEmptyResult(result);
+      return new ResponseWrapper<>(result);
     } catch (Exception e) {
       processingErrorCounter.increment();
       throw e;
@@ -309,12 +329,19 @@ public class DisplayInventory {
     query.setParameter("orgId", orgId);
     query.setParameter("hostname", hostname);
     List<EapInstance> results = query.getResultList();
+    throwIfEmptyResult(results);
     if (!Boolean.parseBoolean(includeRaw)) {
       for (EapInstance result : results) {
         result.setRaw("");
       }
     }
     return new ResponseWrapper<>(results);
+  }
+
+  private void throwIfEmptyResult(List<?> results) {
+    if (results.isEmpty()) {
+      throw new NoResultException();
+    }
   }
 
   @SuppressWarnings("unchecked")
